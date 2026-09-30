@@ -78,7 +78,10 @@ Run against a production build (`npm run build && npm start`):
 | `npm run test:schema` | JSON-LD against the schema.org vocabulary (set `SCHEMA_VOCAB` to a local copy of `schemaorg-current-https.jsonld`) |
 | `npm run test:contrast` | Contrast of every text/ground pair, read from the six brand tokens in `globals.css` (body and muted text AAA; Ink on Amber ≥ 4.5) |
 | `npm run test:brand` | Brand acceptance (below) |
-| `npm run check:copy` | Fails (and fails `npm run build`, via `prebuild`) if draft copy about Jay's life ("my dad", "my own dad") is anywhere in the codebase |
+| `npm run check:copy` | **prebuild.** Fails if draft copy about Jay's life ("my dad", "my own dad") is anywhere in the codebase, or if a claim (N years, rides completed, on-time, $N, Net-30, insured, certified, background-check) is written as literal copy in `src/` instead of coming from a `site.ts` field |
+| `npm run check:launch` | **prebuild.** With `NEXT_PUBLIC_SITE_LIVE=true` only: fails on a placeholder phone (555) or street (12345), or if `RESEND_API_KEY`, `BOOKING_TO_EMAIL`, `BOOKING_FROM_EMAIL` or the lead store env is missing |
+| `npm run check:claims` | **postbuild.** Reads every rendered page and fails if a claim shows while the `site.ts` field behind it is null (years ↔ `stats.years`, $ ↔ pricing, certified ↔ `safety.driverTraining`, "text you" ↔ `smsEnabled`, …) |
+| `npm run test:quote` / `test:partner` | The quote form and `/api/quote`; the facility account + packet forms and `/api/partner` |
 | `npm run build:map` | Regenerates `public/brand/service-map.svg` (tries OpenStreetMap Overpass, falls back to the hand-traced coordinates in `scripts/map-data/`) |
 | `npm run test:email` | Sends one sample booking email through Resend to `BOOKING_TO_EMAIL` (needs `RESEND_API_KEY`) |
 | `npm run test:pricing` | Pricing rules render correctly in all three display modes |
@@ -86,6 +89,8 @@ Run against a production build (`npm run build && npm start`):
 | `npm run lighthouse` | Lighthouse mobile ×3 runs (median) for Home, `/book`, `/pricing` and the wheelchair service page |
 
 `npm run screenshots:brand` captures Home, `/about`, a filled-in `/book` success screen and the footer at 390 and 1440 px into `reports/screenshots/brand`.
+
+CI (`.github/workflows/ci.yml`) runs lint, the build with every pre/post-build check, typecheck, contrast and the acceptance run, and asserts that a live build with placeholder contact details fails.
 
 Scripts use Chromium at `/opt/pw-browsers/...` by default; override with `CHROME_PATH`.
 
@@ -116,7 +121,10 @@ The site follows *Northline Brand Guidelines v1* (Stringham Web Design, Septembe
 
 - **Owner note.** `owner.note` and `owner.noteHeadline` in `site.ts` are empty until Jay writes them (questionnaire Q11). While empty, the Home section shows a marked placeholder in his layout. Nothing on the site describes Jay's life until he writes it; `check:copy` enforces the two phrases from the old draft.
 - **Reviews.** `reviews` in `site.ts` is empty. No review, quote or star renders anywhere until it holds an entry with `isPlaceholder: false`. The Google rating badge renders only when `googleRating` is set; the "Leave a review" button only when `googleReviewUrl` is set. The mechanism the section promises: `src/content/sms.ts` holds the post-ride text (`reviewRequestSms`), and `src/lib/sms.ts` has the "Send review request" action (`sendReviewRequest`) for the Phase 2 admin ride view. Sending is Twilio, Phase 2.
-- **Bookings.** `/book` asks for five things (name, phone, pickup, drop-off, date and time); everything else is an optional expander. `POST /api/book` checks the honeypot, rate-limits by IP (in memory, per instance), and emails Jay through Resend with every field, plus an auto-reply to the rider when they gave an email. Env: `RESEND_API_KEY`, `BOOKING_TO_EMAIL` (Jay's address, CONFIRM), `BOOKING_FROM_EMAIL` (on a domain verified in Resend, CONFIRM). Without a key the route logs the request and returns success so previews work. Texting the confirmed Ride Card is Phase 2 (`sendRideCard` in `src/lib/sms.ts`).
+- **Unconfirmed facts render nothing.** Stats, pricing numbers and rules, every safety list, certifications, drop-off notes (live site: only notes with `confirmed: true`), local notes and `site.partners` lines are null/empty in `site.ts` until Jay confirms them. A section that would be empty shows one line instead: "Jay is confirming these details. Call (phone) and we'll answer directly." (`<Unconfirmed />`). FAQ answers whose facts are null are left out of the page and the schema. Each removed claim is an `ASK JAY:` comment at the spot it came from.
+- **Texts.** `smsEnabled` is `false`. It drives every text promise: Text us buttons, "call or text", the SMS mock, the Ride Card footer and the confirmation wording. `src/content/sms.ts` and `src/lib/sms.ts` are Phase 2 code; nothing user-facing uses them until texts send.
+- **Forms.** `/book` (five required fields; the pickup window is optional), `/pricing` quote form and the `/partners` account and packet forms post to `/api/book`, `/api/quote` and `/api/partner`. All three share `src/lib/leads.ts`: honeypot, per-IP rate limit, a reference number `NL-YYMMDD-XXXX` (Chicago date) shown to the sender and in Jay's email, then the lead is **stored** (Upstash Redis, one JSON record per lead on `leads:{kind}`) and **emailed** (Resend). A route answers `ok` when either succeeded. In production (`VERCEL_ENV=production`) it never answers `ok` without delivering: it returns 503 with the phone number. Booking "today" is Houston's today (America/Chicago), on the client and the server.
+- **Env.** `RESEND_API_KEY`, `BOOKING_TO_EMAIL` (Jay's inbox, CONFIRM), `BOOKING_FROM_EMAIL` (a Resend-verified domain, CONFIRM), `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (or the `KV_REST_API_*` pair). A live build fails without them (`check:launch`).
 
 ## Placeholder assets
 

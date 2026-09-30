@@ -18,7 +18,7 @@ import { ArrowRightIcon } from "@/components/ui/Icons";
 
 export const metadata: Metadata = buildMetadata({
   title: "Wheelchair Transportation in North Houston",
-  description: `On-time, door-to-door wheelchair van rides in ${areaList()}. Doctor visits, dialysis, hospital discharge. ${hoursSummary()}. Call ${site.phone.display} or book online.`,
+  description: `Door-to-door wheelchair van rides in ${areaList()}. Doctor visits, dialysis, hospital discharge. ${hoursSummary()}. Call ${site.phone.display} or book online.`,
   path: "/",
 });
 
@@ -32,12 +32,12 @@ export default function HomePage() {
         id="services"
         eyebrow="How we can help"
         title="Wheelchair van rides for every kind of trip"
-        intro="From a Monday dialysis chair to a ride home from the hospital, we get you there on time and walk you to the right door."
+        intro="Rides to dialysis, doctor visits and home from the hospital, from your door to the right door. It's non-emergency medical transportation (NEMT), in a van built for your wheelchair."
       >
         <ServiceList />
         <div className="mt-8 flex flex-col gap-3 rounded-[var(--radius-card)] bg-morning p-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-lg">
-            <strong className="text-navy">Discharge planners and case managers:</strong> one direct line, standing schedules, monthly invoicing.
+            <strong className="text-navy">Discharge planners and case managers:</strong> set up a facility account or ask for the facility packet.
           </p>
           <Link href="/partners" className="inline-flex min-h-12 shrink-0 items-center gap-2 font-bold text-navy underline decoration-2 underline-offset-4">
             See how facilities work with us <ArrowRightIcon />

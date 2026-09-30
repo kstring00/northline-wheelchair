@@ -5,9 +5,9 @@ import { CountUpMotion } from "@/components/home/CountUpMotion";
 export function StatsStrip({ tone = "sand" }: { tone?: "sand" | "navy" }) {
   const s = site.stats;
   const items = [
-    s.years !== null && { value: s.years, suffix: "", label: "years driving Houston riders" },
-    s.rides !== null && { value: s.rides, suffix: "+", label: "rides completed" },
-    s.onTimeRate !== null && { value: s.onTimeRate, suffix: "%", label: "on-time pickups" },
+    s.years !== null && { value: s.years, suffix: "", label: "years driving Houston riders" }, // claims: stats.years
+    s.rides !== null && { value: s.rides, suffix: "+", label: "rides completed" }, // claims: stats.rides
+    s.onTimeRate !== null && { value: s.onTimeRate, suffix: "%", label: "on-time pickups" }, // claims: stats.onTimeRate
   ].filter(Boolean) as { value: number; suffix: string; label: string }[];
   if (!items.length) return null;
   const dark = tone === "navy";

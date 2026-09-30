@@ -11,9 +11,9 @@ export function OwnerNote() {
   const { owner } = site;
   const filled = owner.note.length > 0;
   return (
-    <section id="meet-jay" aria-labelledby="owner-heading" data-owner-note={filled ? "filled" : "placeholder"} className="bg-cream py-16 sm:py-20 lg:py-24">
+    <section id="meet-jay" aria-labelledby="owner-heading" data-owner-note={filled ? "filled" : "placeholder"} className="bg-cream py-12 sm:py-20 lg:py-24">
       <div className="container-page grid items-center gap-10 md:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-        <div className="mx-auto grid aspect-[4/5] w-full max-w-sm place-items-center rounded-[2rem] border-2 border-dashed border-ink/25 bg-sand md:max-w-none">
+        <div className="mx-auto grid aspect-[16/9] w-full max-w-sm md:aspect-[4/5] place-items-center rounded-[2rem] border-2 border-dashed border-ink/25 bg-sand md:max-w-none">
           <p className="text-ink/85">Jay&apos;s photo</p>
         </div>
         <div>

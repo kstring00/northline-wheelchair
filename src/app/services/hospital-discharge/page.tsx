@@ -10,38 +10,37 @@ const service = getService("hospital-discharge")!;
 
 export const metadata: Metadata = buildMetadata({
   title: "Hospital Discharge Rides in Houston",
-  description: `Wheelchair van rides home from Houston hospitals and rehab, timed to the discharge, often same day. For families and discharge planners. Call ${site.phone.display}.`,
+  description: `Wheelchair van rides home from Houston hospitals and rehab, timed to the discharge. For families and discharge planners. Call ${site.phone.display}.`,
   path: `/services/${service.slug}`,
 });
 
 const copy: ServiceCopy = {
   audiences: [
     { title: "Families with a discharge tomorrow", body: "The nurse just said the word. You have a day to arrange a ride for someone who can't get into your car. Call us today." },
-    { title: "Discharge planners and case managers", body: "You need a van that answers the phone and shows up at the time you said. We have one dispatch line and no hold queue." },
+    { title: "Discharge planners and case managers", body: "You need a van that answers the phone and shows up at the time you said. One call books it." },
     { title: "Rehab and skilled nursing transfers", body: "Hospital to rehab, rehab to home, home to a skilled nursing stay. Any direction." },
     { title: "Riders going home alone", body: "We don't leave until you're inside and settled. If no one's home yet, tell us who to expect." },
   ],
   steps: [
     { title: "Call as soon as you hear", body: "Don't wait for the final paperwork. Give us the window the nurse gave you and we'll hold the spot." },
-    { title: "We adjust when the time firms up", body: "Discharges slip. When the nurse calls with the real time, so do you, and we move the ride. No fee." },
-    { title: "The driver meets you at the entrance", body: "Main lobby, discharge door, whichever the hospital uses. We know the big north-side campuses." },
+    { title: "We adjust when the time firms up", body: "Discharges slip. When the nurse calls with the real time, so do you, and we move the ride." },
+    { title: "The driver meets you at the entrance", body: "Main lobby or discharge door, whichever the hospital uses. Tell us which." },
   ],
   included: [
-    { title: "Same-day rides, most days", body: "Discharges are what our afternoons are for." },
-    { title: "The right entrance", body: "We keep drop-off notes for the hospitals we serve most." },
-    { title: "Pharmacy on the way", body: "A short stop for prescriptions is fine. Tell us when you book." },
+    // ASK JAY: same-day most days? Drop-off notes kept per hospital? Pharmacy stops OK? Any fee to move a discharge time?
+    { title: "Same day, when a van is free", body: site.booking.sameDay },
     { title: "Equipment rides too", body: "Walker, shower chair, portable oxygen. It all fits." },
     { title: "Inside, not to the curb", body: "Up the steps, through the door, to a chair or bed." },
     { title: "A price before the ride", body: "Told to you when we confirm, even on same-day rides." },
   ],
   onTheDay: [
-    "You call when the nurse says the discharge is coming. We give you a real pickup window and hold a van. When the paperwork is done, you or the nurse call again, and we're on our way.",
+    "You call when the nurse says the discharge is coming. We give you a pickup window on the call. When the paperwork is done, you or the nurse call again.",
     "Hospital transport usually wheels the patient down in a hospital chair. Your driver meets them at the entrance, helps them into their own chair or a seat in the van, secures everything, and you're on the road.",
-    "At home, the driver helps up the steps and inside, to wherever your family member wants to sit. If you booked a pharmacy stop, it's already done. If the day slips to tomorrow, one call moves the ride.",
+    "At home, the driver helps up the steps and inside, to wherever your family member wants to sit. If the day slips to tomorrow, one call moves the ride.",
   ],
   extra: (
-    <Section id="hospitals" tone="white" eyebrow="Hospitals we drive to" title="We know where to pull in">
-      <p className="mt-4 max-w-3xl text-lg text-ink/85">Drop-off notes, the right entrance, and what to expect at the big north-side campuses.</p>
+    <Section id="hospitals" tone="white" eyebrow="Hospitals we drive to" title="North-side hospitals">
+      <p className="mt-4 max-w-3xl text-lg text-ink/85">A page for each hospital, with the campus address.</p>
       <ul className="mt-8 grid gap-3 sm:grid-cols-2">
         {hospitals.map((h) => (
           <li key={h.slug}>
@@ -59,5 +58,5 @@ const copy: ServiceCopy = {
 };
 
 export default function Page() {
-  return <ServicePage service={service} title="Hospital Discharge Rides in Houston" copy={copy} />;
+  return <ServicePage service={service} title="Hospital discharge rides in Houston" copy={copy} />;
 }

@@ -43,13 +43,14 @@ function RealReview({ r }: { r: Review }) {
 export function ReviewStrip({ limit = 3 }: { limit?: number }) {
   const reviews = realReviews.slice(0, limit);
   return (
-    <section id="reviews" aria-labelledby="reviews-heading" data-reviews={reviews.length ? "real" : "empty"} className="bg-sand py-16 sm:py-20 lg:py-24">
+    <section id="reviews" aria-labelledby="reviews-heading" data-reviews={reviews.length ? "real" : "empty"} className="bg-sand py-12 sm:py-20 lg:py-24">
       <div className="container-page">
         <div className="max-w-3xl">
           <p className="label mb-3 text-navy">What riders and families say</p>
           <h2 id="reviews-heading" className="text-[2rem] font-bold sm:text-[2.5rem]">We ask every rider for a review after the ride.</h2>
           <p className="mt-4 text-lg">
-            Northline is new. After every ride we send a text with a link to leave a Google review, and we&apos;ll show them here as they come in — the good and the honest.
+            Northline is new.{" "}
+            {site.smsEnabled ? "After every ride we send a text with a link to leave a Google review" : "After every ride we ask for a Google review"}, and we&apos;ll show them here as they come in — the good and the honest.
           </p>
         </div>
 

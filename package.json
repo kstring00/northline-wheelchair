@@ -23,9 +23,15 @@
     "test:brand": "node scripts/brand-check.mjs",
     "screenshots:brand": "node scripts/brand-screenshots.mjs",
     "check:copy": "node scripts/check-copy.mjs",
-    "prebuild": "node scripts/check-copy.mjs",
+    "prebuild": "node scripts/check-copy.mjs && tsx scripts/check-launch.ts",
     "test:email": "tsx scripts/test-email.ts",
-    "build:map": "tsx scripts/build-map.ts"
+    "build:map": "tsx scripts/build-map.ts",
+    "check:launch": "tsx scripts/check-launch.ts",
+    "check:claims": "tsx scripts/check-claims.ts",
+    "postbuild": "tsx scripts/check-claims.ts",
+    "test:quote": "node scripts/test-quote.mjs",
+    "test:partner": "node scripts/test-partner.mjs",
+    "test:forms": "node scripts/test-forms.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      # Previews and CI build the pre-launch site. check:launch only enforces
+      # its rules when NEXT_PUBLIC_SITE_LIVE=true (the production build).
+      NEXT_PUBLIC_SITE_LIVE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      # prebuild: check:copy (owner copy + literal claims) and check:launch
+      # postbuild: check:claims (claims in the rendered HTML need a non-null site.ts field)
+      - run: npm run build
+      - run: npm run typecheck
+      - name: Contrast
+        run: npm run test:contrast
+      - name: Acceptance (against the production server)
+        run: |
+          npx next start -p 3000 &
+          for i in $(seq 1 60); do curl -sf http://localhost:3000/ >/dev/null && break; sleep 1; done
+          npm run test:acceptance
+      - name: A live build with placeholder contact details must fail
+        run: |
+          if NEXT_PUBLIC_SITE_LIVE=true npx tsx scripts/check-launch.ts; then
+            echo "check:launch should have failed on the placeholder phone/address"; exit 1
+          fi

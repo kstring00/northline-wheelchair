@@ -33,16 +33,16 @@ export function RideCard({ tag, pickup, dropoff, when, driver, phone = site.phon
       className={`relative w-full max-w-[330px] overflow-hidden rounded-[14px] bg-white font-sans text-ink shadow-[var(--shadow-lift)] [--logo-dot:var(--color-white)] ${className}`}
     >
       {sample && (
-        <span data-sample-tag className="absolute right-0 bottom-0 rounded-tl-lg bg-morning px-2 py-1 text-[9.5px] font-bold uppercase leading-none tracking-[0.12em] text-navy">
+        <span data-sample-tag className="absolute right-0 bottom-0 rounded-tl-lg bg-morning px-2 py-1 text-[12px] font-bold uppercase leading-none tracking-[0.08em] text-navy">
           Sample
         </span>
       )}
       {/* Header strip: logomark, RIDE CARD, tag. */}
       <div className="flex flex-wrap items-center gap-2 bg-navy px-3.5 py-2.5 text-white [--logo-dot:var(--color-navy)]">
         <LogoMark className="h-5 w-5 shrink-0" />
-        <Title className="!m-0 whitespace-nowrap font-sans text-[11px] font-bold uppercase leading-none tracking-[0.14em] !text-white">Ride Card</Title>
+        <Title className="!m-0 whitespace-nowrap font-sans text-[12px] font-bold uppercase leading-none tracking-[0.12em] !text-white">Ride Card</Title>
         {tag && (
-          <span data-ride-card-tag className={`rounded-full bg-amber px-2.5 py-1 font-bold leading-[1.3] text-ink ${longTag ? "mt-1 basis-full text-left text-[11px] tracking-[0.01em]" : "ml-auto text-right text-[10px] uppercase tracking-[0.1em]"}`}>
+          <span data-ride-card-tag className={`rounded-full bg-amber px-2.5 py-1 font-bold leading-[1.3] text-ink ${longTag ? "mt-1 basis-full text-left text-[12px] tracking-[0.01em]" : "ml-auto text-right text-[12px] uppercase tracking-[0.06em]"}`}>
             {tag}
           </span>
         )}
@@ -51,11 +51,11 @@ export function RideCard({ tag, pickup, dropoff, when, driver, phone = site.phon
       <div className="px-3.5 pt-3 pb-3.5">
         <dl className="grid grid-cols-2 gap-x-4">
           <div>
-            <dt className="text-[9.5px] font-bold uppercase leading-tight tracking-[0.12em] text-ink/85">Pickup</dt>
+            <dt className="text-[12px] font-bold uppercase leading-tight tracking-[0.08em] text-ink/85">Pickup</dt>
             <dd className="mt-0.5 text-[14px] font-bold leading-snug break-words">{pickup}</dd>
           </div>
           <div className="text-right">
-            <dt className="text-[9.5px] font-bold uppercase leading-tight tracking-[0.12em] text-ink/85">Drop-off</dt>
+            <dt className="text-[12px] font-bold uppercase leading-tight tracking-[0.08em] text-ink/85">Drop-off</dt>
             <dd className="mt-0.5 text-[14px] font-bold leading-snug break-words">{dropoff}</dd>
           </div>
         </dl>
@@ -71,17 +71,18 @@ export function RideCard({ tag, pickup, dropoff, when, driver, phone = site.phon
 
         <dl className="mt-2.5 grid grid-cols-2 gap-x-4">
           <div>
-            <dt className="text-[9.5px] font-bold uppercase leading-tight tracking-[0.12em] text-ink/85">When</dt>
+            <dt className="text-[12px] font-bold uppercase leading-tight tracking-[0.08em] text-ink/85">When</dt>
             <dd className="mt-0.5 text-[14px] font-bold leading-snug">{when}</dd>
           </div>
           <div className="text-right">
-            <dt className="text-[9.5px] font-bold uppercase leading-tight tracking-[0.12em] text-ink/85">Your driver</dt>
+            <dt className="text-[12px] font-bold uppercase leading-tight tracking-[0.08em] text-ink/85">Your driver</dt>
             <dd className="mt-0.5 text-[14px] font-bold leading-snug">{driver}</dd>
           </div>
         </dl>
 
-        <p className="mt-2.5 text-[12.5px] leading-snug text-ink/85">
-          We text you when your driver is on the way. Questions:{" "}
+        <p className="mt-2.5 text-[13px] leading-snug text-ink/85">
+          {site.onTimePromise.enRouteText && (site.smsEnabled ? "We text you when your driver is on the way. " : "We call you when your driver is on the way. ")}
+          Questions:{" "}
           <a href={telHref} className="font-bold text-ink no-underline">{phone}</a>
         </p>
       </div>

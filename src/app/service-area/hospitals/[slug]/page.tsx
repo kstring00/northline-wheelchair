@@ -9,6 +9,8 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/ui/Section";
 import { OnTimePromise } from "@/components/home/OnTimePromise";
 import { DraftLabel } from "@/components/ui/Badges";
+import { Unconfirmed } from "@/components/ui/Unconfirmed";
+import { isSiteLive } from "@/lib/env";
 import { FinalCta } from "@/components/home/FinalCta";
 import { ArrowRightIcon, CheckIcon, PinIcon } from "@/components/ui/Icons";
 
@@ -32,6 +34,8 @@ export default async function HospitalPage({ params }: PageProps<"/service-area/
   if (!h) notFound();
   const path = `/service-area/hospitals/${h.slug}`;
   const areas = h.nearestAreas.map(getCoreArea).filter(Boolean);
+  // A note shows on the live site only once Jay has confirmed it; unconfirmed notes show before launch, marked draft.
+  const notes = h.dropOffNotes.filter((n) => n.confirmed || !isSiteLive);
 
   return (
     <>
@@ -39,19 +43,23 @@ export default async function HospitalPage({ params }: PageProps<"/service-area/
       <PageHeader
         crumbs={[{ name: "Service Area", path: "/service-area" }, { name: h.name, path }]}
         title={`Wheelchair transportation to ${h.name}`}
-        answer={`Northline drives riders to and from ${h.name} in ${h.city} every week: discharges home, appointments in the office buildings, and rides in from ${areas.map((a) => a!.name).join(", ")}. ${h.localNote}`}
+        answer={`Wheelchair van rides to and from ${h.name} in ${h.city}, for riders in ${areas.map((a) => a!.name).join(", ")}.${h.localNote ? ` ${h.localNote}` : ""}`}
       />
       <OnTimePromise />
 
       <Section id="dropoff" tone="white" eyebrow="Where we pull in" title={`Drop-off at ${h.system}`}>
         <div className="mt-8 grid gap-10 lg:grid-cols-[1.2fr_1fr]">
           <div>
-            {h.dropOffNotesDraft && <div className="mb-4"><DraftLabel what="Drop-off notes: draft, to confirm with Jay" /></div>}
-            <ul className="space-y-4">
-              {h.dropOffNotes.map((n) => (
-                <li key={n} className="flex gap-3 text-lg"><PinIcon className="mt-1 h-5 w-5 shrink-0 text-navy" /> {n}</li>
-              ))}
-            </ul>
+            {notes.some((n) => !n.confirmed) && <div className="mb-4"><DraftLabel what="Drop-off notes: draft, to confirm with Jay" /></div>}
+            {notes.length ? (
+              <ul className="space-y-4">
+                {notes.map((n) => (
+                  <li key={n.text} className="flex gap-3 text-lg"><PinIcon className="mt-1 h-5 w-5 shrink-0 text-navy" /> {n.text}</li>
+                ))}
+              </ul>
+            ) : (
+              <Unconfirmed />
+            )}
           </div>
           <div className="rounded-[var(--radius-card)] bg-morning p-6">
             <h3 className="text-xl font-bold">Campus address</h3>
@@ -68,12 +76,10 @@ export default async function HospitalPage({ params }: PageProps<"/service-area/
 
       <Section id="discharge" eyebrow="Going home" title={`Discharge rides from ${h.name}`}>
         <div className="mt-6 max-w-3xl space-y-4 text-lg">
-          <p>Call us as soon as the nurse says a discharge is coming. Give us the window they gave you. We hold a van and adjust the time when the paperwork is done. Same-day changes are normal for us.</p>
+          {/* ASK JAY: do you hold a van for a discharge and adjust when the paperwork is done? Do drivers help up steps at home? */}
+          <p>Call as soon as the nurse says a discharge is coming, and give us the window they gave you. <Link href="/services/hospital-discharge" className="font-bold text-navy underline">More about discharge rides</Link>.</p>
           <p>
-            Your driver meets the patient at the entrance above, helps them from the hospital chair into their own chair or a seat, and secures everything. At home, they help up the steps and inside. <Link href="/services/hospital-discharge" className="font-bold text-navy underline">More about discharge rides</Link>.
-          </p>
-          <p>
-            Discharge planners: one call to <a href={telHref} className="font-bold text-navy underline">{site.phone.display}</a> books it. <Link href="/partners" className="font-bold text-navy underline">Set up a facility account</Link> for monthly invoicing.
+            Discharge planners: call <a href={telHref} className="font-bold text-navy underline">{site.phone.display}</a>, or <Link href="/partners" className="font-bold text-navy underline">set up a facility account</Link>.
           </p>
         </div>
       </Section>

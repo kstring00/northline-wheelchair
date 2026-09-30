@@ -13,6 +13,8 @@ import {
   days,
   emptyBooking,
   formatTime,
+  timeWindowOptions,
+  windowText,
   mobilityOptions,
   todayISO,
   validateBooking,
@@ -27,14 +29,22 @@ function useClientValue<T>(get: () => T, server: T) {
   return useSyncExternalStore(noop, get, () => server);
 }
 
-/** POST the request to /api/book. Resolves on 2xx, rejects with the status otherwise. */
-async function submitRequest(data: BookingData): Promise<void> {
+class SendError extends Error {
+  constructor(public status: number, public userMessage?: string) {
+    super(String(status));
+  }
+}
+
+/** POST the request to /api/book. Resolves with the reference number, or throws with the status and any message to show. */
+async function submitRequest(data: BookingData): Promise<string> {
   const res = await fetch("/api/book", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(String(res.status));
+  const body = (await res.json().catch(() => ({}))) as { ref?: string; message?: string };
+  if (!res.ok) throw new SendError(res.status, body.message);
+  return body.ref ?? "";
 }
 
 export function BookingForm() {
@@ -43,6 +53,7 @@ export function BookingForm() {
   const [sendError, setSendError] = useState("");
   const [showErrors, setShowErrors] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const [ref, setRef] = useState("");
   const [moreOpen, setMoreOpen] = useState<boolean | null>(null);
 
   const summaryRef = useRef<HTMLDivElement>(null);
@@ -90,16 +101,16 @@ export function BookingForm() {
     }
     setStatus("sending");
     try {
-      await submitRequest(d);
+      setRef(await submitRequest(d));
       setStatus("sent");
       trackEvent("booking_submitted", d.who);
     } catch (err) {
       setStatus("idle");
-      const code = err instanceof Error ? err.message : "";
+      const e2 = err instanceof SendError ? err : null;
       setSendError(
-        code === "429"
+        e2?.status === 429
           ? `You've sent a few requests in a row. Please wait a few minutes, or call us at ${site.phone.display}.`
-          : `Sorry, something went wrong sending your request. Please call us at ${site.phone.display}.`,
+          : e2?.userMessage || `Sorry, something went wrong sending your request. Please call us at ${site.phone.display}.`,
       );
       setErrors({});
       setShowErrors(true);
@@ -123,7 +134,7 @@ export function BookingForm() {
   return (
     <div data-booking-root className="scroll-mt-28">
       {status === "sent" ? (
-        <Success d={d} firstName={firstName} successRef={successRef} onReset={reset} />
+        <Success d={d} refNo={ref} firstName={firstName} successRef={successRef} onReset={reset} />
       ) : (
         <form noValidate onSubmit={onSubmit} data-clarity-mask="true" aria-label="Ride request">
           {summaryVisible && (
@@ -189,8 +200,21 @@ export function BookingForm() {
             />
             <div className="grid gap-8 sm:grid-cols-2">
               <TextField id="date" type="date" label="Date of the ride" min={minDate} value={d.date} error={errors.date} onChange={(e) => update("date", e.target.value)} />
-              <TextField id="time" type="time" label="Appointment time" value={d.time} error={errors.time} onChange={(e) => update("time", e.target.value)} />
+              <SelectField
+                id="timeWindow"
+                label="Pickup window"
+                optional
+                hint="Jay sets the exact pickup time with you on the call."
+                value={d.timeWindow}
+                onChange={(e) => update("timeWindow", e.target.value as BookingData["timeWindow"])}
+              >
+                <option value="">Not sure yet</option>
+                {timeWindowOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </SelectField>
             </div>
+            {d.timeWindow === "exact" && (
+              <TextField id="time" type="time" label="Appointment or pickup time" value={d.time} error={errors.time} onChange={(e) => update("time", e.target.value)} />
+            )}
           </div>
 
           {/* Optional details. Everything here can also be covered on the call. */}
@@ -387,18 +411,23 @@ export function BookingForm() {
   );
 }
 
-function Success({ d, firstName, successRef, onReset }: { d: BookingData; firstName: string; successRef: React.RefObject<HTMLHeadingElement | null>; onReset: () => void }) {
+function Success({ d, refNo, firstName, successRef, onReset }: { d: BookingData; refNo: string; firstName: string; successRef: React.RefObject<HTMLHeadingElement | null>; onReset: () => void }) {
   // The draft Ride Card, filled from what they entered. The price and the
   // driver are settled on the confirmation call: this is a request until we talk.
   const date = rideCardDate(d.date);
-  const time = formatTime(d.time);
-  const when = d.repeat === "repeat" ? `From ${date} · ${time} appt` : `${date} · ${time} appt`;
+  const win = windowText(d);
+  const when = [d.repeat === "repeat" ? `From ${date}` : date, win].filter(Boolean).join(" · ");
 
   return (
     <div data-booking-success className="bg-white sm:rounded-[var(--radius-card)] sm:border-2 sm:border-navy sm:p-8">
       <h2 ref={successRef} tabIndex={-1} className="text-[1.75rem] font-bold focus:outline-none sm:text-[2rem]">
         Thank you{firstName ? `, ${firstName}` : ""}. Your ride request is in.
       </h2>
+      {refNo && (
+        <p data-booking-ref className="mt-2 text-lg">
+          Your reference: <strong className="font-mono tracking-wide">{refNo}</strong>
+        </p>
+      )}
       <p className="mt-3 text-lg">
         <strong>Jay will call you within {site.responseTime}</strong> during business hours to confirm the price and details. Your ride is not booked until we talk.
       </p>
@@ -413,7 +442,9 @@ function Success({ d, firstName, successRef, onReset }: { d: BookingData; firstN
           driver="Named on our call"
         />
         <p data-draft-note className="mt-4 max-w-[330px] text-center text-ink/85">
-          This is your draft Ride Card. You&apos;ll get the confirmed one by text.
+          {site.smsEnabled
+            ? "This is your draft Ride Card. You'll get the confirmed one by text."
+            : "This is your draft Ride Card. You'll get the confirmed Ride Card by email (or we'll read it to you on the call)."}
         </p>
         {d.tripType === "round-trip" && d.returnTime && <p className="mt-4 text-center">Return pickup at {formatTime(d.returnTime)}.</p>}
         {d.repeat === "repeat" && d.repeatDays.length > 0 && (

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/config/site";
+import { Unconfirmed } from "@/components/ui/Unconfirmed";
 import { buildMetadata } from "@/lib/seo";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/ui/Section";
@@ -17,12 +18,15 @@ export const metadata: Metadata = buildMetadata({
 
 const s = site.safety;
 
+// Each block renders only with confirmed items. Notes describing practice are
+// questions for Jay, not copy (ASK JAY: are screenings repeated? is the
+// pre-trip checklist signed and kept?).
 const blocks = [
-  { title: "Before a driver is hired", items: s.driverScreening, note: "Repeated on a schedule, not just once." },
-  { title: "What every driver is trained in", items: s.driverTraining, note: "PASS is the Community Transportation Association's passenger assistance course." },
-  { title: "On every single ride", items: s.everyRide, note: "The pre-trip checklist is signed and kept." },
+  { title: "Before a driver is hired", items: s.driverScreening, note: null },
+  { title: "What every driver is trained in", items: s.driverTraining, note: s.driverTraining.some((x) => /PASS/.test(x)) ? "PASS is the Community Transportation Association's passenger assistance course." : null },
+  { title: "On every single ride", items: s.everyRide, note: null },
   { title: "Our vans", items: s.vehicles, note: s.insurance },
-];
+].filter((b) => b.items.length > 0);
 
 export default function SafetyPage() {
   return (
@@ -30,11 +34,16 @@ export default function SafetyPage() {
       <PageHeader
         crumbs={[{ name: "Safety", path: "/safety" }]}
         title="Wheelchair van safety in Houston, spelled out"
-        answer="Every Northline driver is background-checked, drug-screened and trained in wheelchair securement. Every ride uses four-point tie-downs and a shoulder belt. Every van is checked before its first pickup. Here is exactly what that means."
+        answer="What Northline does to keep riders safe: drivers, vans and every ride. Each line here is one Jay has confirmed."
         cta={false}
       />
 
       <section aria-label="Standards" className="bg-white py-16 sm:py-20">
+        {blocks.length === 0 && (
+          <div className="container-page">
+            <Unconfirmed />
+          </div>
+        )}
         <div className="container-page grid gap-12 md:grid-cols-2">
           {blocks.map((b) => (
             <div key={b.title} className="border-t-4 border-navy pt-6">
@@ -51,7 +60,9 @@ export default function SafetyPage() {
         {/* CONFIRM every line above with Jay. Do not publish an insurance carrier or limits until verified. */}
       </section>
 
-      <Section id="securement" eyebrow="Two minutes at the ramp" title="How your chair is secured">
+      {/* ASK JAY: how is a chair secured in your vans (ramp or lift, number of straps, belts)? The steps render once everyRide is confirmed. */}
+      {s.everyRide.length > 0 && (
+      <Section id="securement" eyebrow="At the ramp" title="How your chair is secured">
         <ol className="mt-8 grid gap-6 md:grid-cols-4">
           {[
             ["Ramp or lift down", "The driver lowers the ramp to the curb, or the lift to the ground, and locks it."],
@@ -67,6 +78,7 @@ export default function SafetyPage() {
           ))}
         </ol>
       </Section>
+      )}
 
       <CanAndCant />
       <TeamGrid />

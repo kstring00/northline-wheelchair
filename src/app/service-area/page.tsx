@@ -20,7 +20,7 @@ export default function ServiceAreaPage() {
     <>
       <PageHeader
         crumbs={[{ name: "Service Area", path: "/service-area" }]}
-        title="Our wheelchair transportation service area"
+        title="Wheelchair van service area in north Houston"
         answer={`Northline picks up riders across north Houston, including ${areaList()}, and drives to appointments anywhere in the Houston area, including the Texas Medical Center.`}
       />
       <Section id="cities" tone="white" eyebrow="Main areas" title="Cities we serve every day">

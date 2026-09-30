@@ -281,15 +281,17 @@ export function HeroMap({ destinations, className = "" }: { destinations: HeroMa
           @keyframes hm-pulse { 0% { transform: scale(1); opacity: .7 } 100% { transform: scale(2.6); opacity: 0 } }
           [data-hero-map] .hm-dot { opacity: 0; animation: hm-dot 1ms linear forwards; }
           [data-hero-map] .hm-pulse { transform-origin: center; transform-box: fill-box; animation: hm-pulse 1.6s ease-out infinite; }
+          [data-hero-map] .hm-pin-link { cursor: pointer; }
+          [data-hero-map] .hm-pin-link:focus-visible { outline: 3px solid var(--color-cream); outline-offset: 2px; }
           @media (prefers-reduced-motion: reduce) {
             [data-hero-map] .hm-dot { animation: none; opacity: 1; }
             [data-hero-map] .hm-pulse { display: none; }
           }
         `}</style>
-        <svg viewBox={`0 0 ${VW} ${VH}`} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
+        <svg viewBox={`0 0 ${VW} ${VH}`} className="absolute inset-0 h-full w-full" role="presentation">
           <BaseMap />
           {/* route: navy halo so the dots read over the streets, then amber dots in sequence */}
-          <g data-route="hero" key={`${run}:${door.i},${door.j}>${best}`}>
+          <g aria-hidden="true" data-route="hero" key={`${run}:${door.i},${door.j}>${best}`}>
             {dest && (
               <path d={"M" + pts.map((p) => `${p[0]} ${p[1]}`).join(" L")} fill="none" stroke="var(--color-navy)" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
             )}
@@ -297,23 +299,31 @@ export function HeroMap({ destinations, className = "" }: { destinations: HeroMa
               <circle key={i} className="hm-dot" cx={p[0].toFixed(1)} cy={p[1].toFixed(1)} r="2.2" fill={PIN_AMBER} style={dotStyle(i)} />
             ))}
           </g>
-          {/* destinations: every pin shows; the nearest is hot */}
+          {/* destinations: every pin is a link to its hospital page; the nearest is hot.
+              No in-map labels: at this scale they'd render under 12px. The chip names
+              the active destination; each pin carries its name for AT and as a tooltip. */}
           <g data-destinations>
             {dests.map((d, i) => {
               const [x, y] = px(d.node);
-              const east = x > VW * 0.62;
+              const pin = <PinAt x={x} y={y} hot={i === best} />;
               return (
-                <g key={d.name} data-dest className={i === best ? "is-hot" : undefined} style={{ opacity: i === best ? 1 : 0.8 }}>
-                  <PinAt x={x} y={y} hot={i === best} />
-                  <text x={east ? x - 14 : x + 14} y={y - 22} textAnchor={east ? "end" : "start"} fontSize="11" fontWeight="700" fill="var(--color-cream)" fillOpacity={i === best ? 1 : 0.75} className="font-sans max-sm:hidden">
-                    {d.name}
-                  </text>
+                <g key={d.name} data-dest className={i === best ? "is-hot" : undefined} style={{ opacity: i === best ? 1 : 0.85 }}>
+                  {d.href ? (
+                    <a href={d.href} aria-label={d.name} className="hm-pin-link" onPointerDown={(e) => e.stopPropagation()}>
+                      <title>{d.name}</title>
+                      {/* hit area ≥ 48px even on a 390px phone (map scale ≈ 0.5) */}
+                      <circle cx={x} cy={y - PIN_H / 2} r="56" fill="transparent" />
+                      {pin}
+                    </a>
+                  ) : (
+                    pin
+                  )}
                 </g>
               );
             })}
           </g>
           {/* your door */}
-          <g data-door transform={`translate(${start[0]} ${start[1]})`} style={{ transition: "transform 180ms var(--ease-gentle)" }}>
+          <g aria-hidden="true" data-door transform={`translate(${start[0]} ${start[1]})`} style={{ transition: "transform 180ms var(--ease-gentle)" }}>
             <circle className="hm-pulse" r="7" fill="none" stroke="var(--color-cream)" strokeWidth="2" />
             <circle r="7" fill="var(--color-navy)" stroke="var(--color-cream)" strokeWidth="3" />
           </g>
@@ -322,7 +332,7 @@ export function HeroMap({ destinations, className = "" }: { destinations: HeroMa
         {dest && (
           <div aria-hidden="true" data-hero-chip className="pointer-events-none absolute max-w-[42%] rounded-xl bg-white px-3 py-2 text-ink shadow-[var(--shadow-soft)] transition-[left,top] duration-300 ease-[var(--ease-gentle)]" style={chipStyle}>
             <p className="font-sans text-[14px] font-bold leading-tight">{dest.name}</p>
-            <p className="mt-0.5 text-[12px] leading-tight text-ink/85">From your door</p>
+            <p className="mt-0.5 text-[13px] leading-tight text-ink/85">From your door</p>
           </div>
         )}
         <p className="sr-only" aria-live="polite">{announce}</p>

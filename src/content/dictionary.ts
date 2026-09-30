@@ -46,7 +46,7 @@ export const t = {
   promise: {
     heading: "How we make sure you're never late",
     confirmationCall: "We call the day before to confirm your pickup time.",
-    enRouteText: "We text you when your driver is on the way.",
+    enRouteText: site.smsEnabled ? "We text you when your driver is on the way." : "We call you when your driver is on the way.",
     arriveEarly: (m: number) => `Your driver arrives ${m} minutes early.`,
     waitAndReturn: "Your driver waits during your appointment and brings you home.",
   },

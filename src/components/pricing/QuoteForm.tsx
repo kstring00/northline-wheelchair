@@ -3,92 +3,126 @@
 import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { site, telHref } from "@/config/site";
 import { t } from "@/content/dictionary";
+import { chicagoToday } from "@/lib/dates";
 import { trackEvent } from "@/lib/analytics";
 import { buttonClass } from "@/components/ui/Button";
 import { AlertIcon, CheckIcon, PhoneIcon } from "@/components/ui/Icons";
 import { ChoiceGroup, TextField } from "@/components/booking/fields";
-import { phoneDigits, todayISO } from "@/components/booking/model";
+import {
+  emptyQuote,
+  formatPhone,
+  quoteMobilityOptions,
+  quoteTripTypeOptions,
+  validateQuote,
+  type QuoteData,
+  type QuoteErrors,
+} from "@/components/pricing/quote-model";
 
-type Q = { pickupZip: string; destZip: string; date: string; mobility: string; tripType: string; phone: string; website: string };
-type Errors = Partial<Record<keyof Q, string>>;
+type Sent = { ref: string; phone: string };
 
-const empty: Q = { pickupZip: "", destZip: "", date: "", mobility: "", tripType: "", phone: "", website: "" };
-
-/**
- * "Get a quote in 2 minutes". Posts to the same backend as /book.
- * PHASE 2 (CONFIRM): server action with Resend, the `website` honeypot and
- * the same per-IP rate limit as the booking form.
- */
-async function submitQuote(data: Q) {
-  void data;
-  await new Promise((r) => setTimeout(r, 600));
+/** POST to /api/quote. Resolves with the reference; rejects with a message to show. */
+async function submitQuote(data: QuoteData): Promise<string> {
+  let res: Response;
+  try {
+    res = await fetch("/api/quote", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+  } catch {
+    throw new Error(`Sorry, something went wrong. Please call us at ${site.phone.display}.`);
+  }
+  const body = (await res.json().catch(() => ({}))) as { ok?: boolean; ref?: string; message?: string };
+  if (res.ok && body.ok) return body.ref ?? "";
+  if (res.status === 429) throw new Error(`You've sent a few requests in a row. Please wait a few minutes, or call us at ${site.phone.display}.`);
+  if (res.status === 503 && body.message) throw new Error(body.message);
+  throw new Error(`Sorry, something went wrong. Please call us at ${site.phone.display}.`);
 }
 
-const zipOk = (z: string) => /^\d{5}$/.test(z.trim());
+const noop = () => () => {};
+const tripOptions = quoteTripTypeOptions.filter((o) => o.value !== "wait-and-return" || site.onTimePromise.waitAndReturn);
 
 export function QuoteForm() {
-  const [d, setD] = useState<Q>(empty);
-  const [errors, setErrors] = useState<Errors>({});
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const [d, setD] = useState<QuoteData>(emptyQuote);
+  const [errors, setErrors] = useState<QuoteErrors>({});
+  const [sendError, setSendError] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending">("idle");
+  const [sent, setSent] = useState<Sent | null>(null);
   const summaryRef = useRef<HTMLDivElement>(null);
   const doneRef = useRef<HTMLHeadingElement>(null);
-  const minDate = useSyncExternalStore(() => () => {}, () => todayISO(), () => undefined);
+  const minDate = useSyncExternalStore(noop, () => chicagoToday(), () => undefined);
 
-  const update = <K extends keyof Q>(k: K, v: Q[K]) => setD((x) => ({ ...x, [k]: v }));
-
-  const validate = (): Errors => {
-    const e: Errors = {};
-    if (!zipOk(d.pickupZip)) e.pickupZip = "Please enter the 5-digit pickup ZIP code.";
-    if (!zipOk(d.destZip)) e.destZip = "Please enter the 5-digit ZIP code where you're going.";
-    if (!d.date) e.date = "Please choose the date of the ride.";
-    else if (d.date < todayISO()) e.date = "That date has passed. Please choose today or later.";
-    if (!d.mobility) e.mobility = "Please choose how the rider gets around.";
-    if (!d.tripType) e.tripType = "Please choose one-way or round trip.";
-    if (phoneDigits(d.phone).length !== 10) e.phone = `Please enter a 10-digit phone number so we can call with the price.`;
-    return e;
-  };
+  const update = <K extends keyof QuoteData>(k: K, v: QuoteData[K]) => setD((x) => ({ ...x, [k]: v }));
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const errs = validate();
+    const errs = validateQuote(d, chicagoToday());
     setErrors(errs);
+    setSendError("");
     if (Object.keys(errs).length) {
       requestAnimationFrame(() => summaryRef.current?.focus());
       return;
     }
     setStatus("sending");
-    await submitQuote(d);
-    setStatus("sent");
-    trackEvent("booking_submitted", "quote");
-    requestAnimationFrame(() => doneRef.current?.focus());
+    try {
+      const ref = await submitQuote(d);
+      setSent({ ref, phone: formatPhone(d.phone) });
+      trackEvent("booking_submitted", "quote");
+      requestAnimationFrame(() => doneRef.current?.focus());
+    } catch (err) {
+      setSendError(err instanceof Error ? err.message : `Sorry, something went wrong. Please call us at ${site.phone.display}.`);
+      requestAnimationFrame(() => summaryRef.current?.focus());
+    } finally {
+      setStatus("idle");
+    }
   };
 
-  if (status === "sent") {
+  if (sent) {
     return (
-      <div className="rounded-[var(--radius-card)] border-2 border-navy bg-white p-6 sm:p-8">
+      <div data-quote-success className="rounded-[var(--radius-card)] border-2 border-navy bg-white p-6 sm:p-8">
         <span className="grid h-12 w-12 place-items-center rounded-full bg-navy text-cream" aria-hidden="true"><CheckIcon className="h-7 w-7" /></span>
-        <h3 ref={doneRef} tabIndex={-1} className="mt-4 text-2xl font-bold focus:outline-none">Got it. We&apos;ll call you with the price.</h3>
-        <p className="mt-2 text-lg">{t.response.callback} The number we give you is the number you pay.</p>
+        <h3 ref={doneRef} tabIndex={-1} className="mt-4 text-2xl font-bold focus:outline-none">Thanks. Your quote request reached Jay.</h3>
+        {sent.ref && (
+          <p className="mt-2 text-lg">
+            Reference <strong data-quote-ref className="tabular-nums">{sent.ref}</strong>.
+          </p>
+        )}
+        <p className="mt-2 text-lg">He&apos;ll call you at {sent.phone} within {site.responseTime} during business hours with the price.</p>
         <a href={telHref} className={buttonClass("secondary", "lg", "mt-5")}><PhoneIcon /> {t.actions.callNumber}</a>
       </div>
     );
   }
 
-  const errorList = Object.entries(errors).filter(([, v]) => v) as [keyof Q, string][];
+  const errorList = Object.entries(errors).filter(([, v]) => v) as [keyof QuoteData, string][];
+  const summaryVisible = errorList.length > 0 || sendError;
+  const fieldId = (k: keyof QuoteData) => `q-${k}`;
 
   return (
     <form noValidate onSubmit={onSubmit} data-clarity-mask="true" aria-labelledby="quote-heading" className="rounded-[var(--radius-card)] border border-ink/15 bg-white p-5 shadow-[var(--shadow-soft)] sm:p-8">
       <h3 id="quote-heading" className="text-2xl font-bold">{t.actions.quote}</h3>
-      <p className="mt-1 text-ink/85">Six quick answers. We call back with the exact price.</p>
+      <p className="mt-1 text-ink/85">A few quick answers, and a number to call you back on.</p>
 
-      {errorList.length > 0 && (
-        <div ref={summaryRef} tabIndex={-1} role="alert" className="mt-5 rounded-xl border-[3px] border-navy bg-white p-4">
-          <p className="flex items-center gap-2 font-bold text-ink"><AlertIcon /> Please fix {errorList.length === 1 ? "this" : `these ${errorList.length} things`}:</p>
-          <ul className="mt-1 space-y-1">
-            {errorList.map(([k, m]) => (
-              <li key={k}><a href={`#q-${k}`} className="font-bold text-ink underline" onClick={(ev) => { ev.preventDefault(); document.getElementById(`q-${k}`)?.focus(); }}>{m}</a></li>
-            ))}
-          </ul>
+      {summaryVisible && (
+        <div ref={summaryRef} tabIndex={-1} role="alert" data-quote-errors className="mt-5 rounded-xl border-[3px] border-navy bg-white p-4">
+          <p className="flex items-center gap-2 font-bold text-ink">
+            <AlertIcon />
+            {sendError ? "We couldn't send your request" : `Please fix ${errorList.length === 1 ? "this" : `these ${errorList.length} things`}:`}
+          </p>
+          {sendError && <p className="mt-1 font-bold">{sendError}</p>}
+          {errorList.length > 0 && (
+            <ul className="mt-1">
+              {errorList.map(([k, m]) => (
+                <li key={k}>
+                  <a
+                    href={`#${fieldId(k)}`}
+                    className="inline-flex min-h-12 items-center font-bold text-ink underline"
+                    onClick={(ev) => {
+                      ev.preventDefault();
+                      document.getElementById(fieldId(k))?.focus();
+                    }}
+                  >
+                    {m}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -102,26 +136,20 @@ export function QuoteForm() {
         <ChoiceGroup
           name="q-mobility"
           legend="How does the rider get around?"
+          optional
           error={errors.mobility}
           columns={1}
-          options={[
-            { value: "wheelchair", label: "Wheelchair" },
-            { value: "walker", label: "Walker or cane" },
-            { value: "ambulatory", label: "Walks with a little help" },
-          ]}
+          options={[...quoteMobilityOptions]}
           value={d.mobility}
           onChange={(v) => update("mobility", v)}
         />
         <ChoiceGroup
           name="q-tripType"
           legend="One-way or round trip?"
+          optional
           error={errors.tripType}
           columns={1}
-          options={[
-            { value: "one-way", label: "One-way" },
-            { value: "round-trip", label: "Round trip" },
-            ...(site.onTimePromise.waitAndReturn ? [{ value: "wait-and-return", label: "Wait & return" }] : []),
-          ]}
+          options={tripOptions}
           value={d.tripType}
           onChange={(v) => update("tripType", v)}
         />
@@ -130,7 +158,7 @@ export function QuoteForm() {
         <label htmlFor="q-website">Leave this field empty</label>
         <input id="q-website" name="website" tabIndex={-1} autoComplete="off" value={d.website} onChange={(e) => update("website", e.target.value)} />
       </div>
-      <button type="submit" disabled={status === "sending"} className={buttonClass("primary", "lg", "mt-8 w-full sm:w-auto sm:min-w-64")}>
+      <button type="submit" disabled={status === "sending"} aria-disabled={status === "sending"} className={buttonClass("primary", "lg", "mt-8 w-full sm:w-auto sm:min-w-64")}>
         {status === "sending" ? "Sending…" : "Get my price"}
       </button>
     </form>

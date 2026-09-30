@@ -15,15 +15,17 @@ process.stdout.write(renderToStaticMarkup(React.createElement(PricingRules, { mo
 
 let fails = 0;
 const check = (n, ok, d = "") => { if (!ok) fails++; console.log(`${ok ? "PASS" : "FAIL"}  ${n}${d ? `  (${d})` : ""}`); };
-const rules = ["Base fare", "Distance", "Wait time", "Companions", "Round trips", "Nights, weekends, holidays", "Cancelling", "How to pay", "Medicaid"];
 
+// Every pricing number and rule in site.ts is null until Jay sets them. In
+// every display mode the ledger must then show the one honest line and no
+// amount, rule or insurance claim. (When Jay fills the fields in, extend this
+// test with the per-mode number checks.)
 for (const mode of ["full", "startingAt", "quoteOnly"]) {
   const out = execSync(`npx tsx --tsconfig tsconfig.json scripts/.tmp/render-pricing.tsx ${mode}`, { encoding: "utf8" });
-  const t = out.replace(/<[^>]+>/g, " ");
-  check(`${mode}: every rule visible`, rules.every((r) => t.includes(r)), rules.filter((r) => !t.includes(r)).join(","));
-  const dollars = (t.match(/\$\d+/g) ?? []).length;
-  if (mode === "full") check("full: base, per-mile, wait, after-hours amounts shown", dollars >= 4 && /\/ mile/.test(t) && /\/ hour/.test(t), `${dollars} amounts`);
-  if (mode === "startingAt") check("startingAt: only 'from $' base fare shown", /from \$\d+/.test(t) && !/\/ mile/.test(t) && !/\/ hour/.test(t), `${dollars} amounts`);
-  if (mode === "quoteOnly") check("quoteOnly: no dollar amounts in the ledger", dollars === 0, `${dollars} amounts`);
+  const t = out.replace(/<[^>]+>/g, " ").replace(/&#x27;|&apos;/g, "'");
+  check(`${mode}: the honest line renders`, /data-unconfirmed/.test(out) && /Jay is confirming these details/.test(t));
+  check(`${mode}: no dollar amounts`, !/\$\s?\d/.test(t), (t.match(/\$\s?\d+/g) ?? []).join(","));
+  check(`${mode}: no Medicare claim`, !/Medicare/.test(t));
+  check(`${mode}: Medicaid answer is the brokers sentence`, /We're currently private-pay and facility-billed/.test(t));
 }
 process.exit(fails ? 1 : 0);

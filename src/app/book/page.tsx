@@ -20,7 +20,7 @@ export default function BookPage() {
         <Breadcrumbs items={[{ name: "Book a Ride", path: "/book" }]} />
         <div className="mt-4 grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-14">
           <div>
-            <h1 id="page-heading" className="text-[2.25rem] font-bold sm:text-[3rem]">Book a wheelchair van ride</h1>
+            <h1 id="page-heading" className="text-[2.25rem] font-bold sm:text-[3rem]">Book a wheelchair van ride in north Houston</h1>
             <p className="mt-3 max-w-2xl text-xl">
               Five fields, about a minute. Jay calls you back within {site.responseTime} during business hours to confirm the price and details.
             </p>
@@ -42,7 +42,7 @@ export default function BookPage() {
           <aside aria-labelledby="call-heading" className="space-y-5 lg:pt-24">
             <div className="rounded-[1.5rem] bg-navy p-6 text-cream on-dark">
               <h2 id="call-heading" className="text-xl font-bold !text-cream">Rather talk to a person?</h2>
-              <p className="mt-2 text-cream/80">Call or text and we&apos;ll book your ride over the phone.</p>
+              <p className="mt-2 text-cream/80">{site.smsEnabled ? "Call or text and we'll book your ride over the phone." : "Call and we'll book your ride over the phone."}</p>
               <a href={telHref} className="mt-4 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full border-2 border-cream text-lg font-bold text-cream no-underline hover:bg-cream/10">
                 <PhoneIcon /> {site.phone.display}
               </a>
