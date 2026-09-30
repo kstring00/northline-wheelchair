@@ -57,7 +57,7 @@ export type Hospital = {
   localNote: string;
   /** Real position for the service map (WGS84). */
   geo: { latitude: number; longitude: number };
-  /** Street-grid node on the hero map demo: column i (0–8, west→east), row j (0–6, north→south). */
+  /** Street-grid node on the hero map demo (hero-map.svg, 720×520): column i indexes XS (0–16, west→east), row j indexes YS (0–14, north→south). */
   mapNode: { i: number; j: number };
 };
 
@@ -281,7 +281,7 @@ export const site = {
       typicalTrips: ["Discharge rides home to Spring and Klein", "Cardiology and imaging appointments", "ER visits that turn into a ride home"],
       localNote: "This is the closest full hospital to most of our Spring and FM 1960 riders, so our vans are near it most days.", // CONFIRM
       geo: { latitude: 29.9884, longitude: -95.4259 }, // CONFIRM from the street address
-      mapNode: { i: 5, j: 2 }, // CONFIRM position on the hero map grid
+      mapNode: { i: 3, j: 2 }, // CONFIRM position on the hero map grid
     },
     {
       slug: "memorial-hermann-the-woodlands",
@@ -295,7 +295,7 @@ export const site = {
       typicalTrips: ["Rides home to The Woodlands and Spring after a stay", "Cancer center visits", "Follow-up visits in the medical office buildings"],
       localNote: "Riders often have a visit at the hospital and a second one in the office buildings on the same campus. Book a wait-and-return and we'll move you between them.", // CONFIRM
       geo: { latitude: 30.1568, longitude: -95.4563 }, // CONFIRM from the street address
-      mapNode: { i: 3, j: 0 }, // CONFIRM position on the hero map grid
+      mapNode: { i: 13, j: 12 }, // CONFIRM position on the hero map grid
     },
     {
       slug: "houston-methodist-willowbrook",
@@ -309,7 +309,7 @@ export const site = {
       typicalTrips: ["Discharge rides home to Cypress and Tomball", "Physical therapy visits", "Specialist visits in the office buildings"],
       localNote: "Traffic on 249 stacks up after 3 PM. For afternoon pickups we leave early and text you when we're close.", // CONFIRM
       geo: { latitude: 29.9781, longitude: -95.5519 }, // CONFIRM from the street address
-      mapNode: { i: 1, j: 3 }, // CONFIRM position on the hero map grid
+      mapNode: { i: 9, j: 3 }, // CONFIRM position on the hero map grid
     },
     {
       slug: "st-lukes-the-woodlands",
@@ -323,7 +323,7 @@ export const site = {
       typicalTrips: ["Rides home to north Montgomery County after a stay", "Heart and vascular follow-ups", "Rehab and therapy visits"],
       localNote: "It's the farthest north of the hospitals we serve, so we plan extra time on I-45 during the morning rush.", // CONFIRM
       geo: { latitude: 30.1922, longitude: -95.4533 }, // CONFIRM from the street address
-      mapNode: { i: 6, j: 0 }, // CONFIRM position on the hero map grid
+      mapNode: { i: 15, j: 9 }, // CONFIRM position on the hero map grid
     },
   ] satisfies Hospital[],
 
