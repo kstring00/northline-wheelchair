@@ -11,9 +11,9 @@ export function ServiceList() {
   return (
     <ul data-service-list className="mt-10 border-t border-ink/15">
       {list.map((s) => (
-        <li key={s.slug} className="grid gap-2 border-b border-ink/15 py-7 md:grid-cols-[minmax(0,18rem)_1fr] md:gap-10 lg:grid-cols-[minmax(0,22rem)_1fr]">
+        <li key={s.slug} className="grid gap-2 border-b border-ink/15 py-5 md:grid-cols-[minmax(0,18rem)_1fr] md:gap-10 lg:grid-cols-[minmax(0,22rem)_1fr]">
           <h3 className="text-[1.75rem] font-bold leading-tight">
-            <Link href={`/services/${s.slug}`} className="text-navy no-underline underline-offset-4 hover:underline focus-visible:underline">
+            <Link href={`/services/${s.slug}`} className="inline-flex min-h-12 items-center text-navy no-underline underline-offset-4 hover:underline focus-visible:underline">
               {s.shortName}
             </Link>
           </h3>
