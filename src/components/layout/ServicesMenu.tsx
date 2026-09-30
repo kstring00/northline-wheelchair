@@ -6,7 +6,7 @@ import { ChevronIcon } from "@/components/ui/Icons";
 import { serviceLinks } from "@/components/layout/nav";
 import { useDisclosure } from "@/components/layout/useDisclosure";
 
-export function ServicesMenu() {
+export function ServicesMenu({ label, links = serviceLinks }: { label: string; links?: { href: string; label: string }[] }) {
   const { open, setOpen, rootRef, buttonRef } = useDisclosure();
   const id = useId();
   return (
@@ -17,9 +17,9 @@ export function ServicesMenu() {
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen(!open)}
-        className="inline-flex min-h-12 items-center gap-1 rounded-lg px-3 font-bold text-navy-900 hover:bg-navy-100"
+        className="inline-flex min-h-12 items-center gap-1 whitespace-nowrap rounded-lg px-2.5 font-bold xl:px-3 text-navy-900 hover:bg-navy-100"
       >
-        Services
+        {label}
         <ChevronIcon className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
       <div
@@ -29,7 +29,7 @@ export function ServicesMenu() {
         className="absolute left-0 top-full mt-2 w-72 rounded-2xl border border-hairline bg-white p-2 shadow-[var(--shadow-lift)]"
       >
         <ul>
-          {serviceLinks.map((l) => (
+          {links.map((l) => (
             <li key={l.href}>
               <Link href={l.href} className="flex min-h-12 items-center rounded-lg px-3 font-bold text-navy-900 hover:bg-navy-100">
                 {l.label}

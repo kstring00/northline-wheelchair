@@ -1,159 +1,46 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
-import { site, coreAreas, getService, areaList } from "@/config/site";
+import { site, getService, areaList } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
-import { serviceSchema } from "@/lib/schema";
-import { serviceFaqs, wheelchairIncluded, commonTrips } from "@/content/services";
-import { JsonLd } from "@/components/seo/JsonLd";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { Section } from "@/components/ui/Section";
-import { Accordion } from "@/components/ui/Accordion";
-import { ServiceCards } from "@/components/home/ServiceCards";
-import { HowItWorks } from "@/components/home/HowItWorks";
-import { Payment } from "@/components/home/Payment";
-import { FinalCta } from "@/components/home/FinalCta";
-import { ArrowRightIcon, CheckIcon, PinIcon } from "@/components/ui/Icons";
+import { ServicePage, type ServiceCopy } from "@/components/layout/ServicePage";
+import { CanAndCant } from "@/components/home/CanAndCant";
 
-const SLUG = "wheelchair-transportation";
-const PATH = `/services/${SLUG}`;
-const service = getService(SLUG)!;
+const service = getService("wheelchair-transportation")!;
 
 export const metadata: Metadata = buildMetadata({
-  title: "Wheelchair Transportation in Houston, TX",
-  description: `Door-to-door wheelchair van service in ${areaList()}. Ramp and lift vans, trained drivers, family can ride along. Call ${site.phone.display}.`,
-  path: PATH,
+  title: "Wheelchair Transportation in Houston",
+  description: `Door-to-door wheelchair van rides in ${areaList()}. Ramp and lift vans, drivers who walk you to the right suite, and the price before you ride. Call ${site.phone.display}.`,
+  path: `/services/${service.slug}`,
 });
 
-const audiences = [
-  { title: "Wheelchair users", body: "Manual or power chair, you roll right on and stay in your own seat." },
-  { title: "Families booking for a parent", body: "Book for Mom or Dad from anywhere. We call you to confirm, and you can ride along." },
-  { title: "Facilities and case managers", body: "Discharges, standing dialysis schedules and patient rides, with one number to call." },
-];
+const copy: ServiceCopy = {
+  audiences: [
+    { title: "You use a wheelchair every day", body: "Manual or power chair, you roll on and stay in your own seat. No transfers, no lifting." },
+    { title: "You're booking for a parent", body: "You can be at work in Katy while Mom rides from Spring. We call you to confirm and text you when she's picked up and dropped off." },
+    { title: "You can't manage the car anymore", body: "A hip, a stroke, a bad knee. If getting into a car is the hard part, a ramp van fixes it." },
+    { title: "You need it for more than doctors", body: "Church, a grandson's game, the pharmacy, the airport. Any trip where the chair has to come along." },
+  ],
+  steps: [
+    { title: "Tell us where and when", body: `Call ${site.phone.display} or book online. Pickup address, where you're going, the date and time, and how you get around.` },
+    { title: "We confirm and price it", body: `We call back within ${site.responseTime} with your pickup time and the exact price. The day before, we call again to confirm.` },
+    { title: "Your driver does the rest", body: "A text when they're on the way. Help at your door. A secured ride. A walk to the right suite. And the same care coming home." },
+  ],
+  included: [
+    { title: "Door to door, not curb to curb", body: "Your driver comes to your front door and walks you inside at the other end." },
+    { title: "Your own wheelchair, the whole way", body: "Four floor straps hold the chair. A lap and shoulder belt hold you." },
+    { title: "A driver who knows your name", body: "Standing rides get the same driver whenever we can." },
+    { title: `Up to ${site.capabilities.maxCompanions ?? 2} companions`, body: "Family, a caregiver, a friend. Tell us so we save the seats." },
+    { title: "Waiting, if you want it", body: "Book wait & return and your driver stays through the appointment." },
+    { title: "The price up front", body: "You hear the number when we confirm. It doesn't change after." },
+  ],
+  onTheDay: [
+    "The day before your ride, we call to confirm the pickup time. If anything about your home is unusual, a gate, a steep driveway, a dog, that's the time to tell us.",
+    `Your driver texts when they're on the way and arrives about ${site.onTimePromise.arriveEarlyMinutes ?? 10} minutes early. They come to the door, say their name, and ask how you like to be helped.`,
+    "Getting into the van takes about two minutes. You roll up the ramp, the driver locks your chair to the floor, and you buckle up. Then a calm, quiet ride. Most drivers keep the radio off unless you'd like it on.",
+    "At the other end, the driver walks you to the check-in desk or the right suite. If you booked wait & return, they're back at the door within a few minutes of your call. Then the same careful ride home.",
+  ],
+  extra: <CanAndCant heading="What our vans and drivers can do" />,
+};
 
-export default function WheelchairTransportationPage() {
-  const img = site.images.vanRamp;
-  return (
-    <>
-      <JsonLd data={serviceSchema(service, PATH)} />
-      <PageHeader
-        crumbs={[{ name: "Wheelchair Transportation", path: PATH }]}
-        title={<>Wheelchair Transportation in Houston</>}
-        answer={service.answer}
-        aside={
-          <Image
-            src={img.src}
-            alt={img.alt}
-            width={img.width}
-            height={img.height}
-            preload
-            sizes="(min-width: 1024px) 560px, 100vw"
-            className="h-auto w-full rounded-[2rem] shadow-[var(--shadow-lift)]"
-          />
-        }
-      />
-
-      <Section id="included" tone="white" eyebrow="Every ride includes" title="A wheelchair van service built around you">
-        <ul className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
-          {wheelchairIncluded.map((item) => (
-            <li key={item.title} className="flex gap-4">
-              <span aria-hidden="true" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-navy-100 text-navy-900">
-                <CheckIcon className="h-6 w-6" />
-              </span>
-              <div>
-                <h3 className="text-xl font-bold">{item.title}</h3>
-                <p className="mt-1 text-muted">{item.body}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section id="who" eyebrow="Who we drive" title="Rides for riders, families and care teams">
-        <ul className="mt-10 grid gap-5 md:grid-cols-3">
-          {audiences.map((a) => (
-            <li key={a.title} className="rounded-[var(--radius-card)] border border-hairline bg-white p-6">
-              <h3 className="text-xl font-bold">{a.title}</h3>
-              <p className="mt-2 text-muted">{a.body}</p>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-8 text-lg">
-          Booking for a patient?{" "}
-          <Link href="/book?for=facility" className="font-bold text-navy-700 underline decoration-2 underline-offset-4">
-            Request a facility or case-manager ride
-          </Link>
-          .
-        </p>
-      </Section>
-
-      <Section id="trips" tone="white" eyebrow="Where people go" title="Common wheelchair van trips">
-        <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {commonTrips.map((t) => (
-            <li key={t.label}>
-              <Link href={t.href} className="lift-card flex min-h-16 items-center justify-between gap-3 rounded-xl border border-hairline bg-cream px-5 py-3 font-bold text-navy-900 no-underline">
-                {t.label}
-                <ArrowRightIcon className="h-5 w-5 shrink-0" />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <HowItWorks tone="cream" />
-
-      <Section id="safety" tone="navy" eyebrow="Safety first" title="Driver and van standards">
-        <div className="mt-10 grid gap-10 md:grid-cols-2">
-          {([["Our drivers", site.standards.drivers], ["Our vans", site.standards.vehicles]] as const).map(([h, list]) => (
-            <div key={h}>
-              <h3 className="text-xl font-bold !text-cream">{h}</h3>
-              <ul className="mt-4 space-y-3">
-                {list.map((x) => (
-                  <li key={x} className="flex gap-3 text-mist">
-                    <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-cream" /> {x}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-        <Link href="/about" className="mt-8 inline-flex min-h-12 items-center gap-2 font-bold text-cream underline decoration-2 underline-offset-4">
-          Meet Jay and learn how we train drivers <ArrowRightIcon />
-        </Link>
-      </Section>
-
-      <Payment />
-
-      <Section id="areas" eyebrow="Near you" title="Wheelchair transportation across north Houston">
-        <ul className="mt-8 flex flex-wrap gap-3">
-          {coreAreas.map((a) => (
-            <li key={a.slug}>
-              <Link href={`/service-area/${a.slug}`} className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-navy-900 bg-white px-4 font-bold text-navy-900 no-underline hover:bg-navy-100">
-                <PinIcon className="h-5 w-5 text-navy-700" /> {a.name} wheelchair transportation
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-6 text-lg text-muted">
-          Also serving {site.moreAreas.join(", ")}.{" "}
-          <Link href="/service-area" className="font-bold text-navy-700 underline">See our full service area</Link>.
-        </p>
-      </Section>
-
-      <Section id="questions" tone="sand" eyebrow="Questions" title="Wheelchair van questions">
-        <div className="mt-8 max-w-3xl">
-          <Accordion items={serviceFaqs[SLUG]} />
-          <Link href="/faq" className="mt-6 inline-flex min-h-12 items-center gap-2 font-bold text-navy-700 underline decoration-2 underline-offset-4">
-            More answers in our FAQ <ArrowRightIcon />
-          </Link>
-        </div>
-      </Section>
-
-      <Section id="related" tone="white" eyebrow="More ways we help" title="Related services">
-        <ServiceCards exclude={SLUG} />
-      </Section>
-
-      <FinalCta title="Book a wheelchair van ride" />
-    </>
-  );
+export default function Page() {
+  return <ServicePage service={service} title="Wheelchair Transportation in Houston" copy={copy} />;
 }

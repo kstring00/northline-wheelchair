@@ -3,25 +3,30 @@ import { site } from "@/config/site";
 import { isSiteLive } from "@/lib/env";
 
 type PageMeta = {
-  /** Page title without the brand suffix. Include the service and city. */
+  /**
+   * Keyword-first title: "[Service] in [Place]". The brand suffix
+   * "| Northline Wheelchair Transportation" is added here. Only /about and
+   * /contact may lead with the brand (pass `brandFirst`).
+   */
   title: string;
   description: string;
   path: string;
-  /** Use the full title as-is (home page). */
-  absoluteTitle?: boolean;
+  brandFirst?: boolean;
+  /** Draft content: never indexed, even when the site is live. */
+  draft?: boolean;
 };
 
 export const robotsMeta: Metadata["robots"] = isSiteLive
   ? { index: true, follow: true }
   : { index: false, follow: false };
 
-export function buildMetadata({ title, description, path, absoluteTitle }: PageMeta): Metadata {
-  const fullTitle = absoluteTitle ? title : `${title} | ${site.shortName}`;
+export function buildMetadata({ title, description, path, brandFirst, draft }: PageMeta): Metadata {
+  const fullTitle = brandFirst ? `${site.name} | ${title}` : `${title} | ${site.name}`;
   return {
-    title: absoluteTitle ? { absolute: title } : title,
+    title: { absolute: fullTitle },
     description,
     alternates: { canonical: path },
-    robots: robotsMeta,
+    robots: draft ? { index: false, follow: false } : robotsMeta,
     openGraph: {
       type: "website",
       locale: "en_US",
@@ -30,11 +35,7 @@ export function buildMetadata({ title, description, path, absoluteTitle }: PageM
       title: fullTitle,
       description,
     },
-    twitter: {
-      card: "summary_large_image",
-      title: fullTitle,
-      description,
-    },
+    twitter: { card: "summary_large_image", title: fullTitle, description },
   };
 }
 

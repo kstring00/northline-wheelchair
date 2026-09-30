@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible, Bricolage_Grotesque } from "next/font/google";
-import { site, areaList } from "@/config/site";
+import { site, areaList, hoursSummary } from "@/config/site";
 import { robotsMeta } from "@/lib/seo";
 import { localBusinessSchema, organizationSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -35,10 +35,10 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `Wheelchair Transportation in Houston, TX | ${site.name}`,
-    template: `%s | ${site.shortName}`,
+    default: `Wheelchair Transportation in North Houston | ${site.name}`,
+    template: `%s | ${site.name}`,
   },
-  description: `Door-to-door wheelchair van rides in ${areaList()}. Call ${site.phone.display} or book online.`,
+  description: `Door-to-door wheelchair van rides in ${areaList()}. ${hoursSummary()}. Call ${site.phone.display} or book online.`,
   applicationName: site.name,
   robots: robotsMeta,
   formatDetection: { telephone: true },

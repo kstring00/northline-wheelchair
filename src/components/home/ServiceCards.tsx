@@ -6,7 +6,7 @@ import { ArrowRightIcon } from "@/components/ui/Icons";
 export function ServiceCards({ exclude }: { exclude?: string }) {
   const list = services.filter((s) => s.slug !== exclude);
   return (
-    <ul className={`mt-10 grid gap-5 sm:grid-cols-2 ${list.length === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+    <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {list.map((s, i) => (
         <li key={s.slug} className="lift-card flex rounded-[var(--radius-card)] border border-hairline bg-white shadow-[var(--shadow-soft)]">
           {/* The whole card is the link, so the tap target is the full card. */}

@@ -17,11 +17,15 @@
     "lighthouse": "bash scripts/lighthouse.sh",
     "screenshots": "node scripts/screenshots.mjs",
     "assets:placeholders": "node scripts/make-placeholders.mjs",
-    "assets:icons": "node scripts/make-icons.mjs"
+    "assets:icons": "node scripts/make-icons.mjs",
+    "test:pricing": "node scripts/test-pricing-modes.mjs",
+    "test:acceptance": "node scripts/acceptance.mjs"
   },
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "gsap": "^3.15.0",
     "next": "^16.3.7",
+    "next-mdx-remote": "^6.0.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
@@ -38,6 +42,7 @@
     "postcss": "^8.5.28",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3"
   }
 }

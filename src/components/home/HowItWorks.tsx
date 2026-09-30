@@ -10,7 +10,7 @@ const steps = [
   },
   {
     title: "We call to confirm",
-    body: `We call you back within ${site.booking.callbackWindow} ${site.booking.callbackHoursNote} to confirm the pickup time and the price. No surprises.`,
+    body: `We call back within ${site.responseTime} during business hours with the pickup time and the exact price. No surprises.`,
   },
   {
     title: "Door-to-door ride",

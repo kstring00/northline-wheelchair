@@ -1,9 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import { site, telHref, bookHref, areaList } from "@/config/site";
 import { ButtonLink } from "@/components/ui/Button";
 import { RouteMotif } from "@/components/ui/RouteMotif";
-import { CheckIcon, PinIcon } from "@/components/ui/Icons";
+import { PinIcon } from "@/components/ui/Icons";
 import { HeroMotion } from "@/components/home/HeroMotion";
+import { OnTimePromise } from "@/components/home/OnTimePromise";
+import { SeHablaBadge } from "@/components/ui/Badges";
 
 /**
  * The 5-second test: WHAT (wheelchair van rides), FOR WHOM (you or someone
@@ -14,16 +17,17 @@ export function Hero() {
   const img = site.images.hero;
   return (
     <section id="hero" aria-labelledby="hero-heading" className="relative overflow-hidden bg-cream">
-      <div className="container-page grid items-center gap-10 pt-6 pb-12 sm:pt-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:pt-16 lg:pb-20">
+      <div className="container-page grid items-center gap-10 pt-6 pb-6 sm:pt-10 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:pt-16 lg:pb-10">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full bg-navy-100 px-3 py-1.5 text-sm font-bold text-navy-900">
             <PinIcon className="h-4 w-4" /> Houston & the north side
           </p>
+          <SeHablaBadge className="ml-2" />
           <h1 id="hero-heading" className="mt-4 text-[2.375rem] font-bold sm:text-[3.25rem] lg:text-[3.75rem]">
-            Wheelchair van rides in Houston, <span className="text-navy-700">for you or someone you love.</span>
+            Wheelchair transportation in North Houston, <span className="text-navy-700">for you or someone you love.</span>
           </h1>
           <p className="mt-4 max-w-xl text-lg text-muted">
-            Safe, on-time, door-to-door rides to doctor visits, dialysis and hospital discharge. We serve {areaList()}.
+            On-time, door-to-door wheelchair van rides to doctor visits, dialysis and home from the hospital. We serve {areaList()}. Non-emergency medical transportation, in plain words.
           </p>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -36,15 +40,12 @@ export function Hero() {
             </a>
           </div>
 
-          {/* CONFIRM these four promises with Jay. */}
-          <ul className="mt-7 grid gap-2 text-base text-ink sm:grid-cols-2">
-            {["Ramp and lift vans", "Help from your door to theirs", "Family can ride along", "Repeating rides for dialysis"].map((t) => (
-              <li key={t} className="flex items-start gap-2">
-                <CheckIcon className="mt-1 h-5 w-5 shrink-0 text-success" />
-                {t}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-5 text-muted">
+            You&apos;ll know the price before you ride. <Link href="/pricing" className="font-bold text-navy-700 underline">See how pricing works</Link>.
+          </p>
+          <div className="mt-7 lg:hidden">
+            <OnTimePromise compact />
+          </div>
         </div>
 
         <div className="relative">
@@ -70,6 +71,9 @@ export function Hero() {
             <RouteMotif hook="data-hero-route" className="mt-1 h-auto w-full" />
           </div>
         </div>
+      </div>
+      <div className="container-page hidden pb-12 lg:block lg:pb-16">
+        <OnTimePromise compact />
       </div>
       <HeroMotion />
     </section>

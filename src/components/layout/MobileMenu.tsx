@@ -5,7 +5,8 @@ import { useId } from "react";
 import { site, telHref, bookHref } from "@/config/site";
 import { buttonClass } from "@/components/ui/Button";
 import { CloseIcon, MenuIcon, PhoneIcon } from "@/components/ui/Icons";
-import { mainLinks, serviceLinks } from "@/components/layout/nav";
+import { mainLinks, moreLinks, serviceLinks } from "@/components/layout/nav";
+import { TextUsLink } from "@/components/ui/Badges";
 import { useDisclosure } from "@/components/layout/useDisclosure";
 
 export function MobileMenu() {
@@ -41,8 +42,8 @@ export function MobileMenu() {
             ))}
           </ul>
           <hr className="my-3 border-hairline" />
-          <ul>
-            {mainLinks.map((l) => (
+          <ul className="grid sm:grid-cols-2">
+            {[...mainLinks, ...moreLinks].map((l) => (
               <li key={l.href}><Link href={l.href} className={linkClass}>{l.label}</Link></li>
             ))}
           </ul>
@@ -51,6 +52,7 @@ export function MobileMenu() {
             <a href={telHref} className={buttonClass("secondary", "lg")}>
               <PhoneIcon /> Call {site.phone.display}
             </a>
+            <TextUsLink size="lg" />
           </div>
         </div>
       </nav>

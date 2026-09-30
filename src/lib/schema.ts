@@ -1,7 +1,16 @@
-import { site, coreAreas, fullAddress, type Service, type CoreArea } from "@/config/site";
+import {
+  site,
+  coreAreas,
+  fullAddress,
+  realReviews,
+  hasRealReviews,
+  type Service,
+  type CoreArea,
+  type Hospital,
+} from "@/config/site";
 import { absoluteUrl } from "@/lib/seo";
 
-/** JSON-LD builders. All values come from site.ts. */
+/** JSON-LD builders. Every value comes from site.ts. Nothing is invented. */
 
 const businessId = absoluteUrl("/#business");
 const orgId = absoluteUrl("/#organization");
@@ -17,10 +26,40 @@ const postalAddress = () => ({
   addressCountry: site.address.country,
 });
 
+/** Each core city links to its own page, so Google can tie the area to the URL. */
 const areaServed = () => [
-  ...coreAreas.map((a) => ({ "@type": "City", name: `${a.name}, TX` })),
+  ...coreAreas.map((a) => ({ "@type": "City", name: `${a.name}, TX`, url: absoluteUrl(`/service-area/${a.slug}`) })),
   ...site.moreAreas.map((name) => ({ "@type": "City", name: `${name}, TX` })),
 ];
+
+const openingHours = () =>
+  site.hours.map((h) => ({
+    "@type": "OpeningHoursSpecification",
+    dayOfWeek: h.days.map((d) => `https://schema.org/${d}`),
+    opens: h.opens,
+    closes: h.closes,
+  }));
+
+/** Review + AggregateRating only when real reviews and a real rating exist. */
+const ratingBlock = () =>
+  hasRealReviews
+    ? {
+        aggregateRating: {
+          "@type": "AggregateRating",
+          ratingValue: site.googleRating,
+          reviewCount: site.googleReviewCount ?? realReviews.length,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        review: realReviews.map((r) => ({
+          "@type": "Review",
+          author: { "@type": "Person", name: r.author },
+          datePublished: r.date,
+          reviewBody: r.text,
+          reviewRating: { "@type": "Rating", ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+        })),
+      }
+    : {};
 
 export function organizationSchema() {
   return {
@@ -44,24 +83,21 @@ export function localBusinessSchema() {
     "@type": "LocalBusiness",
     "@id": businessId,
     name: site.name,
-    description: `${site.tagline}. Door-to-door wheelchair van rides across ${coreAreas.map((a) => a.name).join(", ")}, TX.`,
+    description: `${site.tagline}. Door-to-door wheelchair van rides in ${coreAreas.map((a) => a.name).join(", ")}, TX.`,
     url: site.url,
     telephone: site.phone.e164,
     email: site.email,
     image: absoluteUrl(site.images.hero.src),
     logo: absoluteUrl("/logo.png"),
-    priceRange: site.priceRange,
+    ...(site.pricing.displayMode !== "quoteOnly" ? { priceRange: site.pricing.priceRange } : {}),
     address: postalAddress(),
     geo: { "@type": "GeoCoordinates", latitude: site.geo.latitude, longitude: site.geo.longitude },
     areaServed: areaServed(),
-    openingHoursSpecification: site.hours.map((h) => ({
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: h.days.map((d) => `https://schema.org/${d}`),
-      opens: h.opens,
-      closes: h.closes,
-    })),
+    openingHoursSpecification: openingHours(),
     parentOrganization: { "@id": orgId },
+    ...(site.languages.includes("es") ? { knowsLanguage: ["en", "es"] } : {}),
     ...(sameAs().length ? { sameAs: sameAs() } : {}),
+    ...ratingBlock(),
   };
 }
 
@@ -93,18 +129,27 @@ export function cityServiceSchema(area: CoreArea, path: string) {
   };
 }
 
+export function hospitalServiceSchema(h: Hospital, path: string) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": absoluteUrl(`${path}#service`),
+    name: `Wheelchair transportation to ${h.name}`,
+    serviceType: "Wheelchair transportation",
+    description: `Door-to-door wheelchair van rides to and from ${h.name}, ${h.city}, TX.`,
+    url: absoluteUrl(path),
+    provider: { "@id": businessId },
+    areaServed: { "@type": "Place", name: h.name, address: h.address },
+  };
+}
+
 export type Crumb = { name: string; path: string };
 
 export function breadcrumbSchema(crumbs: Crumb[]) {
   return {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: crumbs.map((c, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      name: c.name,
-      item: absoluteUrl(c.path),
-    })),
+    itemListElement: crumbs.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.name, item: absoluteUrl(c.path) })),
   };
 }
 
@@ -112,11 +157,20 @@ export function faqSchema(items: { q: string; a: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: items.map((f) => ({
-      "@type": "Question",
-      name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a },
-    })),
+    mainEntity: items.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  };
+}
+
+export function articleSchema(a: { title: string; description: string; date: string; author: string; path: string }) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: a.title,
+    description: a.description,
+    datePublished: a.date,
+    author: { "@type": "Person", name: a.author },
+    publisher: { "@id": orgId },
+    mainEntityOfPage: absoluteUrl(a.path),
   };
 }
 

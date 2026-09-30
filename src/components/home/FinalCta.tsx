@@ -10,7 +10,7 @@ export function FinalCta({ title = "Ready when you are", body }: { title?: strin
           <RouteMotif tone="dark" className="mx-auto mb-6 h-auto w-56 opacity-90" />
           <h2 id="final-cta-heading" className="text-[2rem] font-bold !text-cream sm:text-[2.75rem]">{title}</h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-mist">
-            {body ?? `Book online in about two minutes, or call and talk to a real person. We'll call you back within ${site.booking.callbackWindow} to confirm.`}
+            {body ?? `Book online in about two minutes, or call and talk to a real person. We call back within ${site.responseTime} during business hours to confirm.`}
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <ButtonLink href={bookHref} size="lg" className="w-full sm:w-auto sm:min-w-56">Book a Ride</ButtonLink>

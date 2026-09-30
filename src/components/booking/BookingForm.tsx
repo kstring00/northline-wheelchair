@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { site, telHref } from "@/config/site";
+import { site, telHref, money } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { loadGsap, MOTION_OK } from "@/components/motion/gsap";
 import { buttonClass } from "@/components/ui/Button";
@@ -28,6 +28,7 @@ const stepNames: Record<Step, string> = { 1: "Who is riding", 2: "The trip", 3: 
 const stepShort: Record<Step, string> = { 1: "Rider", 2: "Trip", 3: "Contact" };
 
 const noop = () => () => {};
+void money;
 function useClientValue<T>(get: () => T, server: T) {
   return useSyncExternalStore(noop, get, () => server);
 }
@@ -262,12 +263,15 @@ export function BookingForm() {
                   </div>
                   <ChoiceGroup
                     name="tripType"
-                    legend="One-way or round trip?"
+                    legend="What kind of trip?"
                     error={errors.tripType}
-                    columns={2}
+                    columns={3}
                     options={[
                       { value: "one-way", label: "One-way", hint: "Just the ride there." },
-                      { value: "round-trip", label: "Round trip", hint: "There and back home." },
+                      { value: "round-trip", label: "Round trip", hint: "We come back later for the ride home." },
+                      ...(site.onTimePromise.waitAndReturn
+                        ? [{ value: "wait-and-return", label: "Wait & return", hint: `Your driver waits, walks you out, and brings you home.${site.pricing.waitFreeMinutes ? ` First ${site.pricing.waitFreeMinutes} min free.` : ""}` }]
+                        : []),
                     ]}
                     value={d.tripType}
                     onChange={(v) => update("tripType", v as BookingData["tripType"])}
@@ -356,12 +360,12 @@ export function BookingForm() {
                   <SelectField
                     id="companions"
                     label="How many people are riding along?"
-                    hint={`Family or caregivers. Up to ${site.booking.maxCompanions}.`}
+                    hint={`Family or caregivers. Up to ${site.capabilities.maxCompanions ?? 2}.`}
                     value={d.companions}
                     onChange={(e) => update("companions", e.target.value)}
                   >
                     <option value="0">No one, just the rider</option>
-                    {Array.from({ length: site.booking.maxCompanions }, (_, i) => (
+                    {Array.from({ length: site.capabilities.maxCompanions ?? 2 }, (_, i) => (
                       <option key={i + 1} value={String(i + 1)}>
                         {i + 1} {i === 0 ? "person" : "people"}
                       </option>
@@ -445,7 +449,7 @@ function Success({ d, firstName, successRef, onReset }: { d: BookingData; firstN
     ["Pickup", [d.pickupAddress, d.pickupUnit].filter(Boolean).join(", ")],
     ["Going to", d.destination],
     ["When", `${formatDate(d.date)} at ${formatTime(d.time)}`],
-    ["Trip", d.tripType === "round-trip" ? `Round trip${d.returnTime ? `, return at ${formatTime(d.returnTime)}` : ", call when ready"}` : "One-way"],
+    ["Trip", d.tripType === "wait-and-return" ? "Wait & return: your driver waits and brings you home" : d.tripType === "round-trip" ? `Round trip${d.returnTime ? `, return at ${formatTime(d.returnTime)}` : ", call when ready"}` : "One-way"],
   ];
   if (d.repeat === "repeat") rows.push(["Repeats", `Every ${d.repeatDays.map((x) => dayNames[x]).join(", ")}`]);
   rows.push(["We'll call", d.phone]);
@@ -459,7 +463,7 @@ function Success({ d, firstName, successRef, onReset }: { d: BookingData; firstN
         Thank you{firstName ? `, ${firstName}` : ""}. Your ride request is in.
       </h2>
       <p className="mt-3 text-lg">
-        <strong>We&apos;ll call you within {site.booking.callbackWindow}</strong> {site.booking.callbackHoursNote} to confirm the pickup time and price. Your ride is not booked until we talk.
+        <strong>We call back within {site.responseTime}</strong> during business hours to confirm the pickup time and the price. Your ride is not booked until we talk.
       </p>
       <dl className="mt-6 divide-y divide-hairline rounded-xl bg-cream px-5">
         {rows.map(([k, v]) => (

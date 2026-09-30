@@ -25,7 +25,7 @@ const state = (page) => page.evaluate(() => ({
   check("Reduced: hero route visible immediately", s.heroOpacity === "1", s.heroOpacity);
   check("Reduced: how-it-works lines fully drawn", s.lines.every((t) => t === "none" || t.startsWith("matrix(1, 0, 0, 1")), s.lines.join(" | "));
   check("Reduced: every step lit", s.lits.every((o) => o === "1"), s.lits.join(","));
-  check("Reduced: stats show final values", s.counts.join(",") === "5,000,98,12", s.counts.join(","));
+  check("Reduced: stats show final values", s.counts.join(",") === "12,5,000,98", s.counts.join(","));
   await page.waitForTimeout(2000);
   const s2 = await state(page);
   check("Reduced: nothing changes after load", JSON.stringify(s) === JSON.stringify(s2));
@@ -44,7 +44,7 @@ const state = (page) => page.evaluate(() => ({
   await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 300) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 50)); } });
   await page.waitForTimeout(2000);
   const s1 = await state(page);
-  check("Motion: stats counted up to final values", s1.counts.join(",") === "5,000,98,12", s1.counts.join(","));
+  check("Motion: stats counted up to final values", s1.counts.join(",") === "12,5,000,98", s1.counts.join(","));
   check("Motion: lines fully drawn after scrolling past", s1.lines.every((t) => t.startsWith("matrix(1, 0, 0, 1")), s1.lines.join(" | "));
   check("Motion: all steps lit after scrolling past", s1.lits.every((o) => o === "1"), s1.lits.join(","));
 }

@@ -10,7 +10,7 @@ export type BookingData = {
   destination: string;
   date: string;
   time: string;
-  tripType: "one-way" | "round-trip" | "";
+  tripType: "one-way" | "round-trip" | "wait-and-return" | "";
   returnTime: string;
   repeat: "once" | "repeat";
   repeatDays: string[];
@@ -128,7 +128,7 @@ export function validateStep(step: Step, d: BookingData): Errors {
     if (!d.date) e.date = "Please choose the date of the ride.";
     else if (d.date < todayISO()) e.date = "That date has already passed. Please choose today or a later date.";
     if (!d.time) e.time = "Please enter the appointment or pickup time.";
-    if (!d.tripType) e.tripType = "Please choose one-way or round trip.";
+    if (!d.tripType) e.tripType = "Please choose one-way, round trip, or wait and return.";
     if (d.repeat === "repeat" && d.repeatDays.length === 0) e.repeatDays = "Please choose the days this ride repeats.";
   }
   if (step === 3) {

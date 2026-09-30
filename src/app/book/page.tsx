@@ -5,10 +5,11 @@ import { Breadcrumbs } from "@/components/layout/Breadcrumbs";
 import { BookingForm } from "@/components/booking/BookingForm";
 import { buttonClass } from "@/components/ui/Button";
 import { ClockIcon, PhoneIcon, ShieldIcon } from "@/components/ui/Icons";
+import { TextUsLink } from "@/components/ui/Badges";
 
 export const metadata: Metadata = buildMetadata({
   title: "Book a Wheelchair Van Ride in Houston",
-  description: `Request a wheelchair van ride in the Houston area in about two minutes. We'll call you within ${site.booking.callbackWindow} to confirm. Or call ${site.phone.display}.`,
+  description: `Request a wheelchair van ride in the Houston area in about two minutes. We call back within ${site.responseTime} to confirm. Or call ${site.phone.display}.`,
   path: "/book",
 });
 
@@ -21,7 +22,7 @@ export default function BookPage() {
           <div>
             <h1 id="page-heading" className="text-[2.25rem] font-bold sm:text-[3rem]">Book a wheelchair van ride</h1>
             <p className="mt-3 max-w-2xl text-xl">
-              Three short steps, about two minutes. We&apos;ll call you within {site.booking.callbackWindow} {site.booking.callbackHoursNote} to confirm.
+              Three short steps, about two minutes. We call back within {site.responseTime} during business hours to confirm.
             </p>
 
             <div className="mt-8 rounded-[1.5rem] border border-hairline bg-white p-5 shadow-[var(--shadow-soft)] sm:p-8">
@@ -41,10 +42,11 @@ export default function BookPage() {
           <aside aria-labelledby="call-heading" className="space-y-5 lg:pt-24">
             <div className="rounded-[1.5rem] bg-navy-900 p-6 text-cream on-dark">
               <h2 id="call-heading" className="text-xl font-bold !text-cream">Rather talk to a person?</h2>
-              <p className="mt-2 text-mist">Call and we&apos;ll book your ride over the phone.</p>
+              <p className="mt-2 text-mist">Call or text and we&apos;ll book your ride over the phone.</p>
               <a href={telHref} className="mt-4 inline-flex min-h-14 w-full items-center justify-center gap-2 rounded-full border-2 border-cream text-lg font-bold text-cream no-underline hover:bg-navy-700">
                 <PhoneIcon /> {site.phone.display}
               </a>
+              <TextUsLink variant="onDark" size="lg" className="mt-3 w-full" />
             </div>
             <div className="rounded-[1.5rem] border border-hairline bg-white p-6">
               <h2 className="flex items-center gap-2 text-lg font-bold"><ClockIcon /> Hours</h2>
@@ -56,6 +58,7 @@ export default function BookPage() {
                   </div>
                 ))}
               </dl>
+              <p className="mt-3 text-sm text-muted">{site.afterHoursPolicy}</p>
             </div>
             <div className="rounded-[1.5rem] border border-hairline bg-white p-6">
               <h2 className="flex items-center gap-2 text-lg font-bold"><ShieldIcon /> Your privacy</h2>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { site, coreAreas, getCoreArea, services } from "@/config/site";
+import { site, coreAreas, getCoreArea, services, hospitals } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 import { cityServiceSchema } from "@/lib/schema";
 import { JsonLd } from "@/components/seo/JsonLd";
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps<"/service-area/[cit
   });
 }
 
-// PHASE 2: expand with unique local copy (routes, parking/entrance tips per facility, local reviews).
+
 export default async function CityPage({ params }: PageProps<"/service-area/[city]">) {
   const { city } = await params;
   const area = getCoreArea(city);
@@ -71,6 +71,17 @@ export default async function CityPage({ params }: PageProps<"/service-area/[cit
             </li>
           ))}
         </ul>
+        {hospitals.some((h) => h.nearestAreas.includes(area.slug)) && (
+          <p className="mt-6 text-lg">
+            Hospital drop-off notes:{" "}
+            {hospitals.filter((h) => h.nearestAreas.includes(area.slug)).map((h, i, arr) => (
+              <span key={h.slug}>
+                <Link href={`/service-area/hospitals/${h.slug}`} className="font-bold text-navy-700 underline">{h.name}</Link>
+                {i < arr.length - 1 ? ", " : ""}
+              </span>
+            ))}
+          </p>
+        )}
         <p className="mt-6 text-lg">
           Nearby:{" "}
           {coreAreas.filter((a) => a.slug !== area.slug).map((a, i, arr) => (

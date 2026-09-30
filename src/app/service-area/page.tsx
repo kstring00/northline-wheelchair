@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { site, coreAreas, areaList } from "@/config/site";
+import { site, coreAreas, hospitals, areaList } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/ui/Section";
@@ -8,12 +8,12 @@ import { FinalCta } from "@/components/home/FinalCta";
 import { PinIcon } from "@/components/ui/Icons";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Wheelchair Transportation Service Area | North Houston",
+  title: "Wheelchair Transportation Service Area in North Houston",
   description: `Wheelchair van rides in ${areaList()}, plus ${site.moreAreas.slice(0, 4).join(", ")} and more. See the hospitals and clinics we drive to.`,
   path: "/service-area",
 });
 
-// PHASE 2: add the service-area map and the full hospital/clinic directory.
+// Later: service-area map.
 export default function ServiceAreaPage() {
   const facilities = Array.from(new Set(coreAreas.flatMap((a) => a.facilities))).sort();
   return (
@@ -40,7 +40,19 @@ export default function ServiceAreaPage() {
         <h3 className="mt-12 text-xl font-bold">Also serving</h3>
         <p className="mt-2 text-lg text-muted">{site.moreAreas.join(", ")}. Not on the list? Call {site.phone.display} and ask.</p>
       </Section>
-      <Section id="facilities" eyebrow="Where we drive" title="Hospitals and clinics we drive to">
+      <Section id="hospitals" eyebrow="Hospital pages" title="Hospitals we drive to most, with drop-off notes">
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2">
+          {hospitals.map((h) => (
+            <li key={h.slug} className="lift-card rounded-[var(--radius-card)] border border-hairline bg-white">
+              <Link href={`/service-area/hospitals/${h.slug}`} className="flex min-h-24 flex-col justify-center rounded-[var(--radius-card)] p-5 no-underline">
+                <span className="text-xl font-bold text-navy-900">{h.name}</span>
+                <span className="mt-1 text-muted">{h.city} · {h.typicalTrips[0]}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Section>
+      <Section id="facilities" tone="white" eyebrow="Also" title="Other hospitals and clinics we drive to">
         <ul className="mt-8 grid gap-x-8 gap-y-2 sm:grid-cols-2">
           {facilities.map((f) => <li key={f} className="text-lg">{f}</li>)}
         </ul>

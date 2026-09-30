@@ -2,7 +2,7 @@
 # Lighthouse mobile (default Moto G Power emulation + simulated slow 4G/4x CPU).
 export CHROME_PATH=${CHROME_PATH:-/opt/pw-browsers/chromium-1194/chrome-linux/chrome}
 BASE=${BASE_URL:-http://localhost:3000}
-for p in / /book /services/wheelchair-transportation; do
+for p in / /book /pricing /services/wheelchair-transportation; do
   name=$( [ "$p" = "/" ] && echo home || echo "$p" | sed 's#^/##; s#/#_#g')
   for run in 1 2 3; do
     npx lighthouse "$BASE$p" --quiet --output=json --output-path="reports/lighthouse/$name-$run.json" \
@@ -11,7 +11,7 @@ for p in / /book /services/wheelchair-transportation; do
 done
 node -e '
 const fs=require("fs");const rows=[];
-for (const n of ["home","book","services_wheelchair-transportation"]) {
+for (const n of ["home","book","pricing","services_wheelchair-transportation"]) {
   const runs=[1,2,3].map(i=>JSON.parse(fs.readFileSync(`reports/lighthouse/${n}-${i}.json`)));
   const med=(f)=>{const v=runs.map(f).sort((a,b)=>a-b);return v[1];};
   const c=(k)=>med(r=>Math.round(r.categories[k].score*100));

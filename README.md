@@ -38,6 +38,18 @@ Put the photo in `public/images/`, then change `images.hero` in `src/config/site
 
 Placeholder reviews have `isPlaceholder: true`, which shows a visible **Sample review** tag. Replace them with real Google reviews (with permission) and set `isPlaceholder: false`.
 
+### Drafts
+
+Guides (`src/content/guides/*.mdx`) carry `draft: true` in frontmatter until Jay approves them. Drafts never enter the sitemap, are always `noindex`, and show a "Draft, pending approval" label while `NEXT_PUBLIC_SITE_LIVE` is false. Hospital drop-off notes use `dropOffNotesDraft` the same way.
+
+### Pricing display mode
+
+`pricing.displayMode` in `site.ts` is Jay's choice: `"full"` (every number), `"startingAt"` (base fare only) or `"quoteOnly"` (rules in words, no numbers). Every mode shows every rule. `npm run test:pricing` renders all three.
+
+### Reviews and ratings
+
+`reviews[]` entries with `isPlaceholder: true` show an "Example review" tag and never enter schema. `AggregateRating`/`Review` JSON-LD appears only when `googleRating` is set and at least one real review exists.
+
 ## Launch switch: `NEXT_PUBLIC_SITE_LIVE`
 
 Default is **off** (unset or `false`). While off:
@@ -65,7 +77,9 @@ Run against a production build (`npm run build && npm start`):
 | `npm run test:inp` | Interaction latency on a 4× CPU-throttled phone |
 | `npm run test:schema` | JSON-LD against the schema.org vocabulary (set `SCHEMA_VOCAB` to a local copy of `schemaorg-current-https.jsonld`) |
 | `npm run test:contrast` | Palette contrast ratios (body text AAA) |
-| `npm run lighthouse` | Lighthouse mobile ×3 runs (median) for Home, `/book` and the wheelchair service page |
+| `npm run test:pricing` | Pricing rules render correctly in all three display modes |
+| `npm run test:acceptance` | Phase 1.5 acceptance: service + place in title/H1/first sentence, banned words, NEMT placement, no iframes or external scripts, drafts excluded, schema gating |
+| `npm run lighthouse` | Lighthouse mobile ×3 runs (median) for Home, `/book`, `/pricing` and the wheelchair service page |
 
 Scripts use Chromium at `/opt/pw-browsers/...` by default; override with `CHROME_PATH`.
 

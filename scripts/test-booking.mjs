@@ -50,7 +50,7 @@ await page.keyboard.press("Enter");
 await page.waitForTimeout(200);
 check("Past date gets plain-language error", await page.getByText("That date has already passed").first().isVisible());
 check("Missing time error", await page.getByText("Please enter the appointment or pickup time.").first().isVisible());
-check("Missing trip type error", await page.getByText("Please choose one-way or round trip.").first().isVisible());
+check("Missing trip type error", await page.getByText("Please choose one-way, round trip, or wait and return.").first().isVisible());
 
 // Fix step 2 by keyboard.
 const d = new Date(Date.now() + 3 * 864e5);
@@ -59,6 +59,7 @@ await page.locator("#date").focus();
 await page.keyboard.type(mmddyyyy);
 await tabTo((f) => f.id === "time");
 await page.keyboard.type("0930AM");
+check("Wait & Return option present", (await page.locator('input[name="tripType"][value="wait-and-return"]').count()) === 1);
 f = await tabTo((f) => f.name === "tripType");
 await page.keyboard.press("ArrowRight"); // round trip
 f = await tabTo((f) => f.name === "repeat");
@@ -101,7 +102,7 @@ await page.keyboard.press("Enter");
 await page.waitForTimeout(1500);
 f = await focused();
 check("Success: focus moves to thank-you heading", f.tag === "H2" && f.text?.startsWith("Thank you, Maria"), f.text);
-check("Success states callback window", await page.getByText("We'll call you within 30 minutes", { exact: true }).isVisible());
+check("Success states responseTime", await page.getByText("We call back within 30 minutes", { exact: true }).isVisible());
 check("Success repeats phone number", await page.locator('[data-booking-root] a[href^="tel:"]').isVisible());
 check("Success summarises repeating days", await page.getByText("Every Monday, Wednesday, Friday").isVisible());
 
@@ -117,7 +118,7 @@ const noJs = await (await browser.newContext({ javaScriptEnabled: false, viewpor
 await noJs.goto(BASE + "/book");
 check("No-JS: call fallback visible", await noJs.getByText("Online booking needs JavaScript turned on.").isVisible());
 await noJs.goto(BASE + "/");
-check("No-JS: FAQ answers readable", await noJs.getByText("Yes. You ride in your own manual or power wheelchair.", { exact: false }).first().isVisible());
+check("No-JS: FAQ answers readable", await noJs.getByText("Book a wait-and-return ride and your driver waits", { exact: false }).first().isVisible());
 check("No-JS: hero route visible", (await noJs.locator("[data-hero-route]").evaluate((el) => getComputedStyle(el).opacity)) === "1");
 
 await browser.close();

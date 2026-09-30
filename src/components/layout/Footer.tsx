@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { site, coreAreas, telHref, bookHref } from "@/config/site";
+import { t } from "@/content/dictionary";
 import { Logo } from "@/components/ui/Logo";
 import { RouteMotif } from "@/components/ui/RouteMotif";
+import { SeHablaBadge } from "@/components/ui/Badges";
 import { CopyrightYear } from "@/components/layout/CopyrightYear";
-import { serviceLinks } from "@/components/layout/nav";
+import { serviceLinks, moreLinks } from "@/components/layout/nav";
 
 const BUILD_YEAR = new Date().getFullYear();
 
@@ -23,20 +25,15 @@ export function Footer() {
             <address className="mt-5 not-italic">
               <p className="font-bold text-cream">{site.name}</p>
               {site.address.showStreet && <p>{site.address.street}</p>}
-              <p>
-                {site.address.city}, {site.address.region} {site.address.postalCode}
-              </p>
-              <p className="mt-2">
-                <a href={telHref} className={`${link} text-lg font-bold`}>{site.phone.display}</a>
-              </p>
-              <p>
-                <a href={`mailto:${site.email}`} className={link}>{site.email}</a>
-              </p>
+              <p>{site.address.city}, {site.address.region} {site.address.postalCode}</p>
+              <p className="mt-2"><a href={telHref} className={`${link} text-lg font-bold`}>{site.phone.display}</a></p>
+              <p><a href={`mailto:${site.email}`} className={link}>{site.email}</a></p>
             </address>
+            <SeHablaBadge className="mt-4" />
           </div>
 
           <div>
-            <h2 className={heading}>Hours</h2>
+            <h2 className={heading}>{t.labels.hours}</h2>
             <dl className="mt-3 space-y-2">
               {site.hours.map((h) => (
                 <div key={h.label}>
@@ -45,39 +42,38 @@ export function Footer() {
                 </div>
               ))}
             </dl>
+            <p className="mt-4 text-sm"><strong className="text-cream">{t.labels.afterHours}</strong> {t.response.afterHours}</p>
           </div>
 
-          <nav aria-label="Services">
-            <h2 className={heading}>Services</h2>
+          <nav aria-label={t.footer.services}>
+            <h2 className={heading}>{t.footer.services}</h2>
             <ul className="mt-2">
-              {serviceLinks.map((l) => (
-                <li key={l.href}><Link href={l.href} className={link}>{l.label}</Link></li>
-              ))}
-              <li><Link href={bookHref} className={link}>Book a wheelchair van</Link></li>
+              {serviceLinks.map((l) => <li key={l.href}><Link href={l.href} className={link}>{l.label}</Link></li>)}
+              <li><Link href="/pricing" className={link}>{t.nav.pricing}</Link></li>
+              <li><Link href={bookHref} className={link}>{t.actions.bookLong}</Link></li>
             </ul>
           </nav>
 
-          <nav aria-label="Service areas">
-            <h2 className={heading}>Where we drive</h2>
-            <ul className="mt-2">
-              {coreAreas.map((a) => (
-                <li key={a.slug}>
-                  <Link href={`/service-area/${a.slug}`} className={link}>{a.name} wheelchair transportation</Link>
-                </li>
-              ))}
-              <li><Link href="/service-area" className={link}>All service areas</Link></li>
-            </ul>
-          </nav>
+          <div>
+            <nav aria-label={t.footer.areas}>
+              <h2 className={heading}>{t.footer.areas}</h2>
+              <ul className="mt-2">
+                {coreAreas.map((a) => (
+                  <li key={a.slug}><Link href={`/service-area/${a.slug}`} className={link}>{a.name}</Link></li>
+                ))}
+                <li><Link href="/service-area" className={link}>{t.footer.allAreas}</Link></li>
+              </ul>
+            </nav>
+          </div>
         </div>
 
         <div className="mt-12 flex flex-col gap-4 border-t border-navy-700 pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © <CopyrightYear buildYear={BUILD_YEAR} /> {site.legalName}. All rights reserved.
-          </p>
+          <p>© <CopyrightYear buildYear={BUILD_YEAR} /> {site.legalName}. {t.footer.rights}</p>
           <ul className="flex flex-wrap gap-x-6">
-            <li><Link href="/about" className={link}>About</Link></li>
-            <li><Link href="/faq" className={link}>FAQ</Link></li>
-            <li><Link href="/privacy" className={link}>Privacy policy</Link></li>
+            <li><Link href="/about" className={link}>{t.nav.about}</Link></li>
+            <li><Link href="/partners" className={link}>{t.nav.partners}</Link></li>
+            {moreLinks.map((l) => <li key={l.href}><Link href={l.href} className={link}>{l.label}</Link></li>)}
+            <li><Link href="/privacy" className={link}>{t.footer.privacy}</Link></li>
           </ul>
         </div>
       </div>
