@@ -77,13 +77,14 @@ export default function PartnersPage() {
             <p className="mt-4 text-lg">
               Every booked ride produces one Ride Card: pickup, drop-off, when, and who is driving. Nothing else. You get it by text or email, the family gets the same card, and the driver leaves a printed copy on the first ride.
             </p>
-            <p className="mt-3 text-ink/85">Sample confirmation. Names and times are examples.</p>
+            <p className="mt-3 text-ink/85">Sample Ride Card. Names, times and driver are examples.</p>
           </div>
           <div className="relative mx-auto grid w-full max-w-[400px] place-items-center py-6">
             <RideCardBack className="absolute right-0 top-0 hidden rotate-3 sm:grid" />
             <RideCard
               className="relative -rotate-1"
               titleAs="p"
+              sample
               tag="Hospital discharge"
               pickup="HCA Northwest, Rm 412"
               dropoff="Home, Humble"

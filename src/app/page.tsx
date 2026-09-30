@@ -5,7 +5,7 @@ import { buildMetadata } from "@/lib/seo";
 import { homeFaqs } from "@/content/faq";
 import { Hero } from "@/components/home/Hero";
 import { StatsStrip } from "@/components/home/StatsStrip";
-import { ServiceCards } from "@/components/home/ServiceCards";
+import { ServiceList } from "@/components/home/ServiceList";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { OwnerNote } from "@/components/home/OwnerNote";
 import { ReviewStrip } from "@/components/home/ReviewStrip";
@@ -34,7 +34,7 @@ export default function HomePage() {
         title="Wheelchair van rides for every kind of trip"
         intro="From a Monday dialysis chair to a ride home from the hospital, we get you there on time and walk you to the right door."
       >
-        <ServiceCards />
+        <ServiceList />
         <div className="mt-8 flex flex-col gap-3 rounded-[var(--radius-card)] bg-morning p-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-lg">
             <strong className="text-navy">Discharge planners and case managers:</strong> one direct line, standing schedules, monthly invoicing.

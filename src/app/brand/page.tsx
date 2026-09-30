@@ -74,9 +74,9 @@ export default function BrandPage() {
           <h2 id="elements-h" className="text-2xl font-bold">Ride Card, badge, text, contact</h2>
           <div className="mt-6 grid items-start gap-10 lg:grid-cols-3">
             <div className="space-y-6">
-              <RideCard tag="Every Mon · Wed · Fri" pickup="Spring, TX" dropoff="DaVita Cypress Creek" when="7:15 AM pickup" driver="Jay" />
-              <RideCard tag="Hospital discharge" pickup="HCA Northwest, Rm 412" dropoff="Home, Humble" when="Today, ready at 2 PM" driver="[Driver]" />
-              <RideCard tag="Round trip · wait & return" pickup="The Woodlands" dropoff="Methodist Willowbrook" when="Thu Oct 9 · 9:40 AM" driver="[Driver]" />
+              <RideCard sample tag="Every Mon · Wed · Fri" pickup="Spring, TX" dropoff="DaVita Cypress Creek" when="7:15 AM pickup" driver="Jay" />
+              <RideCard sample tag="Hospital discharge" pickup="HCA Northwest, Rm 412" dropoff="Home, Humble" when="Today, ready at 2 PM" driver="[Driver]" />
+              <RideCard sample tag="Round trip · wait & return" pickup="The Woodlands" dropoff="Methodist Willowbrook" when="Thu Oct 9 · 9:40 AM" driver="[Driver]" />
               <RideCardBack />
             </div>
             <div className="space-y-6">

@@ -51,7 +51,9 @@ else pass(`colour literals: ${literals.length} found, all are brand tokens (${[.
 const amberRules = [
   [/Logo\.tsx$|logomark\.svg$|pin\.svg$|make-icons\.mjs$|opengraph-image\.tsx$|app\/icon\.svg$/, "pin"],
   [/Button\.tsx$|MobileActionBar\.tsx$/, "primary button"],
-  [/HeroPattern\.tsx$/, "route line"],
+  [/HeroMap\.tsx$/, "route line / pin (hero map demo)"],
+  [/build-map\.ts$|service-map\.svg$|map-data\//, "pin (service map)"],
+  [/lib\/email\.ts$/, "Pending tag in the booking email"],
   [/RideCard\.tsx$/, "Ride Card tag (brand insert §5)"],
   [/globals\.css$|contrast\.mjs$/, "token definition / check"],
   [/app\/brand\/page\.tsx$/, "brand sheet swatch (/brand, internal)"],

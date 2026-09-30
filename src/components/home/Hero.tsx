@@ -1,6 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
-import { site, telHref, bookHref, areaList } from "@/config/site";
+import { site, telHref, bookHref } from "@/config/site";
 import { ButtonLink } from "@/components/ui/Button";
 import { Pin } from "@/components/ui/Logo";
 import { HeroPattern } from "@/components/brand/HeroPattern";
@@ -9,9 +8,9 @@ import { SeHablaBadge } from "@/components/ui/Badges";
 
 /**
  * The 5-second test: WHAT (wheelchair van rides), FOR WHOM (you or someone
- * you love), WHERE (Houston area), HOW (Book a Ride / call). The headline is the
- * brand's poster style: all caps, one word in Navy, a plain fact under it.
- * Until the real photo arrives the right-hand slot is the map pattern.
+ * you love), WHERE (north Houston), HOW (Book a Ride / call). Three type styles
+ * only: the headline, one line under it, the CTA row. The right column is the
+ * interactive map demo (or the real photo once it arrives).
  */
 export function Hero() {
   const img = site.images.hero;
@@ -23,14 +22,11 @@ export function Hero() {
             <Pin className="h-4 w-auto" /> Houston & the north side
           </p>
           <SeHablaBadge className="ml-2" />
-          <h1 id="hero-heading" className="poster mt-5 text-[2.75rem] sm:text-[3.75rem] lg:text-[4.5rem]">
-            Wheelchair rides in North <em>Houston.</em>
+          <h1 id="hero-heading" className="mt-5 text-[2.75rem] font-extrabold leading-[1.02] tracking-[-0.03em] text-navy sm:text-[3.5rem] lg:text-[4rem]">
+            Wheelchair van rides in north Houston.
           </h1>
-          <p className="poster-fact mt-4 text-[1.625rem] text-ink sm:text-[2rem]">
-            On time, every ride. We call back in {site.responseTime}.
-          </p>
-          <p className="mt-4 max-w-xl text-lg text-ink/85">
-            On-time, door-to-door wheelchair van rides to doctor visits, dialysis and home from the hospital. We serve {areaList()}. Non-emergency medical transportation, in plain words.
+          <p className="mt-4 font-display text-[1.375rem] font-medium leading-snug tracking-[-0.01em] text-ink">
+            On time, every ride. We call you back within {site.responseTime}.
           </p>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -42,9 +38,6 @@ export function Hero() {
             </a>
           </div>
 
-          <p className="mt-5 text-ink/85">
-            You&apos;ll know the price before you ride. <Link href="/pricing" className="font-bold text-navy underline">See how pricing works</Link>.
-          </p>
           <div className="mt-7 lg:hidden">
             <OnTimePromise compact />
           </div>

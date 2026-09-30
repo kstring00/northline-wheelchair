@@ -8,6 +8,7 @@
 //  - Review/AggregateRating absent unless real reviews exist
 // Plus a source grep for lorem / CONFIRM / banned words (reported, not failed).
 import { execSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 
 const BASE = process.env.BASE_URL ?? "http://localhost:3000";
 let fails = 0;
@@ -68,6 +69,28 @@ check("Hospital drop-off notes carry draft label", /Drop-off notes: draft/.test(
 check("No AggregateRating/Review while reviews are placeholders", !/AggregateRating|"@type":"Review"/.test(home));
 check("priceRange present when displayMode != quoteOnly", /"priceRange"/.test(home));
 check("FAQPage on every service page", (await Promise.all(urls.filter((u) => u.startsWith("/services/")).map(html))).every((h) => /"@type":"FAQPage"/.test(h)));
+
+// 6a. Homepage revision 3
+{
+  const h = home;
+  const services = h.match(/<ul data-service-list[\s\S]*?<\/ul>/)?.[0] ?? "";
+  check("Services list: five rows, headings are links", (services.match(/<h3[^>]*>\s*<a /g) ?? []).length === 5, String((services.match(/<h3/g) ?? []).length));
+  check("Services list: no cards, shadows, numbers or Learn more", services && !/shadow|rounded-\[var|lift-card|Learn more|>0\d</.test(services) && !/<svg/.test(services));
+  check("Services list: For facilities not in the list", !/For facilities/.test(services) && /facilities work with us/.test(h));
+  const hero = h.match(/<section id="hero"[\s\S]*?<\/section>/)?.[0] ?? "";
+  check("Hero: headline text", /Wheelchair van rides in north Houston\./.test(hero));
+  check("Hero: one line under it", /On time, every ride\. We call you back within 30 minutes\./.test(hero));
+  check("Hero: deleted lines gone", !/Non-emergency medical transportation, in plain words|know the price before you ride|See how pricing works|for you or someone you love/.test(hero));
+  const heroLeft = hero.split("data-hero-map")[0];
+  check("Hero: no uppercase except the pill, no poster class", !/poster/.test(heroLeft) && (heroLeft.match(/uppercase/g) ?? []).length === 0);
+  check("Owner: placeholder text present verbatim", /Jay(&#x27;|')s story goes here — how Northline started and why, in his own words, from questionnaire Q11\. Nothing on this site describes Jay(&#x27;|')s life until he writes it\./.test(h) && /\[Jay(&#x27;|')s headline, in his words\]/.test(h) && /A note from the owner/i.test(h));
+  check("Owner: no 'dad' anywhere on Home or /about", !/\bdad\b/i.test(text(h)) && !/\bdad\b/i.test(text(await html("/about"))));
+  const reviews = h.match(/<section id="reviews"[\s\S]*?<\/section>/)?.[0] ?? "";
+  check("Reviews: honest empty state", /We ask every rider for a review after the ride\./.test(reviews) && /Northline is new\./.test(reviews) && /data-reviews="empty"/.test(reviews));
+  check("Reviews: zero review/star/quote elements while reviews[] is empty", !/data-review\b|data-review-stars|<blockquote|Example review/.test(reviews) && !/data-google-rating/.test(reviews));
+  check("Reviews: SMS template exists", existsSync("src/content/sms.ts") && /reviewRequestSms/.test(readFileSync("src/content/sms.ts", "utf8")));
+  check("Ride Card: sample tag on the partners sample", /data-sample="true"[\s\S]*?Sample Ride Card\. Names, times and driver are examples\./.test((await html("/partners")).replace(/\n/g, " ")) || /data-sample-tag/.test(await html("/partners")));
+}
 
 // 6. sticky bar + success screens show responseTime
 check("Sticky bar shows callback window", /Callback within 30 minutes/.test(home));

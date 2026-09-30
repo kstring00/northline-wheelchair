@@ -20,20 +20,28 @@ type RideCardProps = {
   className?: string;
   /** Heading level for the card title, for the page outline. */
   titleAs?: "h2" | "h3" | "p";
+  /** Not backed by a real booking: renders a small SAMPLE corner tag. */
+  sample?: boolean;
 };
 
-export function RideCard({ tag, pickup, dropoff, when, driver, phone = site.phone.display, className = "", titleAs: Title = "p" }: RideCardProps) {
+export function RideCard({ tag, pickup, dropoff, when, driver, phone = site.phone.display, className = "", titleAs: Title = "p", sample = false }: RideCardProps) {
   return (
     <article
       data-ride-card
-      className={`w-full max-w-[330px] overflow-hidden rounded-[14px] bg-white font-sans text-ink shadow-[var(--shadow-lift)] [--logo-dot:var(--color-white)] ${className}`}
+      data-sample={sample ? "true" : undefined}
+      className={`relative w-full max-w-[330px] overflow-hidden rounded-[14px] bg-white font-sans text-ink shadow-[var(--shadow-lift)] [--logo-dot:var(--color-white)] ${className}`}
     >
+      {sample && (
+        <span data-sample-tag className="absolute right-0 bottom-0 rounded-tl-lg bg-morning px-2 py-1 text-[9.5px] font-bold uppercase leading-none tracking-[0.12em] text-navy">
+          Sample
+        </span>
+      )}
       {/* Header strip: logomark, RIDE CARD, tag. */}
       <div className="flex items-center gap-2 bg-navy px-3.5 py-2.5 text-white [--logo-dot:var(--color-navy)]">
         <LogoMark className="h-5 w-5 shrink-0" />
         <Title className="!m-0 whitespace-nowrap font-sans text-[11px] font-bold uppercase leading-none tracking-[0.14em] !text-white">Ride Card</Title>
         {tag && (
-          <span data-ride-card-tag className="ml-auto rounded-full bg-amber px-2.5 py-1 text-[10px] font-bold uppercase leading-none tracking-[0.1em] text-ink">
+          <span data-ride-card-tag className="ml-auto max-w-[62%] rounded-full bg-amber px-2.5 py-1 text-right text-[10px] font-bold uppercase leading-[1.25] tracking-[0.1em] text-ink">
             {tag}
           </span>
         )}

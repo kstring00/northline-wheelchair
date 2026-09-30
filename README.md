@@ -78,6 +78,9 @@ Run against a production build (`npm run build && npm start`):
 | `npm run test:schema` | JSON-LD against the schema.org vocabulary (set `SCHEMA_VOCAB` to a local copy of `schemaorg-current-https.jsonld`) |
 | `npm run test:contrast` | Contrast of every text/ground pair, read from the six brand tokens in `globals.css` (body and muted text AAA; Ink on Amber ≥ 4.5) |
 | `npm run test:brand` | Brand acceptance (below) |
+| `npm run check:copy` | Fails (and fails `npm run build`, via `prebuild`) if draft copy about Jay's life ("my dad", "my own dad") is anywhere in the codebase |
+| `npm run build:map` | Regenerates `public/brand/service-map.svg` (tries OpenStreetMap Overpass, falls back to the hand-traced coordinates in `scripts/map-data/`) |
+| `npm run test:email` | Sends one sample booking email through Resend to `BOOKING_TO_EMAIL` (needs `RESEND_API_KEY`) |
 | `npm run test:pricing` | Pricing rules render correctly in all three display modes |
 | `npm run test:acceptance` | Phase 1.5 acceptance: service + place in title/H1/first sentence, banned words, NEMT placement, no iframes or external scripts, drafts excluded, schema gating |
 | `npm run lighthouse` | Lighthouse mobile ×3 runs (median) for Home, `/book`, `/pricing` and the wheelchair service page |
@@ -108,6 +111,12 @@ The site follows *Northline Brand Guidelines v1* (Stringham Web Design, Septembe
 - [ ] `/public` holds only brand SVGs, generated icons and photo placeholders (inventory printed).
 - [ ] Pattern SVGs under 60 KB each and not provisional.
 - [ ] Lighthouse mobile ≥ 90 on Home, `/book`, `/pricing` (`npm run lighthouse`).
+
+## Owner copy, reviews and bookings
+
+- **Owner note.** `owner.note` and `owner.noteHeadline` in `site.ts` are empty until Jay writes them (questionnaire Q11). While empty, the Home section shows a marked placeholder in his layout. Nothing on the site describes Jay's life until he writes it; `check:copy` enforces the two phrases from the old draft.
+- **Reviews.** `reviews` in `site.ts` is empty. No review, quote or star renders anywhere until it holds an entry with `isPlaceholder: false`. The Google rating badge renders only when `googleRating` is set; the "Leave a review" button only when `googleReviewUrl` is set. The mechanism the section promises: `src/content/sms.ts` holds the post-ride text (`reviewRequestSms`), and `src/lib/sms.ts` has the "Send review request" action (`sendReviewRequest`) for the Phase 2 admin ride view. Sending is Twilio, Phase 2.
+- **Bookings.** `/book` asks for five things (name, phone, pickup, drop-off, date and time); everything else is an optional expander. `POST /api/book` checks the honeypot, rate-limits by IP (in memory, per instance), and emails Jay through Resend with every field, plus an auto-reply to the rider when they gave an email. Env: `RESEND_API_KEY`, `BOOKING_TO_EMAIL` (Jay's address, CONFIRM), `BOOKING_FROM_EMAIL` (on a domain verified in Resend, CONFIRM). Without a key the route logs the request and returns success so previews work. Texting the confirmed Ride Card is Phase 2 (`sendRideCard` in `src/lib/sms.ts`).
 
 ## Placeholder assets
 
