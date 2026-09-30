@@ -2,7 +2,7 @@ import Image from "next/image";
 import { site, telHref, bookHref } from "@/config/site";
 import { ButtonLink } from "@/components/ui/Button";
 import { Pin } from "@/components/ui/Logo";
-import { HeroPattern } from "@/components/brand/HeroPattern";
+import { HeroMap } from "@/components/home/HeroMap";
 import { OnTimePromise } from "@/components/home/OnTimePromise";
 import { SeHablaBadge } from "@/components/ui/Badges";
 
@@ -59,7 +59,8 @@ export function Hero() {
               />
             </div>
           ) : (
-            <HeroPattern />
+            // Destinations come from site.ts hospitals[] (CONFIRM), never from the component.
+            <HeroMap destinations={site.hospitals.map((h) => ({ name: h.name, node: h.mapNode, href: `/service-area/hospitals/${h.slug}` }))} />
           )}
         </div>
       </div>

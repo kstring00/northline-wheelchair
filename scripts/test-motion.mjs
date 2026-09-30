@@ -7,7 +7,7 @@ let fails = 0;
 const check = (n, ok, d = "") => { if (!ok) fails++; console.log(`${ok ? "PASS" : "FAIL"}  ${n}${d ? `  (${d})` : ""}`); };
 
 const state = (page) => page.evaluate(() => ({
-  heroOpacity: getComputedStyle(document.querySelector("[data-hero-pattern]")).opacity,
+  heroOpacity: getComputedStyle(document.querySelector("[data-hero-map]")).opacity,
   lines: [...document.querySelectorAll("[data-how-line]")].map((l) => getComputedStyle(l).transform),
   lits: [...document.querySelectorAll("[data-how-lit]")].map((l) => getComputedStyle(l).opacity),
   counts: [...document.querySelectorAll("[data-countup-value]")].map((e) => e.textContent),
