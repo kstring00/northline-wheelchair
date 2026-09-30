@@ -113,11 +113,13 @@ export function ChoiceGroup({
   onChange,
   columns = 1,
   legendClassName = "text-lg",
+  optional,
 }: {
   name: string;
   legend: ReactNode;
   hint?: ReactNode;
   error?: string;
+  optional?: boolean;
   options: ChoiceOption[];
   type?: "radio" | "checkbox";
   value: string | string[];
@@ -128,7 +130,10 @@ export function ChoiceGroup({
   const cols = { 1: "", 2: "sm:grid-cols-2", 3: "sm:grid-cols-3", 4: "sm:grid-cols-2 lg:grid-cols-4", 7: "grid-cols-4 sm:grid-cols-7" }[columns];
   return (
     <fieldset id={name} tabIndex={-1} aria-describedby={describedBy(name, hint, error)} aria-invalid={error ? true : undefined} className="focus:outline-none">
-      <legend className={`font-bold text-navy ${legendClassName}`}>{legend}</legend>
+      <legend className={`font-bold text-navy ${legendClassName}`}>
+        {legend}
+        {optional && <span className="ml-2 font-normal text-ink/85">(optional)</span>}
+      </legend>
       {hint && <p id={`${name}-hint`} className="mt-1 text-ink/85">{hint}</p>}
       <FieldError id={name} error={error} />
       <div className={`mt-3 grid gap-3 ${cols}`}>

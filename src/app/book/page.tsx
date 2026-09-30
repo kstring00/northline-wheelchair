@@ -9,7 +9,7 @@ import { TextUsLink } from "@/components/ui/Badges";
 
 export const metadata: Metadata = buildMetadata({
   title: "Book a Wheelchair Van Ride in Houston",
-  description: `Request a wheelchair van ride in the Houston area in about two minutes. We call back within ${site.responseTime} to confirm. Or call ${site.phone.display}.`,
+  description: `Request a wheelchair van ride in the Houston area in about a minute. Jay calls back within ${site.responseTime} to confirm the price and details. Or call ${site.phone.display}.`,
   path: "/book",
 });
 
@@ -22,7 +22,7 @@ export default function BookPage() {
           <div>
             <h1 id="page-heading" className="text-[2.25rem] font-bold sm:text-[3rem]">Book a wheelchair van ride</h1>
             <p className="mt-3 max-w-2xl text-xl">
-              Three short steps, about two minutes. We call back within {site.responseTime} during business hours to confirm.
+              Five fields, about a minute. Jay calls you back within {site.responseTime} during business hours to confirm the price and details.
             </p>
 
             <div className="mt-8 rounded-[1.5rem] border border-ink/15 bg-white p-5 shadow-[var(--shadow-soft)] sm:p-8">
