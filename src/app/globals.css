@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Every text/background pair is verified by
+ * `node scripts/contrast.mjs` (body text AAA 7:1, everything else AA+).
+ */
+/*
+ * Metric-matched fallback fonts (zero-CLS font swap). size-adjust values were
+ * measured on real page copy: web font width ÷ fallback width, per weight.
+ * Arial covers Windows/macOS/iOS; Roboto covers Android (no Arial there).
+ */
+@font-face { font-family: "Atkinson Fallback Arial"; font-weight: 400; src: local("Arial"), local("ArialMT"), local("Liberation Sans"); size-adjust: 98.6%; ascent-override: 95.6%; descent-override: 29.2%; line-gap-override: 0%; }
+@font-face { font-family: "Atkinson Fallback Arial"; font-weight: 700; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"); size-adjust: 99.4%; ascent-override: 95.6%; descent-override: 29.2%; line-gap-override: 0%; }
+@font-face { font-family: "Atkinson Fallback Roboto"; font-weight: 400; src: local("Roboto"), local("Roboto-Regular"), local("Roboto Regular"); size-adjust: 99.5%; ascent-override: 95.6%; descent-override: 29.2%; line-gap-override: 0%; }
+@font-face { font-family: "Atkinson Fallback Roboto"; font-weight: 700; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); size-adjust: 106.2%; ascent-override: 95.6%; descent-override: 29.2%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage Fallback Arial"; font-weight: 700; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"); size-adjust: 101.2%; ascent-override: 88.2%; descent-override: 25.6%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage Fallback Roboto"; font-weight: 700; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); size-adjust: 108.1%; ascent-override: 88.2%; descent-override: 25.6%; line-gap-override: 0%; }
+
+@theme {
+  --color-navy-950: #0b1b33;
+  --color-navy-900: #10284a;
+  --color-navy-700: #1f4570;
+  --color-navy-100: #e4ebf5;
+  --color-mist: #c9d6e8;
+  --color-cream: #fbf7f0;
+  --color-sand: #f3ece0;
+  --color-ink: #14202f;
+  --color-muted: #3e4a5a;
+  --color-line: #6b7a8f;
+  --color-hairline: #e2d9ca;
+  /* Amber is reserved for primary calls to action. */
+  --color-amber: #f4a340;
+  --color-amber-hover: #f7b865;
+  --color-amber-ink: #8a4b00;
+  --color-error: #a3161a;
+  --color-success: #1b6b3a;
+
+  --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+
+  /* 18px base body size with generous line height. */
+  --text-sm: 1rem;
+  --text-sm--line-height: 1.6;
+  --text-base: 1.125rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1.25rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.5;
+
+  --radius-card: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(16 40 74 / 0.06), 0 4px 16px rgb(16 40 74 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(16 40 74 / 0.08), 0 16px 40px rgb(16 40 74 / 0.14);
+
+  --ease-gentle: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+  body {
+    background: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--color-navy-900);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  a { text-underline-offset: 0.2em; text-decoration-thickness: 0.08em; }
+
+  /* One strong, consistent focus ring. Dark sections swap the colour. */
+  :focus-visible {
+    outline: 3px solid var(--focus-ring, var(--color-navy-900));
+    outline-offset: 3px;
+    border-radius: 0.375rem;
+  }
+  .on-dark { --focus-ring: var(--color-amber); }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: 76rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+  @media (min-width: 640px) { .container-page { padding-inline: 1.5rem; } }
+  @media (min-width: 1024px) { .container-page { padding-inline: 2rem; } }
+
+  .prose-page > * + * { margin-top: 1rem; }
+  .prose-page h2 { margin-top: 2.5rem; font-size: 1.75rem; }
+  .prose-page h3 { margin-top: 1.75rem; font-size: 1.375rem; }
+  .prose-page ul { list-style: disc; padding-left: 1.25rem; }
+  .prose-page ul > li + li { margin-top: 0.5rem; }
+  .prose-page a { color: var(--color-navy-700); text-decoration: underline; }
+
+  /* Soft lift on hover and keyboard focus. Shadow fades via opacity only. */
+  .lift-card {
+    position: relative;
+    transition: transform 280ms var(--ease-gentle);
+  }
+  .lift-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: var(--shadow-lift);
+    opacity: 0;
+    transition: opacity 280ms var(--ease-gentle);
+    pointer-events: none;
+  }
+  .lift-card:hover,
+  .lift-card:focus-within { transform: translateY(-4px); }
+  .lift-card:hover::after,
+  .lift-card:focus-within::after { opacity: 1; }
+
+  .shine {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .shine-bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.55), transparent);
+    transform: translateX(-120%);
+  }
+}
+
+/*
+ * Progressive enhancement. `js` is added by an inline script in <head> before
+ * first paint; `motion-ok` only when the visitor has not asked for reduced
+ * motion. Without JS every element renders in its final, readable state.
+ */
+@layer utilities {
+  .motion-ok [data-hero-route] { opacity: 0; animation: nl-reveal 0s linear 2.5s forwards; }
+  @keyframes nl-reveal { to { opacity: 1; } }
+
+  .js [data-disclosure-panel][data-state="closed"] { display: none; }
+
+  /* Accordion: smooth height via grid rows; closed panels are hidden from AT. */
+  .js .accordion-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition: grid-template-rows 300ms var(--ease-gentle), visibility 0s linear 300ms;
+  }
+  .js .accordion-panel[data-state="open"] {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows 300ms var(--ease-gentle), visibility 0s;
+  }
+  .accordion-panel > div { overflow: hidden; }
+  .no-js-only { display: none; }
+  html:not(.js) .no-js-only { display: block; }
+  html:not(.js) .js-only { display: none !important; }
+}
