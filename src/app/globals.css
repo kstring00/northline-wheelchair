@@ -13,27 +13,25 @@
 @font-face { font-family: "Atkinson Fallback Arial"; font-weight: 700; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"); size-adjust: 99.4%; ascent-override: 95.6%; descent-override: 29.2%; line-gap-override: 0%; }
 @font-face { font-family: "Atkinson Fallback Roboto"; font-weight: 400; src: local("Roboto"), local("Roboto-Regular"), local("Roboto Regular"); size-adjust: 99.5%; ascent-override: 95.6%; descent-override: 29.2%; line-gap-override: 0%; }
 @font-face { font-family: "Atkinson Fallback Roboto"; font-weight: 700; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); size-adjust: 106.2%; ascent-override: 95.6%; descent-override: 29.2%; line-gap-override: 0%; }
-@font-face { font-family: "Bricolage Fallback Arial"; font-weight: 700; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"); size-adjust: 101.2%; ascent-override: 88.2%; descent-override: 25.6%; line-gap-override: 0%; }
-@font-face { font-family: "Bricolage Fallback Roboto"; font-weight: 700; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); size-adjust: 108.1%; ascent-override: 88.2%; descent-override: 25.6%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage Fallback Arial"; font-weight: 500 800; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"); size-adjust: 101.2%; ascent-override: 88.2%; descent-override: 25.6%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage Fallback Roboto"; font-weight: 500 800; src: local("Roboto Bold"), local("Roboto-Bold"), local("Roboto"); size-adjust: 108.1%; ascent-override: 88.2%; descent-override: 25.6%; line-gap-override: 0%; }
 
 @theme {
-  --color-navy-950: #0b1b33;
-  --color-navy-900: #10284a;
-  --color-navy-700: #1f4570;
-  --color-navy-100: #e4ebf5;
-  --color-mist: #c9d6e8;
-  --color-cream: #fbf7f0;
-  --color-sand: #f3ece0;
-  --color-ink: #14202f;
-  --color-muted: #3e4a5a;
-  --color-line: #6b7a8f;
-  --color-hairline: #e2d9ca;
-  /* Amber is reserved for primary calls to action. */
-  --color-amber: #f4a340;
-  --color-amber-hover: #f7b865;
-  --color-amber-ink: #8a4b00;
-  --color-error: #a3161a;
-  --color-success: #1b6b3a;
+  /*
+   * Northline brand palette: exactly six colours (Brand Guidelines 2.1), plus
+   * white for card surfaces. `--color-*: initial` removes Tailwind's default
+   * palette so an off-brand class (bg-red-500, text-gray-600…) generates nothing.
+   * Amber appears in exactly three places: the pin, the primary button and a
+   * route line. Morning and Sand are section grounds only, never text.
+   */
+  --color-*: initial;
+  --color-navy: #16284a;    /* Northline Navy */
+  --color-amber: #e8a33d;   /* Signal Amber */
+  --color-cream: #faf6ee;
+  --color-ink: #1e2533;
+  --color-morning: #dce6f5; /* Morning Blue */
+  --color-sand: #efe6d6;
+  --color-white: #ffffff;
 
   --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-bricolage), var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
@@ -49,8 +47,8 @@
   --text-xl--line-height: 1.5;
 
   --radius-card: 1.25rem;
-  --shadow-soft: 0 1px 2px rgb(16 40 74 / 0.06), 0 4px 16px rgb(16 40 74 / 0.06);
-  --shadow-lift: 0 2px 4px rgb(16 40 74 / 0.08), 0 16px 40px rgb(16 40 74 / 0.14);
+  --shadow-soft: 0 1px 2px rgb(22 40 74 / 0.06), 0 4px 16px rgb(22 40 74 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(22 40 74 / 0.08), 0 16px 40px rgb(22 40 74 / 0.14);
 
   --ease-gentle: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -70,9 +68,9 @@
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    color: var(--color-navy-900);
-    line-height: 1.15;
-    letter-spacing: -0.015em;
+    color: var(--color-navy);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
   p { text-wrap: pretty; }
@@ -80,11 +78,11 @@
 
   /* One strong, consistent focus ring. Dark sections swap the colour. */
   :focus-visible {
-    outline: 3px solid var(--focus-ring, var(--color-navy-900));
+    outline: 3px solid var(--focus-ring, var(--color-navy));
     outline-offset: 3px;
     border-radius: 0.375rem;
   }
-  .on-dark { --focus-ring: var(--color-amber); }
+  .on-dark { --focus-ring: var(--color-cream); }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -111,7 +109,52 @@
   .prose-page h3 { margin-top: 1.75rem; font-size: 1.375rem; }
   .prose-page ul { list-style: disc; padding-left: 1.25rem; }
   .prose-page ul > li + li { margin-top: 0.5rem; }
-  .prose-page a { color: var(--color-navy-700); text-decoration: underline; }
+  .prose-page a { color: var(--color-navy); text-decoration: underline; }
+
+  /*
+   * Labels: Atkinson 700, 13px, +0.1em, uppercase. With the logo tagline, the
+   * only uppercase on the site outside poster headlines.
+   */
+  .label {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /*
+   * Poster headline (Brand Element Usage 2.5): all-caps Bricolage 800 in Ink,
+   * one word in Navy (<em>), with a plain fact under it in Bricolage 500.
+   */
+  .poster {
+    font-family: var(--font-display);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+    color: var(--color-ink);
+  }
+  .poster em { font-style: normal; color: var(--color-navy); }
+  .on-dark .poster, .poster.on-dark { color: var(--color-white); }
+  .on-dark .poster em { color: var(--color-white); }
+  .poster-fact {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  /*
+   * Brand map pattern: natural size, centred, never tiled, never stretched.
+   * Always on its own ground colour (within two tones of it).
+   */
+  .pattern-navy { background: var(--color-navy) url("/brand/pattern-navy.svg") center / auto no-repeat; }
+  .pattern-sand { background: var(--color-sand) url("/brand/pattern-sand.svg") center / auto no-repeat; }
+
+  /* Logo protection area: padding = height of the N (set by <Logo>). */
+  .logo-clear { padding: var(--logo-clear, 0); }
 
   /* Soft lift on hover and keyboard focus. Shadow fades via opacity only. */
   .lift-card {
@@ -133,22 +176,6 @@
   .lift-card:hover::after,
   .lift-card:focus-within::after { opacity: 1; }
 
-  .shine {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    border-radius: inherit;
-    pointer-events: none;
-  }
-  .shine-bar {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 45%;
-    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.55), transparent);
-    transform: translateX(-120%);
-  }
 }
 
 /*
@@ -157,9 +184,6 @@
  * motion. Without JS every element renders in its final, readable state.
  */
 @layer utilities {
-  .motion-ok [data-hero-route] { opacity: 0; animation: nl-reveal 0s linear 2.5s forwards; }
-  @keyframes nl-reveal { to { opacity: 1; } }
-
   .js [data-disclosure-panel][data-state="closed"] { display: none; }
 
   /* Accordion: smooth height via grid rows; closed panels are hidden from AT. */

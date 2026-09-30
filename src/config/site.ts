@@ -95,7 +95,7 @@ export const site = {
   owner: {
     firstName: "Jay",
     fullName: "Jay", // CONFIRM Jay's last name for the About page and schema
-    role: "Owner and driver", // CONFIRM
+    role: "Owner & driver", // CONFIRM
     photo: {
       src: "/images/owner-jay.jpg", // CONFIRM replace with Jay's real photo
       alt: "Jay, owner of Northline Wheelchair Transportation, standing beside a Northline wheelchair van", // CONFIRM
@@ -380,10 +380,10 @@ export const site = {
   team: [
     {
       firstName: "Jay",
-      role: "Owner and driver",
+      role: "Owner & driver",
       yearsDriving: 12, // CONFIRM
       quote: "I drive most of the dialysis runs myself. I like knowing my regulars by name.", // CONFIRM
-      certifications: ["CPR / First Aid", "PASS securement"], // CONFIRM
+      certifications: ["CPR", "First Aid", "PASS certified"], // CONFIRM
       photo: null as ImageAsset | null, // CONFIRM real photo
       isPlaceholder: true,
     },
@@ -448,6 +448,8 @@ export const site = {
   },
 
   images: {
+    /** false: the hero shows the brand map pattern. Set true once hero.src is a real photo. */
+    heroPhotoReady: false, // CONFIRM
     hero: {
       src: "/images/hero-placeholder.jpg", // CONFIRM real photo of Jay helping a rider into the van
       alt: "A Northline driver guiding a smiling older woman in a wheelchair up the ramp of a navy wheelchair van", // CONFIRM
@@ -456,7 +458,6 @@ export const site = {
     } satisfies ImageAsset,
     vanRamp: { src: "/images/van-ramp-placeholder.jpg", alt: "A Northline wheelchair van with its side ramp lowered to the curb", width: 1600, height: 1067 } satisfies ImageAsset, // CONFIRM
     driverHelping: { src: "/images/driver-helping-placeholder.jpg", alt: "A driver securing a wheelchair with floor straps inside the van", width: 1600, height: 1067 } satisfies ImageAsset, // CONFIRM
-    houston: { src: "/images/houston-placeholder.jpg", alt: "The downtown Houston skyline at sunrise seen from the north", width: 1600, height: 900 } satisfies ImageAsset, // CONFIRM
   },
 };
 

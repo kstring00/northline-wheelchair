@@ -52,10 +52,10 @@ const copy: ServiceCopy = {
           <p>Wait &amp; return means your driver stays. They walk you in, wait outside the suite or in the lobby, walk you back out, and drive you home. You never wonder whether the ride is coming.</p>
           <p>It&apos;s the thing riders mention most in reviews, so we named it and put it on the booking form.</p>
         </div>
-        <div className="rounded-[var(--radius-card)] bg-navy-100 p-6">
+        <div className="rounded-[var(--radius-card)] bg-morning p-6">
           <h3 className="text-xl font-bold">What it costs</h3>
           <p className="mt-2">{waitRule}</p>
-          <p className="mt-2 text-muted">For dialysis and other long visits, it&apos;s usually cheaper to have us come back. We&apos;ll tell you which is better when you book.</p>
+          <p className="mt-2 text-ink/85">For dialysis and other long visits, it&apos;s usually cheaper to have us come back. We&apos;ll tell you which is better when you book.</p>
           <ButtonLink href="/book" className="mt-5">Book a wait & return ride</ButtonLink>
         </div>
       </div>

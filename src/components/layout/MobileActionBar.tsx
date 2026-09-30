@@ -9,14 +9,14 @@ export function MobileActionBar() {
   return (
     <nav
       aria-label={t.nav.quickActions}
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-hairline bg-cream/95 px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-ink/15 bg-cream/95 px-3 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden"
     >
-      <p className="mb-1.5 text-center text-xs font-bold text-muted">{t.response.callbackShort} during business hours</p>
+      <p className="mb-1.5 text-center text-xs font-bold text-ink/85">{t.response.callbackShort} during business hours</p>
       <div className="mx-auto grid max-w-xl grid-cols-2 gap-3">
-        <a href={telHref} className={`${btn} bg-navy-900 text-cream on-dark`}>
+        <a href={telHref} className={`${btn} bg-navy text-cream on-dark`}>
           <PhoneIcon /> {t.actions.call}
         </a>
-        <Link href={bookHref} className={`${btn} bg-amber text-navy-950`}>
+        <Link href={bookHref} className={`${btn} bg-amber text-navy`}>
           <CalendarIcon /> {t.actions.book}
         </Link>
       </div>

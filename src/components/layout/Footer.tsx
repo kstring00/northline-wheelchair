@@ -1,37 +1,41 @@
 import Link from "next/link";
-import { site, coreAreas, telHref, bookHref } from "@/config/site";
+import { site, coreAreas, bookHref } from "@/config/site";
 import { t } from "@/content/dictionary";
 import { Logo } from "@/components/ui/Logo";
-import { RouteMotif } from "@/components/ui/RouteMotif";
 import { SeHablaBadge } from "@/components/ui/Badges";
 import { CopyrightYear } from "@/components/layout/CopyrightYear";
+import { ContactBlock } from "@/components/brand/ContactBlock";
 import { serviceLinks, moreLinks } from "@/components/layout/nav";
 
 const BUILD_YEAR = new Date().getFullYear();
 
+/**
+ * Navy map pattern ground. The stacked lockup sits in a solid navy box sized
+ * to its protection area (never directly on the pattern); the contact block
+ * is the business-card back.
+ */
 export function Footer() {
-  const link = "inline-flex min-h-12 min-w-12 items-center text-cream underline decoration-mist/60 underline-offset-4 hover:decoration-cream";
+  const link = "inline-flex min-h-12 min-w-12 items-center text-cream underline decoration-cream/50 underline-offset-4 hover:decoration-cream";
   const heading = "font-display text-lg font-bold text-cream";
   return (
-    <footer className="on-dark bg-navy-950 text-mist">
+    <footer className="on-dark pattern-navy text-cream/80" data-footer>
       <div className="container-page py-14">
-        <RouteMotif tone="dark" className="mb-10 h-10 w-56 opacity-80" />
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          {/* NAP block: must match Google Business Profile exactly. */}
+        <div className="grid items-start gap-8 md:grid-cols-[auto_minmax(0,28rem)]">
+          <Link href="/" className="inline-flex self-start rounded-xl bg-navy">
+            <Logo variant="stacked" tone="white" size={28} withTagline clear label={`${site.name}, home page`} />
+          </Link>
           <div>
-            <Link href="/" className="inline-flex min-h-12 items-center rounded-lg py-1">
-              <Logo onDark />
-            </Link>
-            <address className="mt-5 not-italic">
-              <p className="font-bold text-cream">{site.name}</p>
-              {site.address.showStreet && <p>{site.address.street}</p>}
-              <p>{site.address.city}, {site.address.region} {site.address.postalCode}</p>
-              <p className="mt-2"><a href={telHref} className={`${link} text-lg font-bold`}>{site.phone.display}</a></p>
-              <p><a href={`mailto:${site.email}`} className={link}>{site.email}</a></p>
+            <ContactBlock />
+            {/* NAP line: must match Google Business Profile exactly. */}
+            <address className="mt-4 not-italic">
+              <span className="font-bold text-cream">{site.name}</span>
+              {site.address.showStreet && <>, {site.address.street}</>}, {site.address.city}, {site.address.region} {site.address.postalCode}
             </address>
             <SeHablaBadge className="mt-4" />
           </div>
+        </div>
 
+        <div className="mt-12 grid gap-10 rounded-2xl bg-navy p-6 sm:grid-cols-3 sm:p-8">
           <div>
             <h2 className={heading}>{t.labels.hours}</h2>
             <dl className="mt-3 space-y-2">
@@ -54,20 +58,18 @@ export function Footer() {
             </ul>
           </nav>
 
-          <div>
-            <nav aria-label={t.footer.areas}>
-              <h2 className={heading}>{t.footer.areas}</h2>
-              <ul className="mt-2">
-                {coreAreas.map((a) => (
-                  <li key={a.slug}><Link href={`/service-area/${a.slug}`} className={link}>{a.name}</Link></li>
-                ))}
-                <li><Link href="/service-area" className={link}>{t.footer.allAreas}</Link></li>
-              </ul>
-            </nav>
-          </div>
+          <nav aria-label={t.footer.areas}>
+            <h2 className={heading}>{t.footer.areas}</h2>
+            <ul className="mt-2">
+              {coreAreas.map((a) => (
+                <li key={a.slug}><Link href={`/service-area/${a.slug}`} className={link}>{a.name}</Link></li>
+              ))}
+              <li><Link href="/service-area" className={link}>{t.footer.allAreas}</Link></li>
+            </ul>
+          </nav>
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-navy-700 pt-6 text-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-4 rounded-2xl bg-navy px-6 py-4 text-sm sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <p>© <CopyrightYear buildYear={BUILD_YEAR} /> {site.legalName}. {t.footer.rights}</p>
           <ul className="flex flex-wrap gap-x-6">
             <li><Link href="/about" className={link}>{t.nav.about}</Link></li>

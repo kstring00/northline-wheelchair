@@ -53,7 +53,7 @@ export default async function CityPage({ params }: PageProps<"/service-area/[cit
               <h3 className="text-xl font-bold">{h}</h3>
               <ul className="mt-3 space-y-2">
                 {list.map((x) => (
-                  <li key={x} className="flex gap-2"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-success" />{x}</li>
+                  <li key={x} className="flex gap-2"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-navy" />{x}</li>
                 ))}
               </ul>
             </div>
@@ -64,7 +64,7 @@ export default async function CityPage({ params }: PageProps<"/service-area/[cit
         <ul className="mt-8 grid gap-3 sm:grid-cols-2">
           {services.map((s) => (
             <li key={s.slug}>
-              <Link href={`/services/${s.slug}`} className="lift-card flex min-h-16 items-center justify-between gap-3 rounded-xl border border-hairline bg-white px-5 py-3 font-bold text-navy-900 no-underline">
+              <Link href={`/services/${s.slug}`} className="lift-card flex min-h-16 items-center justify-between gap-3 rounded-xl border border-ink/15 bg-white px-5 py-3 font-bold text-navy no-underline">
                 {s.name}
                 <ArrowRightIcon className="h-5 w-5 shrink-0" />
               </Link>
@@ -76,7 +76,7 @@ export default async function CityPage({ params }: PageProps<"/service-area/[cit
             Hospital drop-off notes:{" "}
             {hospitals.filter((h) => h.nearestAreas.includes(area.slug)).map((h, i, arr) => (
               <span key={h.slug}>
-                <Link href={`/service-area/hospitals/${h.slug}`} className="font-bold text-navy-700 underline">{h.name}</Link>
+                <Link href={`/service-area/hospitals/${h.slug}`} className="font-bold text-navy underline">{h.name}</Link>
                 {i < arr.length - 1 ? ", " : ""}
               </span>
             ))}
@@ -86,7 +86,7 @@ export default async function CityPage({ params }: PageProps<"/service-area/[cit
           Nearby:{" "}
           {coreAreas.filter((a) => a.slug !== area.slug).map((a, i, arr) => (
             <span key={a.slug}>
-              <Link href={`/service-area/${a.slug}`} className="font-bold text-navy-700 underline">{a.name} wheelchair transportation</Link>
+              <Link href={`/service-area/${a.slug}`} className="font-bold text-navy underline">{a.name} wheelchair transportation</Link>
               {i < arr.length - 1 ? ", " : ""}
             </span>
           ))}

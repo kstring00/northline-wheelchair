@@ -103,8 +103,12 @@ await page.waitForTimeout(1500);
 f = await focused();
 check("Success: focus moves to thank-you heading", f.tag === "H2" && f.text?.startsWith("Thank you, Maria"), f.text);
 check("Success states responseTime", await page.getByText("We call back within 30 minutes", { exact: true }).isVisible());
-check("Success repeats phone number", await page.locator('[data-booking-root] a[href^="tel:"]').isVisible());
+check("Success repeats phone number", await page.locator('[data-booking-root] a[href^="tel:"]').first().isVisible());
 check("Success summarises repeating days", await page.getByText("Every Monday, Wednesday, Friday").isVisible());
+const card = page.locator("[data-booking-success] [data-ride-card]");
+check("Success shows a Ride Card", await card.isVisible());
+check("Ride Card carries the rider's own pickup and drop-off", (await card.getByText("1200 Binz St, Houston, TX 77004").isVisible()) && (await card.getByText("DaVita Dialysis, 123 Main St, Spring").isVisible()));
+check("Ride Card tag shows the repeat days", /^Every (Mon|Tue|Wed|Thu|Fri|Sat|Sun)( · (Mon|Tue|Wed|Thu|Fri|Sat|Sun))*$/.test((await card.locator("[data-ride-card-tag]").textContent())?.trim() ?? ""), await card.locator("[data-ride-card-tag]").textContent());
 
 const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
 check("axe on success state", axe.violations.length === 0, axe.violations.map((v) => v.id).join(","));
@@ -119,7 +123,7 @@ await noJs.goto(BASE + "/book");
 check("No-JS: call fallback visible", await noJs.getByText("Online booking needs JavaScript turned on.").isVisible());
 await noJs.goto(BASE + "/");
 check("No-JS: FAQ answers readable", await noJs.getByText("Book a wait-and-return ride and your driver waits", { exact: false }).first().isVisible());
-check("No-JS: hero route visible", (await noJs.locator("[data-hero-route]").evaluate((el) => getComputedStyle(el).opacity)) === "1");
+check("No-JS: hero route visible", (await noJs.locator("[data-hero-pattern]").evaluate((el) => getComputedStyle(el).opacity)) === "1");
 
 await browser.close();
 const failed = log.filter((l) => !l.ok);

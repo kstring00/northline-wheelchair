@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <path d="M22 84 L22 18 L78 84 L78 18" fill="none" stroke="currentColor" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="22" cy="84" r="5.5" fill="var(--logo-dot)"/>
+  <path d="M78 2c-7.2 0-13 5.8-13 13 0 9.3 13 21 13 21s13-11.7 13-21c0-7.2-5.8-13-13-13z" fill="#E8A33D"/>
+  <circle cx="78" cy="15" r="4.6" fill="var(--logo-dot)"/>
+</svg>

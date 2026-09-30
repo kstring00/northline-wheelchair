@@ -19,14 +19,14 @@ export function OwnerNote() {
           />
         </div>
         <div>
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-navy-700">A note from the owner</p>
+          <p className="mb-3 label text-navy">A note from the owner</p>
           <h2 id="owner-heading" className="text-[2rem] font-bold sm:text-[2.5rem]">Hi, I&apos;m {owner.firstName}. I drive your family like my own.</h2>
           <div className="mt-6 space-y-4 text-lg">
             {owner.note.map((p) => <p key={p}>{p}</p>)}
           </div>
-          <p className="mt-6 font-display text-2xl font-bold text-navy-900">— {owner.firstName}</p>
-          <p className="text-muted">{owner.role}, {site.name}</p>
-          <Link href="/about" className="mt-6 inline-flex min-h-12 items-center gap-2 font-bold text-navy-700 underline decoration-2 underline-offset-4">
+          <p className="mt-6 font-display text-2xl font-bold text-navy">— {owner.firstName}</p>
+          <p className="text-ink/85">{owner.role}, {site.name}</p>
+          <Link href="/about" className="mt-6 inline-flex min-h-12 items-center gap-2 font-bold text-navy underline decoration-2 underline-offset-4">
             Read Jay&apos;s story and our safety standards <ArrowRightIcon />
           </Link>
         </div>

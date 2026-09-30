@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } fro
 import { site, telHref, money } from "@/config/site";
 import { trackEvent } from "@/lib/analytics";
 import { loadGsap, MOTION_OK } from "@/components/motion/gsap";
+import { RideCard, rideCardTag, rideCardDate } from "@/components/brand/RideCard";
 import { buttonClass } from "@/components/ui/Button";
 import { AlertIcon, CheckIcon, PhoneIcon } from "@/components/ui/Icons";
 import { ChoiceGroup, SelectField, TextArea, TextField } from "@/components/booking/fields";
@@ -12,7 +13,6 @@ import {
   dayNames,
   days,
   emptyBooking,
-  formatDate,
   formatTime,
   mobilityOptions,
   todayISO,
@@ -155,19 +155,19 @@ export function BookingForm() {
     <div data-booking-root className="scroll-mt-28">
       {/* Progress indicator */}
       <div className="mb-8">
-        <p className="text-base font-bold text-navy-900" aria-live="polite">
+        <p className="text-base font-bold text-navy" aria-live="polite">
           {status === "sent" ? "Request sent" : `Step ${step} of 3: ${stepNames[step]}`}
         </p>
-        <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-navy-100" aria-hidden="true">
-          <div ref={barRef} className="h-full origin-left rounded-full bg-navy-900" style={{ transform: `scaleX(${step / 3})` }} />
+        <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-morning" aria-hidden="true">
+          <div ref={barRef} className="h-full origin-left rounded-full bg-navy" style={{ transform: `scaleX(${step / 3})` }} />
         </div>
         <ol className="mt-3 grid grid-cols-3 gap-2 text-sm">
           {([1, 2, 3] as Step[]).map((n) => {
             const done = status === "sent" || n < step;
             const current = status !== "sent" && n === step;
             return (
-              <li key={n} aria-current={current ? "step" : undefined} className={`flex items-center gap-1.5 ${current ? "font-bold text-navy-900" : "text-muted"}`}>
-                <span aria-hidden="true" className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 text-xs font-bold ${done ? "border-navy-900 bg-navy-900 text-cream" : current ? "border-navy-900 text-navy-900" : "border-line"}`}>
+              <li key={n} aria-current={current ? "step" : undefined} className={`flex items-center gap-1.5 ${current ? "font-bold text-navy" : "text-ink/85"}`}>
+                <span aria-hidden="true" className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border-2 text-xs font-bold ${done ? "border-navy bg-navy text-cream" : current ? "border-navy text-navy" : "border-ink/60"}`}>
                   {done ? <CheckIcon className="h-3.5 w-3.5" /> : n}
                 </span>
                 <span>
@@ -193,14 +193,14 @@ export function BookingForm() {
             </h2>
 
             {showErrors && errorList.length > 0 && (
-              <div ref={summaryRef} tabIndex={-1} role="alert" aria-labelledby="error-summary-title" className="mt-6 rounded-xl border-[3px] border-error bg-white p-5">
-                <h3 id="error-summary-title" className="flex items-center gap-2 !font-sans text-lg font-bold !text-error">
+              <div ref={summaryRef} tabIndex={-1} role="alert" aria-labelledby="error-summary-title" className="mt-6 rounded-xl border-[3px] border-navy bg-white p-5">
+                <h3 id="error-summary-title" className="flex items-center gap-2 !font-sans text-lg font-bold !text-ink">
                   <AlertIcon /> Please fix {errorList.length === 1 ? "this" : `these ${errorList.length} things`} to continue
                 </h3>
                 <ul className="mt-2 space-y-1">
                   {errorList.map(([k, msg]) => (
                     <li key={k}>
-                      <a href={`#${k}`} className="font-bold text-error underline" onClick={(e) => { e.preventDefault(); document.getElementById(k)?.focus(); }}>
+                      <a href={`#${k}`} className="font-bold text-ink underline" onClick={(e) => { e.preventDefault(); document.getElementById(k)?.focus(); }}>
                         {msg}
                       </a>
                     </li>
@@ -222,7 +222,7 @@ export function BookingForm() {
                     onChange={(v) => update("who", v as Who)}
                   />
                   {d.who === "facility" && (
-                    <p className="rounded-xl bg-navy-100 p-4">
+                    <p className="rounded-xl bg-morning p-4">
                       Next, we&apos;ll ask about the trip. You can set up a <strong>repeating schedule</strong>, and we&apos;ll ask for your organization&apos;s name at the end.
                     </p>
                   )}
@@ -417,9 +417,9 @@ export function BookingForm() {
                     <label htmlFor="website">Leave this field empty</label>
                     <input id="website" name="website" tabIndex={-1} autoComplete="off" value={d.website} onChange={(e) => update("website", e.target.value)} />
                   </div>
-                  <p className="text-muted">
+                  <p className="text-ink/85">
                     We only use these details to plan your ride. See our{" "}
-                    <a href="/privacy" className="font-bold text-navy-700 underline">privacy policy</a>.
+                    <a href="/privacy" className="font-bold text-navy underline">privacy policy</a>.
                   </p>
                 </>
               )}
@@ -445,44 +445,46 @@ export function BookingForm() {
 }
 
 function Success({ d, firstName, successRef, onReset }: { d: BookingData; firstName: string; successRef: React.RefObject<HTMLHeadingElement | null>; onReset: () => void }) {
-  const rows: [string, string][] = [
-    ["Pickup", [d.pickupAddress, d.pickupUnit].filter(Boolean).join(", ")],
-    ["Going to", d.destination],
-    ["When", `${formatDate(d.date)} at ${formatTime(d.time)}`],
-    ["Trip", d.tripType === "wait-and-return" ? "Wait & return: your driver waits and brings you home" : d.tripType === "round-trip" ? `Round trip${d.returnTime ? `, return at ${formatTime(d.returnTime)}` : ", call when ready"}` : "One-way"],
-  ];
-  if (d.repeat === "repeat") rows.push(["Repeats", `Every ${d.repeatDays.map((x) => dayNames[x]).join(", ")}`]);
-  rows.push(["We'll call", d.phone]);
+  // The Ride Card, filled from what they entered. The driver is named on the
+  // confirmation call: this is still a request until we talk.
+  const date = rideCardDate(d.date);
+  const time = formatTime(d.time);
+  const when = d.repeat === "repeat" ? `From ${date} · ${time} appt` : `${date} · ${time} appt`;
 
   return (
-    <div className="rounded-[var(--radius-card)] border-2 border-success bg-white p-6 sm:p-8">
-      <span className="grid h-14 w-14 place-items-center rounded-full bg-success text-cream" aria-hidden="true">
-        <CheckIcon className="h-8 w-8" />
-      </span>
-      <h2 ref={successRef} tabIndex={-1} className="mt-5 text-[1.75rem] font-bold focus:outline-none sm:text-[2rem]">
+    <div data-booking-success className="bg-white sm:rounded-[var(--radius-card)] sm:border-2 sm:border-navy sm:p-8">
+      <h2 ref={successRef} tabIndex={-1} className="text-[1.75rem] font-bold focus:outline-none sm:text-[2rem]">
         Thank you{firstName ? `, ${firstName}` : ""}. Your ride request is in.
       </h2>
       <p className="mt-3 text-lg">
         <strong>We call back within {site.responseTime}</strong> during business hours to confirm the pickup time and the price. Your ride is not booked until we talk.
       </p>
-      <dl className="mt-6 divide-y divide-hairline rounded-xl bg-cream px-5">
-        {rows.map(([k, v]) => (
-          <div key={k} className="grid gap-1 py-3 sm:grid-cols-[8rem_1fr]">
-            <dt className="font-bold text-navy-900">{k}</dt>
-            <dd>{v}</dd>
-          </div>
-        ))}
-      </dl>
-      <div className="mt-6 rounded-xl bg-navy-100 p-5">
-        <p className="text-lg font-bold text-navy-900">Rather talk now?</p>
+
+      <div className="-mx-2 mt-6 grid place-items-center rounded-xl bg-sand px-2 py-6 sm:mx-0 sm:px-4 sm:py-8">
+        <RideCard
+          titleAs="h3"
+          tag={rideCardTag(d)}
+          pickup={[d.pickupAddress, d.pickupUnit].filter(Boolean).join(", ")}
+          dropoff={d.destination}
+          when={when}
+          driver="Named on our call"
+        />
+        {d.tripType === "round-trip" && d.returnTime && <p className="mt-4 text-center">Return pickup at {formatTime(d.returnTime)}.</p>}
+        {d.repeat === "repeat" && d.repeatDays.length > 0 && (
+          <p className="mt-4 text-center">Repeats every {d.repeatDays.map((x) => dayNames[x]).join(", ")}.</p>
+        )}
+        <p className="mt-4 text-center">We&apos;ll call you at <strong>{d.phone}</strong>.</p>
+      </div>
+
+      <div className="mt-6 rounded-xl bg-morning p-5">
+        <p className="text-lg font-bold text-navy">Rather talk now?</p>
         <a href={telHref} className={buttonClass("secondary", "lg", "mt-3 w-full sm:w-auto")}>
           <PhoneIcon /> Call {site.phone.display}
         </a>
       </div>
-      <button type="button" onClick={onReset} className="mt-6 inline-flex min-h-12 items-center font-bold text-navy-700 underline decoration-2 underline-offset-4">
+      <button type="button" onClick={onReset} className="mt-6 inline-flex min-h-12 items-center font-bold text-navy underline decoration-2 underline-offset-4">
         Request another ride
       </button>
     </div>
   );
 }
-

@@ -41,18 +41,18 @@ const copy: ServiceCopy = {
   ],
   extra: (
     <Section id="clinics" tone="white" eyebrow="Where we drive" title="Dialysis centers across north Houston">
-      <p className="mt-4 max-w-3xl text-lg text-muted">
+      <p className="mt-4 max-w-3xl text-lg text-ink/85">
         We drive to every dialysis clinic in our service area. These are the corridors we run most days. Don&apos;t see yours? We still go there.
       </p>
       <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {coreAreas.map((a) => {
           const dialysis = [...a.facilities, ...a.typicalTrips].filter((x) => /dialysis/i.test(x));
           return (
-            <li key={a.slug} className="rounded-[var(--radius-card)] border border-hairline bg-cream p-5">
-              <Link href={`/service-area/${a.slug}`} className="inline-flex min-h-12 items-center gap-2 text-xl font-bold text-navy-900 underline decoration-2 underline-offset-4">
+            <li key={a.slug} className="rounded-[var(--radius-card)] border border-ink/15 bg-cream p-5">
+              <Link href={`/service-area/${a.slug}`} className="inline-flex min-h-12 items-center gap-2 text-xl font-bold text-navy underline decoration-2 underline-offset-4">
                 {a.name} <ArrowRightIcon className="h-5 w-5" />
               </Link>
-              <p className="mt-1 text-muted">{dialysis[0] ?? "Dialysis centers and clinics"}</p>
+              <p className="mt-1 text-ink/85">{dialysis[0] ?? "Dialysis centers and clinics"}</p>
             </li>
           );
         })}

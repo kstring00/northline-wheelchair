@@ -35,11 +35,11 @@ export default function HomePage() {
         intro="From a Monday dialysis chair to a ride home from the hospital, we get you there on time and walk you to the right door."
       >
         <ServiceCards />
-        <div className="mt-8 flex flex-col gap-3 rounded-[var(--radius-card)] bg-navy-100 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 rounded-[var(--radius-card)] bg-morning p-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-lg">
-            <strong className="text-navy-900">Discharge planners and case managers:</strong> one direct line, standing schedules, monthly invoicing.
+            <strong className="text-navy">Discharge planners and case managers:</strong> one direct line, standing schedules, monthly invoicing.
           </p>
-          <Link href="/partners" className="inline-flex min-h-12 shrink-0 items-center gap-2 font-bold text-navy-900 underline decoration-2 underline-offset-4">
+          <Link href="/partners" className="inline-flex min-h-12 shrink-0 items-center gap-2 font-bold text-navy underline decoration-2 underline-offset-4">
             See how facilities work with us <ArrowRightIcon />
           </Link>
         </div>
@@ -51,10 +51,10 @@ export default function HomePage() {
       <ReviewStrip />
       <AreasPreview />
 
-      <Section id="faq" tone="sand" eyebrow="Questions" title="Common questions">
+      <Section id="faq" tone="sandPattern" eyebrow="Questions" title="Common questions">
         <div className="mt-8 max-w-3xl">
           <Accordion items={homeFaqs} />
-          <Link href="/faq" className="mt-6 inline-flex min-h-12 items-center gap-2 font-bold text-navy-700 underline decoration-2 underline-offset-4">
+          <Link href="/faq" className="mt-6 inline-flex min-h-12 items-center gap-2 font-bold text-navy underline decoration-2 underline-offset-4">
             All sixteen questions, answered <ArrowRightIcon />
           </Link>
         </div>

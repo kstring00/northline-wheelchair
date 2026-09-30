@@ -19,7 +19,9 @@
     "assets:placeholders": "node scripts/make-placeholders.mjs",
     "assets:icons": "node scripts/make-icons.mjs",
     "test:pricing": "node scripts/test-pricing-modes.mjs",
-    "test:acceptance": "node scripts/acceptance.mjs"
+    "test:acceptance": "node scripts/acceptance.mjs",
+    "test:brand": "node scripts/brand-check.mjs",
+    "screenshots:brand": "node scripts/brand-screenshots.mjs"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",

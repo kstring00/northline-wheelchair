@@ -25,7 +25,7 @@ const fmt = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("en-
 
 const components = {
   a: (props: React.ComponentProps<"a">) =>
-    props.href?.startsWith("/") ? <Link href={props.href} className="font-bold text-navy-700 underline">{props.children}</Link> : <a {...props} className="font-bold text-navy-700 underline" />,
+    props.href?.startsWith("/") ? <Link href={props.href} className="font-bold text-navy underline">{props.children}</Link> : <a {...props} className="font-bold text-navy underline" />,
 };
 
 export default async function GuidePage({ params }: PageProps<"/guides/[slug]">) {
@@ -41,7 +41,7 @@ export default async function GuidePage({ params }: PageProps<"/guides/[slug]">)
           <Breadcrumbs items={[{ name: "Guides", path: "/guides" }, { name: g.title, path }]} />
           {g.draft && <div className="mt-4"><DraftLabel /></div>}
           <h1 className="mt-4 text-[2.25rem] font-bold sm:text-[3rem]">{g.title}</h1>
-          <p className="mt-4 text-lg text-muted">
+          <p className="mt-4 text-lg text-ink/85">
             By {g.author}, {site.owner.role.toLowerCase()} · {fmt(g.date)} · {Math.max(2, Math.round(g.words / 200))} min read
           </p>
           {/* CONFIRM: byline and body approved by Jay before `draft: false`. */}

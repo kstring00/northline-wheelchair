@@ -15,10 +15,12 @@ import { TextUsLink } from "@/components/ui/Badges";
  */
 export function Header() {
   return (
-    <header className="relative z-40 border-b border-hairline bg-cream/95 lg:sticky lg:top-0 lg:backdrop-blur">
+    <header className="relative z-40 border-b border-ink/15 bg-cream/95 lg:sticky lg:top-0 lg:backdrop-blur">
       <div className="container-page flex min-h-20 items-center justify-between gap-3">
-        <Link href="/" className="-ml-1 rounded-lg p-1">
-          <Logo />
+        {/* Wordmark + tagline at 28px; logomark alone below 400px. Both padded by their protection area. */}
+        <Link href="/" className="shrink-0 rounded-lg">
+          <Logo variant="mark" size={32} clear label={`${site.name}, home page`} className="min-[400px]:hidden" />
+          <Logo variant="wordmark" size={28} withTagline clear label={`${site.name}, home page`} className="max-[399px]:hidden" />
         </Link>
 
         <nav aria-label={t.nav.main} className="hidden lg:block">
@@ -26,7 +28,7 @@ export function Header() {
             <li><ServicesMenu label={t.nav.services} /></li>
             {mainLinks.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="inline-flex min-h-12 items-center whitespace-nowrap rounded-lg px-2.5 font-bold text-navy-900 hover:bg-navy-100 xl:px-3">
+                <Link href={l.href} className="inline-flex min-h-12 items-center whitespace-nowrap rounded-lg px-2.5 font-bold text-navy hover:bg-morning xl:px-3">
                   {l.label}
                 </Link>
               </li>
@@ -36,7 +38,7 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <a href={telHref} className="inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-lg px-2 font-bold text-navy-900 hover:bg-navy-100">
+          <a href={telHref} className="inline-flex min-h-12 items-center gap-2 whitespace-nowrap rounded-lg px-2 font-bold text-navy hover:bg-morning">
             <PhoneIcon />
             <span>
               <span className="sr-only">Call </span>

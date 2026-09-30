@@ -41,18 +41,18 @@ const copy: ServiceCopy = {
   ],
   extra: (
     <Section id="hospitals" tone="white" eyebrow="Hospitals we drive to" title="We know where to pull in">
-      <p className="mt-4 max-w-3xl text-lg text-muted">Drop-off notes, the right entrance, and what to expect at the big north-side campuses.</p>
+      <p className="mt-4 max-w-3xl text-lg text-ink/85">Drop-off notes, the right entrance, and what to expect at the big north-side campuses.</p>
       <ul className="mt-8 grid gap-3 sm:grid-cols-2">
         {hospitals.map((h) => (
           <li key={h.slug}>
-            <Link href={`/service-area/hospitals/${h.slug}`} className="lift-card flex min-h-16 items-center justify-between gap-3 rounded-xl border border-hairline bg-cream px-5 py-3 font-bold text-navy-900 no-underline">
+            <Link href={`/service-area/hospitals/${h.slug}`} className="lift-card flex min-h-16 items-center justify-between gap-3 rounded-xl border border-ink/15 bg-cream px-5 py-3 font-bold text-navy no-underline">
               {h.name} <ArrowRightIcon className="h-5 w-5 shrink-0" />
             </Link>
           </li>
         ))}
       </ul>
       <p className="mt-6 text-lg">
-        Booking for a patient? <Link href="/partners" className="font-bold text-navy-700 underline">See how facilities work with us</Link>.
+        Booking for a patient? <Link href="/partners" className="font-bold text-navy underline">See how facilities work with us</Link>.
       </p>
     </Section>
   ),

@@ -5,7 +5,7 @@ import { ExampleTag } from "@/components/ui/Badges";
 const Stars = ({ n }: { n: number }) => (
   <span className="flex gap-0.5" role="img" aria-label={`${n} out of 5 stars`}>
     {[1, 2, 3, 4, 5].map((i) => (
-      <svg key={i} viewBox="0 0 20 20" className={`h-5 w-5 ${i <= n ? "text-navy-900" : "text-hairline"}`} aria-hidden="true">
+      <svg key={i} viewBox="0 0 20 20" className={`h-5 w-5 ${i <= n ? "text-navy" : "text-ink/20"}`} aria-hidden="true">
         <path fill="currentColor" d="m10 1.5 2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L10 14.9l-5.3 2.8 1.1-5.9L1.5 7.7l5.9-.8z" />
       </svg>
     ))}
@@ -16,7 +16,7 @@ const Stars = ({ n }: { n: number }) => (
 function Quote({ r }: { r: Review }) {
   if (!r.driverName) return <p>{r.text}</p>;
   const parts = r.text.split(new RegExp(`(${r.driverName})`, "g"));
-  return <p>{parts.map((part, i) => (part === r.driverName ? <strong key={i} className="text-navy-900">{part}</strong> : part))}</p>;
+  return <p>{parts.map((part, i) => (part === r.driverName ? <strong key={i} className="text-navy">{part}</strong> : part))}</p>;
 }
 
 const fmtDate = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "long", year: "numeric" });
@@ -33,15 +33,15 @@ export function ReviewStrip({ limit = 3 }: { limit?: number }) {
       <div className="container-page">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-2xl">
-            <p className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-navy-700">In their words</p>
+            <p className="mb-3 label text-navy">In their words</p>
             <h2 id="reviews-heading" className="text-[2rem] font-bold sm:text-[2.5rem]">On time, clean van, walked her to the right suite</h2>
           </div>
           {hasRealReviews && (
-            <div className="flex items-center gap-3 rounded-2xl border border-hairline bg-white px-4 py-3">
-              <span className="font-display text-4xl font-bold text-navy-900">{site.googleRating?.toFixed(1)}</span>
+            <div className="flex items-center gap-3 rounded-2xl border border-ink/15 bg-white px-4 py-3">
+              <span className="font-display text-4xl font-bold text-navy">{site.googleRating?.toFixed(1)}</span>
               <span className="text-sm leading-tight">
                 <Stars n={Math.round(site.googleRating ?? 0)} />
-                <span className="mt-1 block text-muted">{site.googleReviewCount ?? site.reviews.length} Google reviews</span>
+                <span className="mt-1 block text-ink/85">{site.googleReviewCount ?? site.reviews.length} Google reviews</span>
               </span>
             </div>
           )}
@@ -60,11 +60,11 @@ export function ReviewStrip({ limit = 3 }: { limit?: number }) {
                 </blockquote>
                 <figcaption className="mt-5 flex items-end justify-between gap-3">
                   <span>
-                    <span className="block font-bold text-navy-900">{r.author}</span>
-                    <span className="text-sm text-muted">{fmtDate(r.date)}</span>
+                    <span className="block font-bold text-navy">{r.author}</span>
+                    <span className="text-sm text-ink/85">{fmtDate(r.date)}</span>
                   </span>
                   {r.sourceUrl && (
-                    <a href={r.sourceUrl} rel="noopener" className="inline-flex min-h-12 items-center text-sm font-bold text-navy-700 underline">
+                    <a href={r.sourceUrl} rel="noopener" className="inline-flex min-h-12 items-center text-sm font-bold text-navy underline">
                       On Google
                     </a>
                   )}
@@ -77,7 +77,7 @@ export function ReviewStrip({ limit = 3 }: { limit?: number }) {
         {site.googleReviewUrl && (
           <p className="mt-8">
             Had a ride with us?{" "}
-            <a href={site.googleReviewUrl} rel="noopener" className="inline-flex min-h-12 items-center font-bold text-navy-700 underline decoration-2 underline-offset-4">
+            <a href={site.googleReviewUrl} rel="noopener" className="inline-flex min-h-12 items-center font-bold text-navy underline decoration-2 underline-offset-4">
               {t.actions.leaveReview}
             </a>
           </p>

@@ -21,14 +21,14 @@ export default function GuidesPage() {
       <PageHeader crumbs={[{ name: "Guides", path: "/guides" }]} title="Guides for families arranging rides in Houston" answer="Short, plain answers to the questions adult children ask us most. Written by the people who drive the rides." cta={false} />
       <section aria-label="Guides" className="bg-white py-12 sm:py-16">
         <div className="container-page max-w-3xl">
-          <ol className="divide-y divide-hairline">
+          <ol className="divide-y divide-ink/15">
             {guides.map((g) => (
               <li key={g.slug} className="py-8">
-                <p className="text-sm text-muted">{fmt(g.date)} · {g.author} · {Math.max(2, Math.round(g.words / 200))} min read</p>
+                <p className="text-sm text-ink/85">{fmt(g.date)} · {g.author} · {Math.max(2, Math.round(g.words / 200))} min read</p>
                 <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-                  <Link href={`/guides/${g.slug}`} className="text-navy-900 underline decoration-2 underline-offset-4 hover:text-navy-700">{g.title}</Link>
+                  <Link href={`/guides/${g.slug}`} className="text-navy underline decoration-2 underline-offset-4 hover:text-navy">{g.title}</Link>
                 </h2>
-                <p className="mt-2 text-lg text-muted">{g.description}</p>
+                <p className="mt-2 text-lg text-ink/85">{g.description}</p>
                 {g.draft && <div className="mt-3"><DraftLabel /></div>}
               </li>
             ))}

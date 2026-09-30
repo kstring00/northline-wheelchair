@@ -17,7 +17,7 @@ export function ServicesMenu({ label, links = serviceLinks }: { label: string; l
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen(!open)}
-        className="inline-flex min-h-12 items-center gap-1 whitespace-nowrap rounded-lg px-2.5 font-bold xl:px-3 text-navy-900 hover:bg-navy-100"
+        className="inline-flex min-h-12 items-center gap-1 whitespace-nowrap rounded-lg px-2.5 font-bold xl:px-3 text-navy hover:bg-morning"
       >
         {label}
         <ChevronIcon className={`h-4 w-4 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
@@ -26,12 +26,12 @@ export function ServicesMenu({ label, links = serviceLinks }: { label: string; l
         id={id}
         data-disclosure-panel
         data-state={open ? "open" : "closed"}
-        className="absolute left-0 top-full mt-2 w-72 rounded-2xl border border-hairline bg-white p-2 shadow-[var(--shadow-lift)]"
+        className="absolute left-0 top-full mt-2 w-72 rounded-2xl border border-ink/15 bg-white p-2 shadow-[var(--shadow-lift)]"
       >
         <ul>
           {links.map((l) => (
             <li key={l.href}>
-              <Link href={l.href} className="flex min-h-12 items-center rounded-lg px-3 font-bold text-navy-900 hover:bg-navy-100">
+              <Link href={l.href} className="flex min-h-12 items-center rounded-lg px-3 font-bold text-navy hover:bg-morning">
                 {l.label}
               </Link>
             </li>

@@ -35,7 +35,7 @@ export default function AboutPage() {
             <div key={h}>
               <h3 className="text-xl font-bold !text-cream">{h}</h3>
               <ul className="mt-3 space-y-2">
-                {list.map((x) => <li key={x} className="flex gap-2 text-mist"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-cream" /> {x}</li>)}
+                {list.map((x) => <li key={x} className="flex gap-2 text-cream/80"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-cream" /> {x}</li>)}
               </ul>
             </div>
           ))}

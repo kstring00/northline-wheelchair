@@ -8,13 +8,13 @@ export function ServiceCards({ exclude }: { exclude?: string }) {
   return (
     <ul className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {list.map((s, i) => (
-        <li key={s.slug} className="lift-card flex rounded-[var(--radius-card)] border border-hairline bg-white shadow-[var(--shadow-soft)]">
+        <li key={s.slug} className="lift-card flex rounded-[var(--radius-card)] border border-ink/15 bg-white shadow-[var(--shadow-soft)]">
           {/* The whole card is the link, so the tap target is the full card. */}
           <Link href={`/services/${s.slug}`} className="flex flex-1 flex-col rounded-[var(--radius-card)] p-6 no-underline">
-            <span aria-hidden="true" className="font-display text-sm font-bold text-navy-700">0{i + 1}</span>
+            <span aria-hidden="true" className="font-display text-sm font-bold text-navy">0{i + 1}</span>
             <h3 className="mt-2 text-xl font-bold">{s.shortName}</h3>
-            <span className="mt-2 flex-1 text-muted">{s.cardSummary}</span>
-            <span aria-hidden="true" className="mt-5 inline-flex items-center gap-2 font-bold text-navy-700">
+            <span className="mt-2 flex-1 text-ink/85">{s.cardSummary}</span>
+            <span aria-hidden="true" className="mt-5 inline-flex items-center gap-2 font-bold text-navy">
               Learn more <ArrowRightIcon />
             </span>
           </Link>

@@ -32,7 +32,7 @@ grep -rn "CONFIRM" src
 
 ### Swap the hero photo
 
-Put the photo in `public/images/`, then change `images.hero` in `src/config/site.ts`: `src`, `alt`, `width`, `height`. Nothing else changes. The other photo slots (`owner.photo`, `images.vanRamp`, `images.driverHelping`) work the same way.
+Put the photo in `public/images/`, then change `images.hero` in `src/config/site.ts` (`src`, `alt`, `width`, `height`) and set `images.heroPhotoReady: true`. Until then the hero shows the brand map pattern. The other photo slots (`owner.photo`, `images.vanRamp`, `images.driverHelping`) work the same way.
 
 ### Testimonials
 
@@ -76,13 +76,39 @@ Run against a production build (`npm run build && npm start`):
 | `npm run test:motion` | Reduced motion shows final states instantly; full motion animates and settles |
 | `npm run test:inp` | Interaction latency on a 4× CPU-throttled phone |
 | `npm run test:schema` | JSON-LD against the schema.org vocabulary (set `SCHEMA_VOCAB` to a local copy of `schemaorg-current-https.jsonld`) |
-| `npm run test:contrast` | Palette contrast ratios (body text AAA) |
+| `npm run test:contrast` | Contrast of every text/ground pair, read from the six brand tokens in `globals.css` (body and muted text AAA; Ink on Amber ≥ 4.5) |
+| `npm run test:brand` | Brand acceptance (below) |
 | `npm run test:pricing` | Pricing rules render correctly in all three display modes |
 | `npm run test:acceptance` | Phase 1.5 acceptance: service + place in title/H1/first sentence, banned words, NEMT placement, no iframes or external scripts, drafts excluded, schema gating |
 | `npm run lighthouse` | Lighthouse mobile ×3 runs (median) for Home, `/book`, `/pricing` and the wheelchair service page |
 
+`npm run screenshots:brand` captures Home, `/about`, a filled-in `/book` success screen and the footer at 390 and 1440 px into `reports/screenshots/brand`.
+
 Scripts use Chromium at `/opt/pw-browsers/...` by default; override with `CHROME_PATH`.
+
+## Brand
+
+The site follows *Northline Brand Guidelines v1* (Stringham Web Design, September 2026). The internal sheet at `/brand` (not linked, not indexed) shows every logo tone and brand element.
+
+- **Colour:** six tokens in `src/app/globals.css`: Navy `#16284A`, Signal Amber `#E8A33D`, Cream `#FAF6EE`, Ink `#1E2533`, Morning Blue `#DCE6F5`, Sand `#EFE6D6` (plus white for card surfaces). Tailwind's default palette is switched off, so any other colour class generates nothing. Muted text is `ink/85`, and `cream/80` on navy.
+- **Amber** appears only on the pin, the primary button and a route line. The Ride Card's tag pill is amber by spec.
+- **Logo:** `<Logo variant="wordmark|stacked|mark" tone="navy|white|ink" withTagline clear />` in `src/components/ui/Logo.tsx`. `clear` pads it by its protection area (height of the N). Never under 24 px tall. Never recolour the pin. Never place it on the pattern without its navy clear-space box.
+- **Type:** headings are Bricolage 700–800 with tight tracking. `.poster` is the all-caps Bricolage 800 headline with one word in Navy (`<em>`), and `.poster-fact` is the Bricolage 500 line under it. `.label` is Atkinson 700 13 px uppercase. Body is Atkinson 18/28.
+- **Pattern:** `public/brand/pattern-navy.svg` and `pattern-sand.svg`, used through `.pattern-navy` / `.pattern-sand`. They sit at natural size and are never tiled or stretched. They appear on the hero slot (until the photo arrives), the footer, the Ride Card back and at most one section ground per page. The amber A-to-B route is drawn once, over the hero only. **The files in the repo are provisional stand-ins; replace them with the brand book exports (under 60 KB each, no amber).**
+- **Brand elements:** `src/components/brand/`: `RideCard` (booking success, `/partners` sample), `SmsMock` (how it works), `DriverBadge` (`/about` team), `ContactBlock` (business-card back: `/contact`, footer, 404).
+
+### Brand launch checklist (`npm run test:brand`, server running)
+
+- [ ] Logo renders in all three tones; pin fill is always `#E8A33D`; header and footer clear space ≥ height of the N with nothing inside it; every logo ≥ 24 px tall.
+- [ ] Every colour literal in `src/`, `scripts/` and `public/*.svg` is one of the six tokens or white (stray list printed).
+- [ ] Amber only on pin / primary button / route line (source lines and computed styles both listed).
+- [ ] Favicon set and the 1200×630 share image are regenerated from the logomark and wordmark (`npm run assets:icons`; `/opengraph-image`).
+- [ ] `npm run test:contrast` passes every pair.
+- [ ] The booking success screen shows a Ride Card with the rider's own inputs (`npm run test:booking`).
+- [ ] `/public` holds only brand SVGs, generated icons and photo placeholders (inventory printed).
+- [ ] Pattern SVGs under 60 KB each and not provisional.
+- [ ] Lighthouse mobile ≥ 90 on Home, `/book`, `/pricing` (`npm run lighthouse`).
 
 ## Placeholder assets
 
-`npm run assets:placeholders` regenerates the duotone placeholder photos. `npm run assets:icons` regenerates the favicon, apple-touch icon, manifest icons and `logo.png` from the brand mark.
+`npm run assets:placeholders` regenerates the photo placeholders. They are flat Sand cards naming the photo that goes there, with no illustration. `npm run assets:icons` regenerates the favicon, apple-touch icon, manifest icons and `logo.png` from the logomark (navy N on cream, amber pin).

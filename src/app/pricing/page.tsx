@@ -52,7 +52,7 @@ export default function PricingPage() {
         <div className="mt-8 max-w-3xl">
           <Accordion items={faqs} />
           <p className="mt-6 text-lg">
-            Case managers: facility accounts are invoiced monthly. <Link href="/partners" className="font-bold text-navy-700 underline">See how facilities work with us</Link>.
+            Case managers: facility accounts are invoiced monthly. <Link href="/partners" className="font-bold text-navy underline">See how facilities work with us</Link>.
           </p>
         </div>
       </Section>

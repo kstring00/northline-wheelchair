@@ -51,9 +51,9 @@ export function ServicePage({ service, title, copy }: { service: Service; title:
       <Section id="who" tone="white" eyebrow="Who it's for" title={`Who books ${service.shortName.toLowerCase()}`}>
         <dl className="mt-10 grid gap-x-10 gap-y-8 md:grid-cols-2">
           {copy.audiences.map((a) => (
-            <div key={a.title} className="border-l-4 border-navy-900 pl-5">
-              <dt className="text-xl font-bold text-navy-900">{a.title}</dt>
-              <dd className="mt-1 text-muted">{a.body}</dd>
+            <div key={a.title} className="border-l-4 border-navy pl-5">
+              <dt className="text-xl font-bold text-navy">{a.title}</dt>
+              <dd className="mt-1 text-ink/85">{a.body}</dd>
             </div>
           ))}
         </dl>
@@ -63,9 +63,9 @@ export function ServicePage({ service, title, copy }: { service: Service; title:
         <ol className="mt-10 grid gap-8 md:grid-cols-3">
           {copy.steps.map((s, i) => (
             <li key={s.title} className="relative rounded-[var(--radius-card)] bg-white p-6 pt-8">
-              <span aria-hidden="true" className="absolute -top-5 left-6 grid h-10 w-10 place-items-center rounded-full bg-navy-900 font-display text-lg font-bold text-cream">{i + 1}</span>
+              <span aria-hidden="true" className="absolute -top-5 left-6 grid h-10 w-10 place-items-center rounded-full bg-navy font-display text-lg font-bold text-cream">{i + 1}</span>
               <h3 className="text-xl font-bold"><span className="sr-only">Step {i + 1}: </span>{s.title}</h3>
-              <p className="mt-2 text-muted">{s.body}</p>
+              <p className="mt-2 text-ink/85">{s.body}</p>
             </li>
           ))}
         </ol>
@@ -75,10 +75,10 @@ export function ServicePage({ service, title, copy }: { service: Service; title:
         <ul className="mt-10 grid gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">
           {copy.included.map((it) => (
             <li key={it.title} className="flex gap-4">
-              <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-navy-100 text-navy-900"><CheckIcon className="h-5 w-5" /></span>
+              <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-morning text-navy"><CheckIcon className="h-5 w-5" /></span>
               <div>
                 <h3 className="text-lg font-bold">{it.title}</h3>
-                <p className="mt-1 text-muted">{it.body}</p>
+                <p className="mt-1 text-ink/85">{it.body}</p>
               </div>
             </li>
           ))}
@@ -86,7 +86,7 @@ export function ServicePage({ service, title, copy }: { service: Service; title:
       </Section>
 
       <Section id="day" tone="navy" eyebrow="On the day" title="What to expect">
-        <div className="mt-8 max-w-3xl space-y-5 text-lg text-mist">
+        <div className="mt-8 max-w-3xl space-y-5 text-lg text-cream/80">
           {copy.onTheDay.map((para) => <p key={para.slice(0, 40)}>{para}</p>)}
         </div>
       </Section>
@@ -96,7 +96,7 @@ export function ServicePage({ service, title, copy }: { service: Service; title:
       <Section id="questions" tone="sand" eyebrow="Questions" title={`${service.shortName} questions`}>
         <div className="mt-8 max-w-3xl">
           <Accordion items={faqs} />
-          <Link href="/faq" className="mt-6 inline-flex min-h-12 items-center gap-2 font-bold text-navy-700 underline decoration-2 underline-offset-4">
+          <Link href="/faq" className="mt-6 inline-flex min-h-12 items-center gap-2 font-bold text-navy underline decoration-2 underline-offset-4">
             All sixteen questions, answered <ArrowRightIcon />
           </Link>
         </div>
@@ -108,7 +108,7 @@ export function ServicePage({ service, title, copy }: { service: Service; title:
             <h2 className="text-xl font-bold">Other rides we give</h2>
             <ul className="mt-3 space-y-1">
               {related.map((s) => (
-                <li key={s.slug}><Link href={`/services/${s.slug}`} className="inline-flex min-h-12 items-center font-bold text-navy-700 underline">{s.name}</Link></li>
+                <li key={s.slug}><Link href={`/services/${s.slug}`} className="inline-flex min-h-12 items-center font-bold text-navy underline">{s.name}</Link></li>
               ))}
             </ul>
           </div>
@@ -117,7 +117,7 @@ export function ServicePage({ service, title, copy }: { service: Service; title:
             <ul className="mt-3 flex flex-wrap gap-2">
               {coreAreas.map((a) => (
                 <li key={a.slug}>
-                  <Link href={`/service-area/${a.slug}`} className="inline-flex min-h-12 items-center gap-1.5 rounded-full border-2 border-navy-900 bg-white px-4 font-bold text-navy-900 no-underline hover:bg-navy-100">
+                  <Link href={`/service-area/${a.slug}`} className="inline-flex min-h-12 items-center gap-1.5 rounded-full border-2 border-navy bg-white px-4 font-bold text-navy no-underline hover:bg-morning">
                     <PinIcon className="h-4 w-4" /> {a.name}
                   </Link>
                 </li>

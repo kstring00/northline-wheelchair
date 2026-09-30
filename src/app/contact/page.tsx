@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { ButtonLink, buttonClass } from "@/components/ui/Button";
 import { TextUsLink, SeHablaBadge } from "@/components/ui/Badges";
 import { PhoneIcon } from "@/components/ui/Icons";
+import { ContactBlock } from "@/components/brand/ContactBlock";
 
 export const metadata: Metadata = buildMetadata({
   title: "Contact",
@@ -21,37 +22,30 @@ export default function ContactPage() {
       <section aria-label="Ways to reach us" className="bg-white py-16">
         <div className="container-page grid gap-10 md:grid-cols-2">
           <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold">Phone</h2>
-              <a href={telHref} className="mt-2 inline-flex min-h-12 items-center gap-2 font-display text-3xl font-bold text-navy-900 underline decoration-2 underline-offset-4"><PhoneIcon className="h-7 w-7" /> {site.phone.display}</a>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <a href={telHref} className={buttonClass("primary", "md")}>{t.actions.call}</a>
-                <TextUsLink />
-              </div>
-              <SeHablaBadge className="mt-3" />
+            <ContactBlock nameAs="h2" />
+            <div className="flex flex-wrap gap-3">
+              <a href={telHref} className={buttonClass("primary", "md")}><PhoneIcon /> {t.actions.call}</a>
+              <TextUsLink />
             </div>
-            <div>
-              <h2 className="text-xl font-bold">Email</h2>
-              <a href={`mailto:${site.email}`} className="mt-1 inline-flex min-h-12 items-center text-lg font-bold text-navy-700 underline">{site.email}</a>
-            </div>
+            <SeHablaBadge />
             <div>
               <h2 className="text-xl font-bold">Address</h2>
               <address className="mt-1 not-italic text-lg">{site.address.showStreet ? fullAddress : `${site.address.city}, ${site.address.region}`}</address>
             </div>
             <ButtonLink href={bookHref} size="lg">{t.actions.bookLong}</ButtonLink>
           </div>
-          <div className="rounded-[var(--radius-card)] border border-hairline bg-cream p-6">
+          <div className="rounded-[var(--radius-card)] border border-ink/15 bg-cream p-6">
             <h2 className="text-xl font-bold">{t.labels.hours}</h2>
             <dl className="mt-3 space-y-2">
               {site.hours.map((h) => (
-                <div key={h.label} className="flex justify-between gap-4 border-b border-hairline pb-2">
+                <div key={h.label} className="flex justify-between gap-4 border-b border-ink/15 pb-2">
                   <dt className="font-bold">{h.label}</dt>
                   <dd>{h.display}</dd>
                 </div>
               ))}
             </dl>
             <h3 className="mt-6 text-lg font-bold">{t.labels.afterHours}</h3>
-            <p className="mt-1 text-muted">{t.response.afterHours}</p>
+            <p className="mt-1 text-ink/85">{t.response.afterHours}</p>
           </div>
         </div>
       </section>
