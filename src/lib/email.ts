@@ -1,6 +1,6 @@
 import { site } from "@/config/site";
 import { rideCardDate } from "@/components/brand/RideCard";
-import { dayNames, formatDate, formatTime, mobilityOptions, whoOptions, type BookingData } from "@/components/booking/model";
+import { dayNames, formatDate, formatTime, mobilityOptions, whoOptions, windowText, type BookingData } from "@/components/booking/model";
 
 /*
  * Email builders for the booking request. Pure functions: they return
@@ -33,18 +33,19 @@ function label<T extends string>(list: readonly { value: T; label: string }[], v
 }
 
 /** Every field, labelled in plain English. Blank fields read "Not given" so Jay sees the same list every time. */
-export function bookingRows(d: BookingData, submittedAt = new Date()) {
+export function bookingRows(d: BookingData, submittedAt = new Date(), ref = "") {
   const notGiven = "Not given";
   const repeatDays = d.repeatDays.map((x) => dayNames[x] ?? x).join(", ");
   const companions = d.companions === "0" ? "No one, just the rider" : `${d.companions} ${d.companions === "1" ? "person" : "people"}`;
   const rows: [string, string][] = [
+    ["Reference", ref || notGiven],
     ["Name", d.contactName.trim() || notGiven],
     ["Phone", d.phone.trim() || notGiven],
     ["Pickup address", d.pickupAddress.trim() || notGiven],
     ["Apartment, building or room", d.pickupUnit.trim() || notGiven],
     ["Drop-off address", d.destination.trim() || notGiven],
     ["Date of the ride", d.date ? `${formatDate(d.date)} (${d.date})` : notGiven],
-    ["Appointment time", d.time ? formatTime(d.time) : notGiven],
+    ["Pickup window", windowText(d) || "Not sure yet (set it on the call)"],
     ["Trip type", tripTypeLabel[d.tripType] ?? "Not chosen (ask on the call)"],
     ["Return pickup time", d.returnTime ? formatTime(d.returnTime) : notGiven],
     ["Repeats", d.repeat === "repeat" ? "Yes, every week" : "No, just this once"],
@@ -83,11 +84,12 @@ function wrap(bodyHtml: string, preheader: string) {
 }
 
 /** The request as Jay receives it: every field, labelled, in the on-screen order. */
-export function bookingEmail(d: BookingData, submittedAt = new Date()): EmailMessage {
-  const rows = bookingRows(d, submittedAt);
+export function bookingEmail(d: BookingData, submittedAt = new Date(), ref = ""): EmailMessage {
+  const rows = bookingRows(d, submittedAt, ref);
   const who = d.contactName.trim() || "someone";
-  const when = d.date ? `${rideCardDate(d.date)}${d.time ? ` · ${formatTime(d.time)}` : ""}` : "date not given";
-  const subject = `Ride request: ${who} · ${when}`;
+  const win = windowText(d);
+  const when = d.date ? `${rideCardDate(d.date)}${win ? ` · ${win}` : ""}` : "date not given";
+  const subject = `Ride request: ${who} · ${when}${ref ? ` · ${ref}` : ""}`;
 
   const text = [
     `New ride request from the website.`,
@@ -116,8 +118,8 @@ ${rows
 /** Draft Ride Card lines shared by the rider's text and HTML copy. */
 export function draftRideCard(d: BookingData) {
   const date = rideCardDate(d.date);
-  const time = formatTime(d.time);
-  const when = `${d.repeat === "repeat" ? "From " : ""}${date}${time ? ` · ${time} appt` : ""}`;
+  const win = windowText(d);
+  const when = `${d.repeat === "repeat" ? "From " : ""}${date}${win ? ` · ${win}` : ""}`;
   return {
     tag: "Pending",
     pickup: [d.pickupAddress.trim(), d.pickupUnit.trim()].filter(Boolean).join(", "),
@@ -127,9 +129,17 @@ export function draftRideCard(d: BookingData) {
   };
 }
 
+/** Channel wording follows site.smsEnabled; the en-route line only renders when Jay has confirmed it. */
+const draftNote = () =>
+  site.smsEnabled
+    ? "This is your draft Ride Card. You'll get the confirmed one by text."
+    : "This is your draft Ride Card. You'll get the confirmed Ride Card by email (or we'll read it to you on the call).";
+const enRouteLine = () =>
+  site.onTimePromise.enRouteText ? (site.smsEnabled ? "We text you when your driver is on the way. " : "We call you when your driver is on the way. ") : "";
+
 /** Sent to the rider only when they gave an email. */
-export function riderAutoReply(d: BookingData): EmailMessage {
-  const subject = "We got your ride request";
+export function riderAutoReply(d: BookingData, ref = ""): EmailMessage {
+  const subject = `We got your ride request${ref ? ` (${ref})` : ""}`;
   const card = draftRideCard(d);
   const first = (d.contactName.trim().split(/\s+/)[0] ?? "").replace(/[^\p{L}'-]/gu, "");
   const hi = first ? `Hi ${first},` : "Hi,";
@@ -138,7 +148,7 @@ export function riderAutoReply(d: BookingData): EmailMessage {
   const text = [
     hi,
     ``,
-    `Thanks. Your ride request is in.`,
+    `Thanks. Your ride request is in.${ref ? ` Your reference: ${ref}.` : ""}`,
     ``,
     `RIDE CARD — ${card.tag}`,
     `Pickup: ${card.pickup}`,
@@ -146,7 +156,7 @@ export function riderAutoReply(d: BookingData): EmailMessage {
     `When: ${card.when}`,
     `Driver: named on our call`,
     ``,
-    `This is your draft Ride Card. You'll get the confirmed one by text.`,
+    draftNote(),
     ``,
     promise,
     `Questions: ${site.phone.display}`,
@@ -155,21 +165,22 @@ export function riderAutoReply(d: BookingData): EmailMessage {
   ].join("\n");
 
   const cell = (k: string, v: string, right = false) =>
-    `<td valign="top" width="50%" style="padding:0;${right ? "text-align:right;" : ""}"><div style="font-size:10px;font-weight:bold;letter-spacing:0.12em;text-transform:uppercase;color:${INK};opacity:0.85;">${esc(k)}</div><div style="margin-top:2px;font-size:15px;font-weight:bold;line-height:1.35;">${esc(v)}</div></td>`;
+    `<td valign="top" width="50%" style="padding:0;${right ? "text-align:right;" : ""}"><div style="font-size:12px;font-weight:bold;letter-spacing:0.1em;text-transform:uppercase;color:${INK};opacity:0.85;">${esc(k)}</div><div style="margin-top:2px;font-size:15px;font-weight:bold;line-height:1.35;">${esc(v)}</div></td>`;
 
   const html = wrap(
     `<p style="margin:0 0 12px;">${esc(hi)}</p>
-<h1 style="margin:0 0 20px;font-size:22px;color:${NAVY};">Thanks. Your ride request is in.</h1>
+<h1 style="margin:0 0 8px;font-size:22px;color:${NAVY};">Thanks. Your ride request is in.</h1>
+${ref ? `<p style="margin:0 0 20px;">Your reference: <strong>${esc(ref)}</strong></p>` : ""}
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:340px;border-collapse:separate;border-radius:14px;overflow:hidden;border:1px solid ${CREAM};">
-<tr><td style="background:${NAVY};color:#FFFFFF;padding:10px 14px;font-size:11px;font-weight:bold;letter-spacing:0.14em;text-transform:uppercase;">Ride Card <span style="float:right;background:${AMBER};color:${INK};border-radius:999px;padding:4px 10px;font-size:10px;letter-spacing:0.1em;">${esc(card.tag)}</span></td></tr>
+<tr><td style="background:${NAVY};color:#FFFFFF;padding:10px 14px;font-size:12px;font-weight:bold;letter-spacing:0.12em;text-transform:uppercase;">Ride Card <span style="float:right;background:${AMBER};color:${INK};border-radius:999px;padding:4px 10px;font-size:12px;letter-spacing:0.08em;">${esc(card.tag)}</span></td></tr>
 <tr><td style="padding:14px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cell("Pickup", card.pickup)}${cell("Drop-off", card.dropoff, true)}</tr></table>
 <hr style="border:0;border-top:1px dashed ${INK};opacity:0.3;margin:12px 0;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${cell("When", card.when)}${cell("Your driver", card.driver, true)}</tr></table>
-<p style="margin:12px 0 0;font-size:13px;color:${INK};">We text you when your driver is on the way. Questions: <strong>${esc(site.phone.display)}</strong></p>
+<p style="margin:12px 0 0;font-size:13px;color:${INK};">${esc(enRouteLine())}Questions: <strong>${esc(site.phone.display)}</strong></p>
 </td></tr>
 </table>
-<p style="margin:12px 0 20px;font-size:14px;color:${INK};">This is your draft Ride Card. You&#8217;ll get the confirmed one by text.</p>
+<p style="margin:12px 0 20px;font-size:14px;color:${INK};">${esc(draftNote())}</p>
 <p style="margin:0 0 8px;"><strong>${esc(promise)}</strong></p>
 <p style="margin:0;">Questions: <a href="tel:${esc(site.phone.e164)}" style="color:${NAVY};font-weight:bold;">${esc(site.phone.display)}</a></p>`,
     subject,

@@ -1,4 +1,5 @@
 import { site } from "@/config/site";
+import { chicagoToday } from "@/lib/dates";
 
 export type Who = "self" | "loved-one" | "facility";
 
@@ -8,6 +9,8 @@ export type BookingData = {
   pickupUnit: string;
   destination: string;
   date: string;
+  /** Pickup window. "exact" reveals the time field. Optional: Jay settles it on the call. */
+  timeWindow: "morning" | "midday" | "afternoon" | "exact" | "";
   time: string;
   tripType: "one-way" | "round-trip" | "wait-and-return" | "";
   returnTime: string;
@@ -33,6 +36,7 @@ export const emptyBooking: BookingData = {
   pickupUnit: "",
   destination: "",
   date: "",
+  timeWindow: "",
   time: "",
   tripType: "",
   returnTime: "",
@@ -98,13 +102,24 @@ export function phoneDigits(v: string) {
   return d.length === 11 && d.startsWith("1") ? d.slice(1) : d;
 }
 
-export function todayISO(now = new Date()) {
-  const tz = now.getTimezoneOffset() * 60000;
-  return new Date(now.getTime() - tz).toISOString().slice(0, 10);
-}
+/** "Today" for booking means today in Houston (America/Chicago), on the client and the server. */
+export const todayISO = (now = new Date()) => chicagoToday(now);
 
 /** The five things we need before Jay can call. Order matches the on-screen order. */
-export const requiredFields = ["contactName", "phone", "pickupAddress", "destination", "date", "time"] as const;
+export const requiredFields = ["contactName", "phone", "pickupAddress", "destination", "date"] as const;
+
+export const timeWindowOptions: { value: Exclude<BookingData["timeWindow"], "">; label: string }[] = [
+  { value: "morning", label: "Morning" },
+  { value: "midday", label: "Midday" },
+  { value: "afternoon", label: "Afternoon" },
+  { value: "exact", label: "An exact time" },
+];
+
+/** "Morning", "9:30 AM", or "" when not given. */
+export function windowText(d: Pick<BookingData, "timeWindow" | "time">) {
+  if (d.timeWindow === "exact") return d.time ? formatTime(d.time) : "";
+  return timeWindowOptions.find((o) => o.value === d.timeWindow)?.label ?? "";
+}
 
 /**
  * Plain-language validation for the required fields. Used on the client and
@@ -119,7 +134,7 @@ export function validateRequired(d: BookingData, today = todayISO()): Errors {
   if (!d.date) e.date = "Please choose the date of the ride.";
   else if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date)) e.date = "Please choose the date of the ride.";
   else if (d.date < today) e.date = "That date has already passed. Please choose today or a later date.";
-  if (!d.time) e.time = "Please enter the appointment time.";
+  if (d.timeWindow === "exact" && !/^\d{2}:\d{2}$/.test(d.time)) e.time = "Please enter the time, or choose a window instead.";
   return e;
 }
 
@@ -155,6 +170,7 @@ export function coerceBooking(input: unknown): BookingData {
     pickupUnit: str("pickupUnit", 200),
     destination: str("destination"),
     date: str("date", 10),
+    timeWindow: oneOf("timeWindow", ["morning", "midday", "afternoon", "exact"] as const),
     time: str("time", 5),
     tripType: oneOf("tripType", ["one-way", "round-trip", "wait-and-return"] as const),
     returnTime: str("returnTime", 5),

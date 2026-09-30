@@ -1,4 +1,4 @@
-import { site, areaList, money, hospitals } from "@/config/site";
+import { site, areaList, money } from "@/config/site";
 
 export type Faq = { id: number; q: string; a: string };
 
@@ -9,9 +9,10 @@ const yesNo = (v: boolean | null, yes: string, no: string, unknown: string) => (
 /**
  * The master FAQ. Every answer is 2–3 plain sentences and pulls its facts from
  * site.ts, so a policy change in one place updates every page and the schema.
- * Answers that depend on Jay's policy are CONFIRM until he signs off.
+ * An answer whose facts are still null in site.ts is left out entirely (page
+ * and FAQPage schema) rather than guessed: see `omit` below.
  */
-export const faqs: Faq[] = [
+const all: (Faq & { omit?: boolean })[] = [
   {
     id: 1,
     q: "How do I book a ride, and how much notice do you need?",
@@ -20,15 +21,16 @@ export const faqs: Faq[] = [
   {
     id: 2,
     q: "Do you take same-day rides?",
-    a: `${site.booking.sameDay} Same-day hospital discharges are the most common one, and we plan our days around them.`, // CONFIRM
+    a: `${site.booking.sameDay}`, // ASK JAY: are same-day discharges the most common same-day ride?
   },
   {
     id: 3,
     q: "What does a ride cost, and are nights and weekends different?",
+    omit: p.base === null && p.afterHoursRule === null,
     a:
       p.displayMode === "quoteOnly"
-        ? `The price depends on distance, wait time and the time of day. We tell you the exact price before you book, and it never changes after. ${p.afterHoursRule}` // CONFIRM
-        : `Rides start at ${money(p.base ?? 0)}, which covers the first ${p.baseIncludesMiles} miles${p.displayMode === "full" && p.perMile ? `, then ${money(p.perMile)} a mile` : ""}. ${p.afterHoursRule}${p.displayMode === "full" && p.afterHoursFee ? ` The fee is ${money(p.afterHoursFee)}.` : ""} You'll know the full price before you book.`, // CONFIRM
+        ? `The price depends on distance, wait time and the time of day. We tell you the exact price before you book, and it never changes after. ${p.afterHoursRule ?? ""}` // CONFIRM
+        : `Rides start at ${money(p.base ?? 0)}, which covers the first ${p.baseIncludesMiles} miles${p.displayMode === "full" && p.perMile ? `, then ${money(p.perMile)} a mile` : ""}. ${p.afterHoursRule ?? ""}${p.displayMode === "full" && p.afterHoursFee ? ` The fee is ${money(p.afterHoursFee)}.` : ""} You'll know the full price before you book.`, // CONFIRM
   },
   {
     id: 4,
@@ -39,7 +41,7 @@ export const faqs: Faq[] = [
     id: 5,
     q: "Will the driver wait during my appointment and bring me home?",
     a: site.onTimePromise.waitAndReturn
-      ? `Yes. Book a wait-and-return ride and your driver waits, walks you back out, and takes you home. ${p.waitFreeMinutes ? `The first ${p.waitFreeMinutes} minutes of waiting are free` : "Wait time is billed by the hour"}${p.waitPerHour ? `, then ${money(p.waitPerHour)} an hour` : ""}.` // CONFIRM
+      ? `Yes. Book a wait-and-return ride and your driver waits, walks you back out, and takes you home.${p.waitFreeMinutes ? ` The first ${p.waitFreeMinutes} minutes of waiting are free` : ""}${p.waitPerHour ? `, then ${money(p.waitPerHour)} an hour` : ""}.` // CONFIRM
       : `For round trips, call us when you're done and we'll come back for you. Tell us your appointment length when you book and we'll plan the return.`, // CONFIRM
   },
   {
@@ -60,17 +62,19 @@ export const faqs: Faq[] = [
   {
     id: 9,
     q: "Do you take Medicaid, Medicare, or insurance?",
-    a: `${p.insurance.medicaid} ${p.insurance.medicare}`, // CONFIRM
+    a: p.insurance.brokers.length
+      ? `We work with ${p.insurance.brokers.join(" and ")}. Call and we'll tell you how to book through your plan.`
+      : "We're currently private-pay and facility-billed. If you use a Medicaid transportation broker, call us and we'll tell you where we stand.",
   },
   {
     id: 10,
     q: "Do you do recurring rides for dialysis or therapy?",
-    a: "Yes. We set up standing rides on the same days and times each week, with the same driver whenever we can. You book once and we handle the rest, including early-morning dialysis chairs.", // CONFIRM
+    a: "Yes. We set up standing rides on the same days and times each week. You book once, and a change is one call.", // ASK JAY: same driver whenever you can? Early-morning chairs?
   },
   {
     id: 11,
     q: "Can you pick up from a hospital discharge the same day?",
-    a: `Usually, yes. Call as soon as the nurse says the discharge is coming, and we'll give you a real pickup window. We serve ${hospitals.slice(0, 2).map((h) => h.name).join(", ")} and every other hospital in the north Houston area.`, // CONFIRM
+    a: `Usually, yes. Call as soon as the nurse says the discharge is coming, and we'll give you a real pickup window. `, // ASK JAY: which hospitals do you serve most? (List them on the hospital pages once confirmed, not here.)
   },
   {
     id: 12,
@@ -85,22 +89,27 @@ export const faqs: Faq[] = [
   {
     id: 14,
     q: "How are your drivers trained and screened?",
-    a: `Every driver passes a ${site.safety.driverScreening.join(" and a ").toLowerCase()}. Drivers are ${site.safety.driverTraining.slice(0, 2).join(" and ").replace("CPR and First Aid certified", "CPR and First Aid certified").toLowerCase()}, and every ride uses ${site.safety.everyRide[0].toLowerCase()}.`, // CONFIRM
+    omit: site.safety.driverScreening.length === 0 || site.safety.driverTraining.length === 0 || site.safety.everyRide.length === 0,
+    a: `Every driver passes a ${site.safety.driverScreening.join(" and a ").toLowerCase()}. Drivers are ${site.safety.driverTraining.slice(0, 2).join(" and ").toLowerCase()}, and every ride uses ${(site.safety.everyRide[0] ?? "").toLowerCase()}.`, // claims: safety.driverScreening
   },
   {
     id: 15,
     q: "What if I need to cancel?",
-    a: `${p.cancellationWindow} Just call or text us as soon as you know.`, // CONFIRM
+    omit: p.cancellationWindow === null,
+    a: `${p.cancellationWindow ?? ""} Just call us as soon as you know.`,
   },
   {
     id: 16,
     q: "How is this different from Uber or a taxi?",
-    a: "Our vans have ramps and lifts, so you ride in your own wheelchair, strapped down and belted in. The driver is trained to help you, walks you inside, and waits if you ask. A rideshare driver waits at the curb, if they show up at all.",
+    a: "You ride in your own wheelchair, on a ramp or lift van. The driver comes to your door, walks you inside at the other end, and waits if you book wait & return.",
   },
 ];
 
-export const faqById = (id: number) => faqs.find((f) => f.id === id)!;
-export const faqsFor = (ids: number[]) => ids.map(faqById);
+/** Every answerable FAQ. Omitted ones never render and never enter schema. */
+export const faqs: Faq[] = all.filter((f) => !f.omit).map(({ id, q, a }) => ({ id, q, a: a.trim() }));
 
-/** Short list on the home page. */
-export const homeFaqs = faqsFor([3, 5, 4, 7, 9]);
+export const faqById = (id: number) => faqs.find((f) => f.id === id);
+export const faqsFor = (ids: number[]) => ids.map(faqById).filter((f): f is Faq => f !== undefined);
+
+/** Short list on the home page (three, to keep the phone page short). */
+export const homeFaqs = faqsFor([5, 9, 4]);

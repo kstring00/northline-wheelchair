@@ -19,7 +19,7 @@ export function Footer() {
   const heading = "font-display text-lg font-bold text-cream";
   return (
     <footer className="on-dark pattern-navy text-cream/80" data-footer>
-      <div className="container-page py-14">
+      <div className="container-page py-10 sm:py-14">
         <div className="grid items-start gap-8 md:grid-cols-[auto_minmax(0,28rem)]">
           <Link href="/" className="inline-flex self-start rounded-xl bg-navy">
             <Logo variant="stacked" tone="white" size={28} withTagline clear label={`${site.name}, home page`} />
@@ -35,8 +35,8 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 grid gap-10 rounded-2xl bg-navy p-6 sm:grid-cols-3 sm:p-8">
-          <div>
+        <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-8 rounded-2xl bg-navy p-5 sm:mt-12 sm:grid-cols-3 sm:gap-10 sm:p-8">
+          <div className="col-span-2 sm:col-span-1">
             <h2 className={heading}>{t.labels.hours}</h2>
             <dl className="mt-3 space-y-2">
               {site.hours.map((h) => (

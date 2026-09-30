@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
-import { site } from "@/config/site";
+import { site, telHref } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 import { articleSchema } from "@/lib/schema";
 import { getGuide, getGuides } from "@/lib/guides";
@@ -23,7 +23,12 @@ export async function generateMetadata({ params }: PageProps<"/guides/[slug]">):
 
 const fmt = (iso: string) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
+// <CallUs /> and <Phone /> read site.ts, so no phone number lives in a guide.
 const components = {
+  CallUs: ({ children = "call us" }: { children?: React.ReactNode }) => (
+    <a href={telHref} className="font-bold text-navy underline">{children}</a>
+  ),
+  Phone: () => <a href={telHref} className="font-bold text-navy underline">{site.phone.display}</a>,
   a: (props: React.ComponentProps<"a">) =>
     props.href?.startsWith("/") ? <Link href={props.href} className="font-bold text-navy underline">{props.children}</Link> : <a {...props} className="font-bold text-navy underline" />,
 };

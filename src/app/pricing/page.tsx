@@ -13,13 +13,12 @@ import { QuoteForm } from "@/components/pricing/QuoteForm";
 import { FinalCta } from "@/components/home/FinalCta";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Wheelchair Van Ride Prices in Houston",
-  description: `What a wheelchair van ride costs in ${areaList()}: base fare, miles, wait time, companions, nights and weekends. You'll know the price before you ride.`,
+  title: "Wheelchair Van Ride Prices in North Houston",
+  description: `Wheelchair van ride prices in ${areaList()}. Call ${site.phone.display} or send a quote request and Jay will give you the price before you book.`,
   path: "/pricing",
 });
 
 const faqs = faqsFor([3, 15, 9, 4]);
-const mode = site.pricing.displayMode;
 
 export default function PricingPage() {
   return (
@@ -27,12 +26,8 @@ export default function PricingPage() {
       <JsonLd data={faqSchema(faqs)} />
       <PageHeader
         crumbs={[{ name: "Pricing", path: "/pricing" }]}
-        title="No surprises. You'll know the price before you ride."
-        answer={
-          mode === "quoteOnly"
-            ? `Wheelchair van ride prices in ${areaList()} depend on distance, wait time and the time of day. We give you the exact number when we confirm, before you're charged a dollar. Here are the rules we price by.`
-            : `Wheelchair van rides in ${areaList()} start at a base fare that covers the first miles and help from your door to the right suite. Here is every rule we price by, so the number we quote is the number you pay.`
-        }
+        title="Wheelchair van ride prices in north Houston"
+        answer="Call or send a quote request and Jay will give you the price before you book."
         cta={false}
       />
 
@@ -42,7 +37,7 @@ export default function PricingPage() {
         </div>
       </Section>
 
-      <Section id="quote" eyebrow="Your trip" title="Get a quote in 2 minutes" intro="Six quick answers. We call back with the exact price for your trip.">
+      <Section id="quote" eyebrow="Your trip" title="Get a quote in 2 minutes" intro="Tell us about the trip. Jay calls you back with the price before you book.">
         <div className="mt-8 max-w-3xl">
           <QuoteForm />
         </div>
@@ -52,12 +47,13 @@ export default function PricingPage() {
         <div className="mt-8 max-w-3xl">
           <Accordion items={faqs} />
           <p className="mt-6 text-lg">
-            Case managers: facility accounts are invoiced monthly. <Link href="/partners" className="font-bold text-navy underline">See how facilities work with us</Link>.
+            Case managers and facilities:{" "}
+            <Link href="/partners" className="inline-flex min-h-12 items-center font-bold text-navy underline">see how facilities work with us</Link>.
           </p>
         </div>
       </Section>
 
-      <FinalCta title="Ready to ride?" body="Book online or call. Either way, you'll hear the price before the ride." />
+      <FinalCta title="Ready to ride?" body="Send a ride request or call. Jay confirms the price with you before your ride is booked." />
     </>
   );
 }

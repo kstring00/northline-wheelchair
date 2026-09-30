@@ -1,140 +1,168 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { site, hospitals, telHref } from "@/config/site";
+import { site, telHref } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Section } from "@/components/ui/Section";
 import { PartnerForm } from "@/components/partners/PartnerForm";
+import { PacketForm } from "@/components/partners/PacketForm";
+import { PartnerLines } from "@/components/partners/PartnerLines";
 import { FinalCta } from "@/components/home/FinalCta";
-import { CheckIcon, PhoneIcon } from "@/components/ui/Icons";
+import { PhoneIcon } from "@/components/ui/Icons";
 import { buttonClass } from "@/components/ui/Button";
 import { RideCard, RideCardBack } from "@/components/brand/RideCard";
+import { SmsMock } from "@/components/brand/SmsMock";
 
 export const metadata: Metadata = buildMetadata({
-  title: "Patient Transportation for Facilities in North Houston",
-  description: `One direct dispatch line for discharge planners, skilled nursing, assisted living and dialysis clinics in north Houston. Standing rides, monthly invoicing. Call ${site.phone.display}.`,
+  title: "Wheelchair Transportation for Facilities in North Houston",
+  description: `Patient rides for discharge planners, nursing and assisted living staff, dialysis clinics and case managers in north Houston. Set up a facility account or call ${site.phone.display}.`,
   path: "/partners",
 });
 
-const groups = [
+/* What each referral source needs. Their problem, in their words: no Northline claims here. */
+const audiences = [
   {
     id: "discharge",
     title: "Hospital discharge planners",
-    lead: "You need a van that answers the phone and shows up when you said it would.",
-    points: ["Same-day rides home, timed to the discharge, with a real pickup window", "A driver who meets the patient at the entrance you name", `Drop-off notes on file for ${hospitals.length} north-side campuses`, "A text to you and the family at pickup and drop-off"],
+    need: "You need a ride home booked before the discharge paperwork is done.",
+    link: { href: "/partners/discharge", label: "Discharge rides: what to send us" },
   },
   {
     id: "snf",
     title: "Skilled nursing and assisted living",
-    lead: "Residents to appointments and back, without tying up your staff.",
-    points: ["Drivers sign residents in and out at your desk", "Wait & return so residents are never left at a clinic", "Standing rides for therapy and wound care", "One monthly invoice with resident names and dates"],
+    need: "You need residents at their appointments and back without pulling staff off the floor.",
   },
   {
     id: "dialysis",
     title: "Dialysis and outpatient clinics",
-    lead: "Standing schedules for your patients, set once, changed with one call.",
-    points: ["Early chairs. Our first vans roll before 5 AM", "The same driver most days, so patients settle in", "Walked to the treatment floor, not the front door", "No-show and delay updates straight to your desk"],
+    need: "You need patients in the chair at their set time, on every treatment day.",
+    link: { href: "/partners/dialysis", label: "Dialysis contracts: what to send us" },
+  },
+  {
+    id: "case-managers",
+    title: "Case managers",
+    need: "You need a client's ride set up without chasing three phone numbers.",
+    link: { href: "/partners/discharge", label: "Timing a discharge ride" },
   },
 ];
+
+const dispatch = site.dispatchPhone;
 
 export default function PartnersPage() {
   return (
     <>
       <PageHeader
         crumbs={[{ name: "For Facilities", path: "/partners" }]}
-        title="Patient rides for facilities in North Houston"
-        answer="Northline gives hospitals, nursing facilities and clinics in north Houston one direct dispatch line for patient rides. No portal, no hold queue. Standing schedules set once. One monthly invoice."
+        title="Patient rides for facilities in north Houston"
+        answer="For discharge planners, nursing and assisted living staff, dialysis clinics and case managers. Set up an account, ask for the paperwork your office needs, or call for a ride today."
         cta={false}
       >
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <a href={telHref} className={buttonClass("primary", "lg", "sm:min-w-56")}><PhoneIcon /> Call dispatch</a>
-          <Link href="#account" className="inline-flex min-h-14 items-center justify-center rounded-full px-4 text-lg font-bold text-navy underline decoration-2 underline-offset-4 hover:bg-morning">or set up an account</Link>
+          <a href={telHref} className={buttonClass("primary", "lg", "sm:min-w-56")}>
+            <PhoneIcon /> Call {site.phone.display}
+          </a>
+          <Link href="#account" className="inline-flex min-h-14 items-center justify-center rounded-full px-4 text-lg font-bold text-navy underline decoration-2 underline-offset-4 hover:bg-morning">
+            or set up a facility account
+          </Link>
         </div>
       </PageHeader>
 
-      <section aria-label="Who we work with" className="bg-white py-16 sm:py-20">
-        <div className="container-page grid gap-12 lg:grid-cols-3 lg:gap-8">
-          {groups.map((g) => (
-            <article key={g.id} id={g.id} aria-labelledby={`${g.id}-h`} className="border-t-4 border-navy pt-6">
-              <h2 id={`${g.id}-h`} className="text-2xl font-bold">{g.title}</h2>
-              <p className="mt-2 text-lg text-ink/85">{g.lead}</p>
-              <ul className="mt-5 space-y-3">
-                {g.points.map((pt) => (
-                  <li key={pt} className="flex gap-3"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-navy" /> {pt}</li>
-                ))}
-              </ul>
-            </article>
+      {/* 1. Who it's for */}
+      <Section id="who" tone="white" title="Who it's for">
+        <ul className="mt-8 grid gap-10 md:grid-cols-2">
+          {audiences.map((a) => (
+            <li key={a.id} id={a.id} className="border-t-4 border-navy pt-5">
+              <h3 className="text-2xl font-bold">{a.title}</h3>
+              <p className="mt-2 text-lg">{a.need}</p>
+              {a.link && (
+                <Link href={a.link.href} className="mt-2 inline-flex min-h-12 items-center font-bold text-navy underline decoration-2 underline-offset-4">
+                  {a.link.label}
+                </Link>
+              )}
+            </li>
           ))}
-        </div>
-      </section>
+        </ul>
+        {/* ASK JAY: which north-side campuses do you have confirmed drop-off notes for? */}
+        {/* ASK JAY: do drivers sign residents in and out at the facility desk? */}
+        {/* ASK JAY: what time does the first van leave, and do you take early dialysis chairs? */}
+        {/* ASK JAY: do patients get the same driver on standing rides, and how often? */}
+        {/* ASK JAY: do you text the facility and the family at pickup and drop-off? */}
+        {/* ASK JAY: do drivers walk dialysis patients to the treatment floor? Do you send no-show or delay updates to the clinic? */}
+      </Section>
 
-      {/* The one patterned section ground on this page. */}
+      {/* 2. How it works for a facility: site.partners lines, each only when confirmed. */}
+      <Section id="how-it-works" title="How it works for a facility">
+        <div className="mt-8 max-w-3xl">
+          <PartnerLines />
+        </div>
+        {/* ASK JAY: who answers facility calls, and when? */}
+        {/* ASK JAY: monthly invoicing? What terms? */}
+      </Section>
+
+      {/* 3. Phone for facilities */}
+      <Section id="facility-phone" tone="white" title="Phone for facilities">
+        <div className="mt-6">
+          {dispatch ? (
+            <a href={`tel:${dispatch.e164}`} className="inline-flex min-h-12 items-center gap-3 text-[1.75rem] font-bold text-navy underline decoration-2 underline-offset-4">
+              <PhoneIcon className="h-7 w-7" /> Dispatch: {dispatch.display}
+            </a>
+          ) : (
+            <>
+              <a href={telHref} className="inline-flex min-h-12 items-center gap-3 text-[1.75rem] font-bold text-navy underline decoration-2 underline-offset-4">
+                <PhoneIcon className="h-7 w-7" /> {site.phone.display}
+              </a>
+              <p className="mt-2 text-lg">Ask for dispatch.</p>
+            </>
+          )}
+        </div>
+      </Section>
+
+      {/* 4. What you can request now: the packet. Nothing is hosted or linked. */}
+      <Section id="request" title="What you can request now">
+        <PacketForm />
+      </Section>
+
+      {/* 5. The account form */}
+      <Section id="account" tone="white" title="Set up a facility account">
+        <div className="mt-8 max-w-3xl">
+          <PartnerForm />
+        </div>
+        {/* ASK JAY: what happens after the call (billing setup, list of bookers, how soon a first ride can run)? */}
+        {/* ASK JAY: which hospitals do you serve most? */}
+      </Section>
+
+      {/* 6. What you get back. The one patterned section ground on this page. */}
       <section id="sample-ride-card" aria-labelledby="sample-ride-card-heading" className="pattern-sand py-16 sm:py-20">
         <div className="container-page grid items-center gap-12 lg:grid-cols-[1fr_1fr]">
           <div className="max-w-xl rounded-2xl bg-sand/90 p-6 sm:p-8">
             <p className="label mb-3 text-navy">What you get back</p>
             <h2 id="sample-ride-card-heading" className="text-[2rem] font-bold sm:text-[2.5rem]">A Ride Card for every patient</h2>
-            <p className="mt-4 text-lg">
-              Every booked ride produces one Ride Card: pickup, drop-off, when, and who is driving. Nothing else. You get it by text or email, the family gets the same card, and the driver leaves a printed copy on the first ride.
-            </p>
+            <p className="mt-4 text-lg">Every booked ride gets a Ride Card: pickup, drop-off, when, and who is driving. Nothing else.</p>
+            {/* ASK JAY: how does the facility get the Ride Card (text, email, printed)? Does the family get a copy? */}
             <p className="mt-3 text-ink/85">Sample Ride Card. Names, times and driver are examples.</p>
           </div>
-          <div className="relative mx-auto grid w-full max-w-[400px] place-items-center py-6">
-            <RideCardBack className="absolute right-0 top-0 hidden rotate-3 sm:grid" />
-            <RideCard
-              className="relative -rotate-1"
-              titleAs="p"
-              sample
-              tag="Hospital discharge"
-              pickup="HCA Northwest, Rm 412"
-              dropoff="Home, Humble"
-              when="Today, ready at 2 PM"
-              driver="Jay"
-            />
+          <div className="relative mx-auto grid w-full max-w-[400px] place-items-center gap-10 py-6">
+            <div className="relative grid w-full place-items-center">
+              <RideCardBack className="absolute right-0 top-0 hidden rotate-3 sm:grid" />
+              <RideCard
+                className="relative -rotate-1"
+                titleAs="p"
+                sample
+                tag="Hospital discharge"
+                pickup="HCA Northwest, Rm 412"
+                dropoff="Home, Humble"
+                when="Today, ready at 2 PM"
+                driver="Jay"
+              />
+            </div>
+            {site.smsEnabled && <SmsMock />}
           </div>
         </div>
       </section>
 
-      <Section id="promise" tone="navy" eyebrow="The direct-line promise" title="Call dispatch directly. No portal, no hold queue.">
-        <div className="mt-8 grid gap-8 md:grid-cols-3">
-          {[
-            ["A person answers", `${site.phone.display} rings to dispatch, and Jay still takes most calls himself. After hours, ${site.afterHoursPolicy.charAt(0).toLowerCase()}${site.afterHoursPolicy.slice(1)}`],
-            ["Recurring rides, set up once", "Give us the patient, the days, the chair time and the end date. We hold the schedule and confirm changes by text."],
-            ["Facility invoicing", "One invoice a month, itemized by rider, date and destination. Net-30 terms for account holders."], // CONFIRM terms
-          ].map(([h, b]) => (
-            <div key={h}>
-              <h3 className="text-xl font-bold !text-cream">{h}</h3>
-              <p className="mt-2 text-cream/80">{b}</p>
-            </div>
-          ))}
-        </div>
-      </Section>
+      {/* 7. The old "direct-line promise" section is gone: every line in it was unconfirmed. */}
 
-      <Section id="account" eyebrow="Get started" title="Set up a facility account">
-        <div className="mt-8 grid gap-10 lg:grid-cols-[1.2fr_1fr]">
-          <PartnerForm />
-          <aside className="space-y-5 lg:pt-2">
-            <div className="rounded-[var(--radius-card)] border border-ink/15 bg-white p-6">
-              <h3 className="text-xl font-bold">What happens next</h3>
-              <ol className="mt-3 list-decimal space-y-2 pl-5">
-                <li>Jay calls you back within {site.responseTime} during business hours.</li>
-                <li>We set up billing and the list of people who can book.</li>
-                <li>Your first ride can be the same day.</li>
-              </ol>
-            </div>
-            <div className="rounded-[var(--radius-card)] bg-morning p-6">
-              <h3 className="text-xl font-bold">Hospitals we serve most</h3>
-              <ul className="mt-3 space-y-1">
-                {hospitals.map((h) => (
-                  <li key={h.slug}><Link href={`/service-area/hospitals/${h.slug}`} className="inline-flex min-h-12 items-center font-bold text-navy underline">{h.name}</Link></li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-        </div>
-      </Section>
-
-      <FinalCta title="Need a ride for a patient today?" body={`Call dispatch at ${site.phone.display}. Account or not, we'll get them home.`} />
+      <FinalCta title="Need a ride for a patient today?" body={`Call ${site.phone.display}. Account or not, we'll help.`} />
     </>
   );
 }

@@ -27,20 +27,20 @@ check("Skip link is first tab stop", (await focused()).text === "Skip to main co
 check("No step indicator", (await page.getByText(/Step \d of \d/).count()) === 0);
 check("Submit button is present up front", await page.getByRole("button", { name: "Send ride request" }).isVisible());
 
-// Empty submit: focus moves to the error summary, six required messages.
+// Empty submit: focus moves to the error summary, five required messages (the pickup window is optional).
 await submit();
 let f = await focused();
-check("Empty submit moves focus to error summary", (f.text ?? "").includes("Please fix these 6 things"), f.text);
+check("Empty submit moves focus to error summary", (f.text ?? "").includes("Please fix these 5 things"), f.text);
 const requiredMsgs = [
   "Please enter your name.",
   "Please enter a 10-digit phone number",
   "Please enter the pickup address",
   "Please enter where you're going",
   "Please choose the date of the ride.",
-  "Please enter the appointment time.",
 ];
 for (const m of requiredMsgs) check(`Required error: "${m}"`, (await page.locator('[role="alert"] a', { hasText: m }).count()) === 1);
-check("Error summary has six links", (await page.locator('[role="alert"] a').count()) === 6);
+check("Error summary has five links", (await page.locator('[role="alert"] a').count()) === 5);
+check("Pickup window is an optional select, time hidden until 'exact'", (await page.locator("#timeWindow").count()) === 1 && (await page.locator("#time").count()) === 0);
 check("Name input marked aria-invalid", (await page.locator("#contactName").getAttribute("aria-invalid")) === "true");
 check("Field errors carry the visible Error: prefix", (await page.locator("#phone-error", { hasText: "Error:" }).count()) === 1);
 
@@ -59,7 +59,9 @@ const d = new Date(Date.now() + 3 * 864e5);
 const mmddyyyy = `${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}${d.getFullYear()}`;
 await tabTo((f) => f.id === "date");
 await page.keyboard.type(mmddyyyy);
-await tabTo((f) => f.id === "time");
+await page.locator("#timeWindow").selectOption("exact");
+check("Choosing 'An exact time' reveals the time field", await page.locator("#time").isVisible());
+await page.locator("#time").focus();
 await page.keyboard.type("0930AM");
 await page.waitForTimeout(100);
 check("Errors clear as fields are fixed", (await page.locator('[role="alert"] a').count()) === 0, String(await page.locator('[role="alert"] a').count()));
@@ -104,7 +106,11 @@ check("Success shows a Ride Card", await card.isVisible());
 check("Ride Card carries the typed pickup and drop-off", (await card.getByText(PICKUP).isVisible()) && (await card.getByText(DROPOFF).isVisible()));
 const tag = (await card.locator("[data-ride-card-tag]").textContent())?.trim() ?? "";
 check("Ride Card tag starts with Pending", tag.startsWith("Pending"), tag);
-check("Draft note under the card", ((await page.locator("[data-draft-note]").textContent()) ?? "").trim() === "This is your draft Ride Card. You'll get the confirmed one by text.");
+check("Draft note under the card (email, not text, while smsEnabled is false)", ((await page.locator("[data-draft-note]").textContent()) ?? "").trim() === "This is your draft Ride Card. You'll get the confirmed Ride Card by email (or we'll read it to you on the call).");
+const refText = ((await page.locator("[data-booking-ref]").textContent()) ?? "").trim();
+check("Success shows a reference NL-YYMMDD-XXXX", /NL-\d{6}-[2-9A-HJKMNP-Z]{4}/.test(refText), refText);
+check("Ride Card When shows the date and window", /9:30 AM/.test((await card.textContent()) ?? ""));
+check("No text promise on the success screen", !/by text|text you/i.test((await page.locator("[data-booking-success]").textContent()) ?? ""));
 
 const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
 check("axe on success state", axe.violations.length === 0, axe.violations.map((v) => v.id).join(","));
@@ -129,7 +135,7 @@ await browser.close();
 // /api/book, straight from the script. Each block uses its own client IP so
 // the counts never mix with the browser submission above.
 const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-const valid = { contactName: "Maria Chen", phone: "281-555-0142", pickupAddress: PICKUP, destination: DROPOFF, date: iso, time: "09:30" };
+const valid = { contactName: "Maria Chen", phone: "281-555-0142", pickupAddress: PICKUP, destination: DROPOFF, date: iso, timeWindow: "morning" };
 const post = (body, ip, raw = false) =>
   fetch(BASE + "/api/book", { method: "POST", headers: { "Content-Type": "application/json", "x-forwarded-for": ip }, body: raw ? body : JSON.stringify(body) });
 
@@ -143,7 +149,14 @@ j = await r.json().catch(() => ({}));
 check("API: missing fields → 400 with errors", r.status === 400 && j.ok === false && j.errors && j.errors.phone && j.errors.date, `${r.status} ${Object.keys(j.errors ?? {}).join(",")}`);
 r = await post(valid, "203.0.113.7");
 j = await r.json().catch(() => ({}));
-check("API: valid → 200 ok (delivered false without a key)", r.status === 200 && j.ok === true && (j.delivered === false || j.delivered === true), `${r.status} ${JSON.stringify(j)}`);
+check("API: valid → 200 ok with a reference (logged, not delivered, outside production)", r.status === 200 && j.ok === true && /^NL-\d{6}-[2-9A-HJKMNP-Z]{4}$/.test(j.ref ?? ""), `${r.status} ${JSON.stringify(j)}`);
+// "Today" is Houston's today: a date that is today in Chicago must pass even when UTC has moved on.
+const chicagoToday = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+r = await post({ ...valid, date: chicagoToday }, "203.0.113.9");
+check("API: today in America/Chicago is accepted", r.status === 200, `${r.status} ${chicagoToday}`);
+r = await post({ ...valid, timeWindow: "exact" }, "203.0.113.9");
+j = await r.json().catch(() => ({}));
+check("API: 'exact' window without a time → 400", r.status === 400 && j.errors?.time, `${r.status}`);
 r = await fetch(BASE + "/api/book", { method: "GET" });
 check("API: GET is not allowed", r.status === 405, String(r.status));
 

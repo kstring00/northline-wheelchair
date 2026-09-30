@@ -1,23 +1,18 @@
 import type { Metadata } from "next";
-import { site, getService, money } from "@/config/site";
+import { site, getService } from "@/config/site";
 import { buildMetadata } from "@/lib/seo";
 import { ServicePage, type ServiceCopy } from "@/components/layout/ServicePage";
 import { Section } from "@/components/ui/Section";
 import { ButtonLink } from "@/components/ui/Button";
 
 const service = getService("medical-appointments")!;
-const p = site.pricing;
+const promise = site.onTimePromise;
 
 export const metadata: Metadata = buildMetadata({
   title: "Rides to Medical Appointments in North Houston",
   description: `Wheelchair van rides to doctor visits, therapy and imaging across north Houston. Your driver waits and brings you home. Call ${site.phone.display}.`,
   path: `/services/${service.slug}`,
 });
-
-const waitRule =
-  p.displayMode === "quoteOnly"
-    ? "We tell you the wait-time rule and the total when we confirm."
-    : `${p.waitFreeMinutes ? `The first ${p.waitFreeMinutes} minutes are free. ` : ""}${p.displayMode === "full" && p.waitPerHour ? `After that, waiting is ${money(p.waitPerHour)} an hour, billed by the quarter hour.` : "After that, waiting is billed by the quarter hour, and we tell you the rate when we confirm."}`;
 
 const copy: ServiceCopy = {
   audiences: [
@@ -37,10 +32,16 @@ const copy: ServiceCopy = {
     { title: "Help with the paperwork stop", body: "Need to stop at the pharmacy on the way home? A short stop is fine." },
     { title: "Companions ride along", body: `Up to ${site.capabilities.maxCompanions ?? 2} people can come with you.` },
     { title: "Late appointments are fine", body: "Doctors run behind. We plan for it. You won't be rushed." },
-    { title: "One price, told up front", body: "Including the wait time. No adding it up after." },
   ],
   onTheDay: [
-    "We call the day before to confirm. Your driver texts when they're on the way and arrives early. They help you into the van and secure your chair.",
+    [
+      promise.confirmationCall ? "We call the day before to confirm." : "",
+      promise.enRouteText ? `We ${site.smsEnabled ? "text" : "call"} you when your driver is on the way.` : "",
+      promise.arriveEarlyMinutes !== null ? `Your driver arrives ${promise.arriveEarlyMinutes} minutes early.` : "",
+      "They help you into the van and secure your chair.",
+    ]
+      .filter(Boolean)
+      .join(" "),
     "At the clinic, they walk you inside, find the suite, and make sure you're checked in. If you asked them to wait, they stay nearby. If the visit runs long, that's fine. They've planned for it.",
     "When you're done, the front desk calls us or you do, and the driver is at the suite door within a few minutes. Then home, and a hand up the steps if you need it.",
   ],
@@ -50,21 +51,20 @@ const copy: ServiceCopy = {
         <div className="space-y-4 text-lg">
           <p>Most ride services drop you at the curb and leave. If your appointment runs long, you call and wait. Sometimes for an hour.</p>
           <p>Wait &amp; return means your driver stays. They walk you in, wait outside the suite or in the lobby, walk you back out, and drive you home. You never wonder whether the ride is coming.</p>
-          <p>It&apos;s the thing riders mention most in reviews, so we named it and put it on the booking form.</p>
+          {/* ASK JAY: is wait & return what riders ask for most? Add one line in Jay's words once it's true (and reviews are real). */}
         </div>
         <div className="rounded-[var(--radius-card)] bg-morning p-6">
-          <h3 className="text-xl font-bold">What it costs</h3>
-          <p className="mt-2">{waitRule}</p>
-          <p className="mt-2 text-ink/85">For dialysis and other long visits, it&apos;s usually cheaper to have us come back. We&apos;ll tell you which is better when you book.</p>
+          <h3 className="text-xl font-bold">Ask for it when you book</h3>
+          <p className="mt-2">Choose wait &amp; return on the booking form, or ask for it when you call. Jay will give you the price before you book.</p>
           <ButtonLink href="/book" className="mt-5">Book a wait & return ride</ButtonLink>
         </div>
       </div>
-      {/* CONFIRM wait-and-return pricing rule with Jay. */}
+      {/* ASK JAY: wait-and-return pricing. It renders on /pricing from site.pricing once set; no wait-time price is written here. */}
     </Section>
   ),
   image: site.images.driverHelping,
 };
 
 export default function Page() {
-  return <ServicePage service={service} title="Rides to Medical Appointments in North Houston" copy={copy} />;
+  return <ServicePage service={service} title="Rides to medical appointments in north Houston" copy={copy} />;
 }

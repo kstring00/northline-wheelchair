@@ -49,12 +49,15 @@ export type Hospital = {
   city: string;
   /** Which core-area page this campus sits nearest. */
   nearestAreas: string[];
-  /** Entrance and drop-off notes. Draft until Jay confirms. */
-  dropOffNotes: string[];
-  dropOffNotesDraft: boolean;
+  /**
+   * Entrance and drop-off notes. A note renders on the live site only when
+   * Jay has confirmed it (confirmed: true); unconfirmed notes show before
+   * launch with a draft label, then disappear.
+   */
+  dropOffNotes: { text: string; confirmed: boolean }[];
   typicalTrips: string[];
-  /** Something true and specific about running rides to this campus. */
-  localNote: string;
+  /** Something true and specific about running rides to this campus, in Jay's words. null = not yet. */
+  localNote: string | null;
   /** Real position for the service map (WGS84). */
   geo: { latitude: number; longitude: number };
   /** Street-grid node on the hero map demo (hero-map.svg, 720×520): column i indexes XS (0–16, west→east), row j indexes YS (0–14, north→south). */
@@ -116,8 +119,14 @@ export const site = {
   },
 
   phone: { display: "(281) 555-0142", e164: "+12815550142" }, // CONFIRM
-  /** Text messages. When true, a "Text us" button appears next to Call. */
-  smsEnabled: true, // CONFIRM can Jay's dispatch line receive texts?
+  /**
+   * Text messages. false until Jay's line can receive texts AND someone answers
+   * them. Drives every "text" promise on the site (Text us buttons, "call or
+   * text", the SMS mock, Ride Card and confirmation wording).
+   */
+  smsEnabled: false, // CONFIRM can Jay's dispatch line receive and answer texts?
+  /** A separate dispatch line for facilities. null = /partners shows the main number with "Ask for dispatch." */
+  dispatchPhone: null as { display: string; e164: string } | null, // CONFIRM
   email: "rides@northlinewheelchair.com", // CONFIRM
 
   address: {
@@ -138,7 +147,7 @@ export const site = {
     { days: ["Sunday"], opens: "08:00", closes: "16:00", label: "Sunday", display: "8:00 AM – 4:00 PM" },
   ],
   /** Plain sentence shown under the hours everywhere. */
-  afterHoursPolicy: "After hours, leave a message or text. We answer first thing the next morning, and we'll always try to help with an early-morning dialysis chair.", // CONFIRM 24/7, on-call or next-day?
+  afterHoursPolicy: "After hours, leave a message and we'll call you back.", // ASK JAY: 24/7, on-call or next-day? Early dialysis chairs?
 
   /** "We call back within ___ during business hours." Used on every success screen and the sticky bar. */
   responseTime: "30 minutes", // CONFIRM
@@ -151,41 +160,40 @@ export const site = {
   /** Every line renders only when true / set. This is the brand promise. */
   onTimePromise: {
     confirmationCall: true, // CONFIRM we call the day before to confirm
-    enRouteText: true, // CONFIRM we text when the driver is on the way
+    /** Someone contacts the rider when the driver is on the way. Channel wording follows smsEnabled. */
+    enRouteText: false, // ASK JAY: do you (or will you) call or text when the driver is on the way?
     arriveEarlyMinutes: 10 as number | null, // CONFIRM
     waitAndReturn: true, // CONFIRM driver waits and brings you home
   },
 
   /** Home stats. Each renders only when set. */
   stats: {
-    years: 12 as number | null, // CONFIRM years Jay has been driving riders
-    rides: 5000 as number | null, // CONFIRM
-    onTimeRate: 98 as number | null, // CONFIRM percent
+    years: null as number | null, // ASK JAY: years driving riders
+    rides: null as number | null, // ASK JAY: rides completed (a real count)
+    onTimeRate: null as number | null, // ASK JAY: on-time rate, and how it's measured
   },
 
   /** Read by /pricing, the booking form, the FAQ and LocalBusiness.priceRange. */
   pricing: {
     displayMode: "startingAt" as PricingDisplayMode, // CONFIRM Jay's choice: "full" | "startingAt" | "quoteOnly"
     currency: "USD",
-    base: 45 as number | null, // CONFIRM base fare (first miles included below)
-    baseIncludesMiles: 10 as number | null, // CONFIRM
-    perMile: 3 as number | null, // CONFIRM per mile after the included miles
-    waitPerHour: 25 as number | null, // CONFIRM wait time, billed by the quarter hour after the first 15 minutes
-    waitFreeMinutes: 15 as number | null, // CONFIRM
-    companionFee: 0 as number | null, // CONFIRM 0 = companions ride free
-    roundTripRule: "A round trip is two one-way fares. If the driver waits, wait time is added instead of a second base fare.", // CONFIRM
-    afterHoursRule: "Rides before 6 AM, after 6 PM, on weekends or on holidays add one flat fee. We tell you before you book, never after.", // CONFIRM hours and fee (amount lives in afterHoursFee)
-    afterHoursFee: 15 as number | null, // CONFIRM
-    cancellationWindow: "Cancel up to 2 hours before pickup at no charge. Later than that, we charge half the base fare.", // CONFIRM
-    paymentMethods: ["Card", "Cash", "Check", "Facility invoice"], // CONFIRM
+    base: null as number | null, // ASK JAY: base fare
+    baseIncludesMiles: null as number | null, // ASK JAY: miles included in the base fare
+    perMile: null as number | null, // ASK JAY: per mile after the included miles
+    waitPerHour: null as number | null, // ASK JAY: wait time per hour, and how it is billed
+    waitFreeMinutes: null as number | null, // ASK JAY: free wait minutes
+    companionFee: null as number | null, // ASK JAY: companion fee (0 = free)
+    roundTripRule: null as string | null, // ASK JAY: how is a round trip priced?
+    afterHoursRule: null as string | null, // ASK JAY: is there an after-hours/weekend fee, and when does it apply?
+    afterHoursFee: null as number | null, // ASK JAY
+    cancellationWindow: null as string | null, // ASK JAY: cancellation window and late-cancel charge
+    paymentMethods: [] as string[], // ASK JAY: payment methods (card, cash, check, facility invoice?)
     insurance: {
-      medicaid: "Texas Medicaid rides are booked through your health plan's ride line, not directly with us. Call and we'll help you find the right number.", // CONFIRM broker enrollment
-      medicare: "Medicare does not pay for wheelchair van rides to routine appointments. Most Medicare riders pay privately.", // CONFIRM
-      private: "Some long-term care policies reimburse rides. We give you a receipt you can submit.", // CONFIRM
-      brokers: [] as string[], // CONFIRM e.g. ["ModivCare", "MTM"] once enrolled
+      /** Medicaid transportation brokers Northline is enrolled with. Empty = private-pay and facility-billed. */
+      brokers: [] as string[], // ASK JAY: enrolled with any broker (ModivCare, MTM, …)?
     },
-    /** Schema.org priceRange, used only when displayMode !== "quoteOnly". */
-    priceRange: "$$", // CONFIRM
+    /** Schema.org priceRange. Emitted only once real prices are set. */
+    priceRange: null as string | null, // ASK JAY
   },
 
   /** What we can and can't do. null = unknown, rendered as "ask us". All CONFIRM. */
@@ -205,11 +213,11 @@ export const site = {
 
   /** /safety. Each list renders only the items present. */
   safety: {
-    driverScreening: ["Criminal background check", "Drug screening before hire and at random"], // CONFIRM
-    driverTraining: ["CPR and First Aid certified", "PASS wheelchair securement training", "Defensive driving course"], // CONFIRM (PASS = CTAA Passenger Assistance Safety and Sensitivity)
-    everyRide: ["Four-point wheelchair tie-downs", "Lap and shoulder belt for the rider", "Pre-trip vehicle check with a written checklist"], // CONFIRM
-    vehicles: ["Rear-entry ramp vans and side-lift vans", "Lift rated to 600 lbs", "Cleaned and disinfected between riders"], // CONFIRM
-    insurance: "Commercial auto and passenger liability insurance", // CONFIRM carrier and limits; do not name a carrier until verified
+    driverScreening: [] as string[], // ASK JAY: background check? drug screening? (exact names, as done)
+    driverTraining: [] as string[], // ASK JAY: CPR / First Aid? PASS? defensive driving? (only what drivers hold now)
+    everyRide: [] as string[], // ASK JAY: tie-downs, belts, pre-trip checks (only what is done every ride)
+    vehicles: [] as string[], // ASK JAY: ramp or lift vans, lift rating, cleaning
+    insurance: null as string | null, // ASK JAY: commercial auto / passenger liability? Carrier and limits for the COI.
   },
 
   coreAreas: [
@@ -276,10 +284,9 @@ export const site = {
       address: "710 Cypress Creek Pkwy, Houston, TX 77090", // CONFIRM
       city: "Houston",
       nearestAreas: ["houston", "spring", "cypress"],
-      dropOffNotes: ["We use the main entrance off Cypress Creek Parkway, under the covered drive.", "For outpatient imaging and the cath lab, tell us and we'll use the outpatient entrance instead.", "Discharges usually leave from the main lobby. Nurses call us when the paperwork is done."], // CONFIRM
-      dropOffNotesDraft: true,
+      dropOffNotes: [{ text: "We use the main entrance off Cypress Creek Parkway, under the covered drive.", confirmed: false }, { text: "For outpatient imaging and the cath lab, tell us and we'll use the outpatient entrance instead.", confirmed: false }, { text: "Discharges usually leave from the main lobby. Nurses call us when the paperwork is done.", confirmed: false }], // CONFIRM
       typicalTrips: ["Discharge rides home to Spring and Klein", "Cardiology and imaging appointments", "ER visits that turn into a ride home"],
-      localNote: "This is the closest full hospital to most of our Spring and FM 1960 riders, so our vans are near it most days.", // CONFIRM
+      localNote: null, // ASK JAY: is HCA Northwest the closest full hospital to most Spring/FM 1960 riders, and are vans near it most days?
       geo: { latitude: 29.9884, longitude: -95.4259 }, // CONFIRM from the street address
       mapNode: { i: 3, j: 2 }, // CONFIRM position on the hero map grid
     },
@@ -290,10 +297,9 @@ export const site = {
       address: "9250 Pinecroft Dr, The Woodlands, TX 77380", // CONFIRM
       city: "The Woodlands",
       nearestAreas: ["the-woodlands", "spring"],
-      dropOffNotes: ["The main entrance on Pinecroft Drive has a covered drop-off with room for our ramp.", "The medical office buildings next door have separate entrances. Give us the suite number and we'll drop you at the right building.", "For discharges, the transport desk brings riders to the main entrance."], // CONFIRM
-      dropOffNotesDraft: true,
+      dropOffNotes: [{ text: "The main entrance on Pinecroft Drive has a covered drop-off with room for our ramp.", confirmed: false }, { text: "The medical office buildings next door have separate entrances. Give us the suite number and we'll drop you at the right building.", confirmed: false }, { text: "For discharges, the transport desk brings riders to the main entrance.", confirmed: false }], // CONFIRM
       typicalTrips: ["Rides home to The Woodlands and Spring after a stay", "Cancer center visits", "Follow-up visits in the medical office buildings"],
-      localNote: "Riders often have a visit at the hospital and a second one in the office buildings on the same campus. Book a wait-and-return and we'll move you between them.", // CONFIRM
+      localNote: null, // ASK JAY: do riders often combine a hospital visit and an office-building visit here, and do you move them between the two on a wait-and-return?
       geo: { latitude: 30.1568, longitude: -95.4563 }, // CONFIRM from the street address
       mapNode: { i: 13, j: 12 }, // CONFIRM position on the hero map grid
     },
@@ -304,10 +310,9 @@ export const site = {
       address: "18220 State Hwy 249, Houston, TX 77070", // CONFIRM
       city: "Houston",
       nearestAreas: ["cypress", "spring", "houston"],
-      dropOffNotes: ["The main entrance faces Highway 249. We pull into the covered patient drop-off.", "The Willowbrook medical office buildings have their own drop-off on the north side of the campus.", "Parking-garage entrances are tight for a ramp van, so we stay at the front drive."], // CONFIRM
-      dropOffNotesDraft: true,
+      dropOffNotes: [{ text: "The main entrance faces Highway 249. We pull into the covered patient drop-off.", confirmed: false }, { text: "The Willowbrook medical office buildings have their own drop-off on the north side of the campus.", confirmed: false }, { text: "Parking-garage entrances are tight for a ramp van, so we stay at the front drive.", confirmed: false }], // CONFIRM
       typicalTrips: ["Discharge rides home to Cypress and Tomball", "Physical therapy visits", "Specialist visits in the office buildings"],
-      localNote: "Traffic on 249 stacks up after 3 PM. For afternoon pickups we leave early and text you when we're close.", // CONFIRM
+      localNote: null, // ASK JAY: what is true about afternoon pickups on 249 (traffic, how early you leave)?
       geo: { latitude: 29.9781, longitude: -95.5519 }, // CONFIRM from the street address
       mapNode: { i: 9, j: 3 }, // CONFIRM position on the hero map grid
     },
@@ -318,10 +323,9 @@ export const site = {
       address: "17200 St Luke's Way, The Woodlands, TX 77384", // CONFIRM
       city: "The Woodlands",
       nearestAreas: ["the-woodlands", "spring"],
-      dropOffNotes: ["The main entrance is off St. Luke's Way, with a covered patient drop-off.", "Emergency drop-off is around the side. Tell us if you're going to the ER.", "The campus has several office buildings. Send us the suite number and we'll take you to the door."], // CONFIRM
-      dropOffNotesDraft: true,
+      dropOffNotes: [{ text: "The main entrance is off St. Luke's Way, with a covered patient drop-off.", confirmed: false }, { text: "Emergency drop-off is around the side. Tell us if you're going to the ER.", confirmed: false }, { text: "The campus has several office buildings. Send us the suite number and we'll take you to the door.", confirmed: false }], // CONFIRM
       typicalTrips: ["Rides home to north Montgomery County after a stay", "Heart and vascular follow-ups", "Rehab and therapy visits"],
-      localNote: "It's the farthest north of the hospitals we serve, so we plan extra time on I-45 during the morning rush.", // CONFIRM
+      localNote: null, // ASK JAY: is St. Luke's the farthest north you serve, and do you plan extra time on I-45 in the morning?
       geo: { latitude: 30.1922, longitude: -95.4533 }, // CONFIRM from the street address
       mapNode: { i: 15, j: 9 }, // CONFIRM position on the hero map grid
     },
@@ -336,7 +340,7 @@ export const site = {
       name: "Wheelchair Transportation",
       shortName: "Wheelchair van rides",
       place: "Houston",
-      answer: "Northline gives door-to-door wheelchair van rides in Houston, Spring, Humble, The Woodlands and Cypress. Your driver helps you from your door, secures your wheelchair in a ramp or lift van, and walks you to the right suite.",
+      answer: "Northline gives door-to-door wheelchair van rides in Houston, Spring, Humble, The Woodlands and Cypress (non-emergency medical transportation, or NEMT). Your driver helps you from your door, secures your wheelchair in a ramp or lift van, and walks you to the right suite.",
       cardSummary: "Door-to-door rides in ramp and lift vans, anywhere in the Houston area. You stay in your own wheelchair the whole way, and your driver walks you to the right door.",
       primaryKeyword: "wheelchair transportation Houston",
       faqIds: [1, 4, 6, 7, 8],
@@ -345,7 +349,7 @@ export const site = {
       slug: "medical-appointments",
       name: "Rides to Medical Appointments",
       shortName: "Medical appointments",
-      place: "North Houston",
+      place: "north Houston",
       answer: "Northline drives north Houston riders to doctor visits, therapy, imaging and other medical appointments in a wheelchair van, then waits and brings them home.",
       cardSummary: "Doctor visits, therapy, imaging and follow-ups, timed so you arrive early. Your driver can wait and bring you home.",
       primaryKeyword: "medical transportation north Houston",
@@ -355,7 +359,7 @@ export const site = {
       slug: "dialysis-transportation",
       name: "Dialysis Rides",
       shortName: "Dialysis rides",
-      place: "North Houston",
+      place: "north Houston",
       answer: "Northline gives standing wheelchair van rides to dialysis in north Houston, three times a week on the same days and times, with the same driver whenever we can.",
       cardSummary: "Standing rides three times a week, same days and same times, usually the same driver. Early chairs are our specialty.",
       primaryKeyword: "dialysis transportation Houston",
@@ -375,32 +379,30 @@ export const site = {
       slug: "senior-transportation",
       name: "Senior Transportation",
       shortName: "Senior rides",
-      place: "North Houston",
+      place: "north Houston",
       answer: "Northline gives assisted rides to older adults in north Houston who walk with a cane, a walker or a steady arm, with a driver who helps from door to door.",
       cardSummary: "Assisted rides for older adults who walk with a cane, a walker or a steady arm. No wheelchair needed to ride with us.",
       primaryKeyword: "senior transportation Houston",
       faqIds: [16, 4, 6, 7, 3],
     },
-    {
-      slug: "facility-and-discharge-partners",
-      name: "Wheelchair Transportation for Facilities",
-      shortName: "For facilities",
-      place: "North Houston",
-      answer: "Northline gives hospitals, skilled nursing, assisted living and dialysis clinics in north Houston one direct dispatch line for patient rides, discharges and standing schedules, billed to a facility account.",
-      cardSummary: "One direct line for discharge planners, nursing homes and clinics.",
-      primaryKeyword: "patient transportation for facilities Houston",
-      faqIds: [11, 10, 9, 14, 13],
-    },
   ] satisfies Service[],
+
+  /** /partners "How it works for a facility". Each renders only when set (non-null). */
+  partners: {
+    directLine: null as string | null, // ASK JAY: who answers facility calls, and when?
+    standingSchedules: null as string | null, // ASK JAY: how standing schedules are set up and changed
+    confirmations: null as string | null, // ASK JAY: who gets a confirmation (facility, family) and how
+    invoicing: null as string | null, // ASK JAY: monthly invoicing? terms?
+  },
 
   /** Jay first. Placeholder cards render with a CONFIRM label until photos arrive. */
   team: [
     {
       firstName: "Jay",
       role: "Owner & driver",
-      yearsDriving: 12, // CONFIRM
+      yearsDriving: null, // ASK JAY: years driving riders
       quote: "I drive most of the dialysis runs myself. I like knowing my regulars by name.", // CONFIRM
-      certifications: ["CPR", "First Aid", "PASS certified"], // CONFIRM
+      certifications: [] as string[], // ASK JAY: certifications he holds now
       photo: null as ImageAsset | null, // CONFIRM real photo
       isPlaceholder: true,
     },

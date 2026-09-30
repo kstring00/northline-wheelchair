@@ -20,7 +20,8 @@ for (const n of graph) {
 const ancestors = (c, seen = new Set()) => { if (seen.has(c)) return seen; seen.add(c); for (const p of classes.get(c) ?? []) ancestors(p, seen); return seen; };
 
 const required = {
-  LocalBusiness: ["name", "address", "telephone", "url", "openingHoursSpecification", "geo", "areaServed", "priceRange", "image"],
+  // priceRange is recommended, not required: it is emitted only once Jay sets real prices (site.ts pricing.priceRange).
+  LocalBusiness: ["name", "address", "telephone", "url", "openingHoursSpecification", "geo", "areaServed", "image"],
   Organization: ["name", "url", "logo"],
   Service: ["name", "provider", "areaServed", "serviceType"],
   BreadcrumbList: ["itemListElement"],

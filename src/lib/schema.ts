@@ -89,7 +89,7 @@ export function localBusinessSchema() {
     email: site.email,
     image: absoluteUrl(site.images.hero.src),
     logo: absoluteUrl("/logo.png"),
-    ...(site.pricing.displayMode !== "quoteOnly" ? { priceRange: site.pricing.priceRange } : {}),
+    ...(site.pricing.priceRange !== null && site.pricing.displayMode !== "quoteOnly" ? { priceRange: site.pricing.priceRange } : {}),
     address: postalAddress(),
     geo: { "@type": "GeoCoordinates", latitude: site.geo.latitude, longitude: site.geo.longitude },
     areaServed: areaServed(),

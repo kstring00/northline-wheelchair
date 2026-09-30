@@ -47,7 +47,7 @@ export function Pin({ className = "", style }: { className?: string; style?: CSS
  * Built as HTML: "Northl" + dotless ı with the pin centred above it + "ne".
  * Screen readers get the plain word.
  */
-function Wordmark({ size, withTagline }: { size: number; withTagline: boolean }) {
+function Wordmark({ size, withTagline, taglineBreak = false }: { size: number; withTagline: boolean; taglineBreak?: boolean }) {
   return (
     <span className="flex flex-col items-start leading-none" style={{ fontSize: size }}>
       <span aria-hidden="true" className="whitespace-nowrap font-display font-extrabold leading-none tracking-[-0.03em]">
@@ -61,10 +61,20 @@ function Wordmark({ size, withTagline }: { size: number; withTagline: boolean })
       {withTagline && (
         <span
           aria-hidden="true"
-          className="whitespace-nowrap font-sans font-bold uppercase leading-none"
-          style={{ fontSize: "0.17em", letterSpacing: "0.11em", marginTop: "0.9em" }}
+          className={`whitespace-nowrap font-sans font-bold uppercase ${taglineBreak ? "leading-[1.15]" : "leading-none"}`}
+          // The brand ratio is 0.17 × the wordmark, which is ~5px in the header.
+          // Riders often have low vision, so the tagline never drops below 15px.
+          style={{ fontSize: "max(0.17em, 15px)", letterSpacing: "0.06em", marginTop: "0.45em" }}
         >
-          Wheelchair Transportation
+          {taglineBreak ? (
+            <>
+              Wheelchair
+              <br />
+              Transportation
+            </>
+          ) : (
+            "Wheelchair Transportation"
+          )}
         </span>
       )}
     </span>
@@ -75,6 +85,8 @@ type LogoProps = {
   variant?: Variant;
   tone?: Tone;
   withTagline?: boolean;
+  /** Put the tagline on two lines ("Wheelchair / Transportation"): narrow headers keep it readable. */
+  taglineBreak?: boolean;
   /** Wordmark font size in px. The mark scales with it. */
   size?: number;
   /** Pad the logo by its protection area (height of the N). */
@@ -86,7 +98,7 @@ type LogoProps = {
   label?: string;
 };
 
-export function Logo({ variant = "wordmark", tone = "navy", withTagline = false, size = 28, clear = false, ground, className = "", label = "Northline Wheelchair Transportation" }: LogoProps) {
+export function Logo({ variant = "wordmark", tone = "navy", withTagline = false, taglineBreak = false, size = 28, clear = false, ground, className = "", label = "Northline Wheelchair Transportation" }: LogoProps) {
   // Height of the N: cap height of Bricolage (0.66em) for the wordmark,
   // 0.83 of the mark's box for the logomark (stroke included).
   const markSize = variant === "mark" ? size : Math.round(size * 1.5);
@@ -100,7 +112,7 @@ export function Logo({ variant = "wordmark", tone = "navy", withTagline = false,
     <span className={`inline-flex ${toneClass[tone]} ${clear ? "logo-clear" : ""} ${className}`} style={style} data-logo={variant} data-logo-tone={tone}>
       {label && <span className="sr-only">{label}</span>}
       {variant === "mark" && <LogoMark style={{ width: markSize, height: markSize }} />}
-      {variant === "wordmark" && <Wordmark size={size} withTagline={withTagline} />}
+      {variant === "wordmark" && <Wordmark size={size} withTagline={withTagline} taglineBreak={taglineBreak} />}
       {variant === "stacked" && (
         <span className="flex flex-col items-start" style={{ gap: size * 0.45 }}>
           <LogoMark style={{ width: markSize, height: markSize, marginLeft: -markSize * 0.13 }} />

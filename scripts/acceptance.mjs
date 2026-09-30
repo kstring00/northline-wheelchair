@@ -49,12 +49,19 @@ for (const p of allPages) {
   const ext = [...h.matchAll(/<script[^>]+src="(https?:)?\/\/([^/"]+)/g)].map((x) => x[2]).filter((d) => !/localhost/.test(d));
   check(`no external scripts: ${p}`, ext.length === 0, ext.join(","));
 }
-check("NEMT phrasing only on Home and /faq", nemt.every((x) => x.startsWith("/:") || x.startsWith("/faq:")), nemt.join(" "));
+check("NEMT phrasing only on Home, /faq and the wheelchair service page", nemt.every((x) => /^\/(faq|services\/wheelchair-transportation)?:/.test(x)), nemt.join(" "));
+check("NEMT parenthetical on Home and the wheelchair service page", nemt.some((x) => x.startsWith("/:")) && nemt.some((x) => x.startsWith("/services/wheelchair-transportation:")), nemt.join(" "));
 
 // 3. Home: on-time promise above the fold (inside hero section) and stats strip present
 const home = await html("/");
 check("On-time promise renders inside hero section", /<section id="hero"[\s\S]*How we make sure you're never late[\s\S]*<\/section>/.test(text(home).length ? home.replace(/&#x27;/g, "'") : home));
-check("Stats strip present with 3 numbers", (home.replace(/<script[\s\S]*?<\/script>/g, "").match(/data-countup-value/g) ?? []).length === 3);
+// A1: stats are null in site.ts, so the strip must be absent (no section, no zeros).
+{
+  const noScripts = (h) => h.replace(/<script[\s\S]*?<\/script>/g, "");
+  const about = await html("/about");
+  check("Stats strip absent while stats are null (Home)", !/data-countup|Northline by the numbers/.test(noScripts(home)));
+  check("Stats strip absent while stats are null (/about)", !/data-countup|Northline by the numbers/.test(noScripts(about)));
+}
 
 // 4. drafts
 const drafts = ["/guides/first-wheelchair-van-ride", "/guides/recurring-dialysis-rides-checklist", "/guides/hospital-discharge-ride-home"];
@@ -67,7 +74,7 @@ check("Hospital drop-off notes carry draft label", /Drop-off notes: draft/.test(
 
 // 5. schema gating
 check("No AggregateRating/Review while reviews are placeholders", !/AggregateRating|"@type":"Review"/.test(home));
-check("priceRange present when displayMode != quoteOnly", /"priceRange"/.test(home));
+check("priceRange absent while pricing is unconfirmed", !/"priceRange"/.test(home));
 check("FAQPage on every service page", (await Promise.all(urls.filter((u) => u.startsWith("/services/")).map(html))).every((h) => /"@type":"FAQPage"/.test(h)));
 
 // 6a. Homepage revision 3
@@ -106,6 +113,74 @@ check("FAQPage on every service page", (await Promise.all(urls.filter((u) => u.s
   check("Service map: five core city <a> links in the HTML", cityLinks.length === 5, cityLinks.join(","));
   check("Service map: hand-traced geometry declared in the SVG", /geometry: (hand-traced|OpenStreetMap)/.test(readFileSync("public/brand/service-map.svg", "utf8")));
   check("Ride Card: sample tag on the partners sample", /data-sample="true"[\s\S]*?Sample Ride Card\. Names, times and driver are examples\./.test((await html("/partners")).replace(/\n/g, " ")) || /data-sample-tag/.test(await html("/partners")));
+}
+
+// 6p. Facility (B2B) path: /partners packet + account form, landing pages, old service URL
+{
+  const h = await html("/partners");
+  const t = text(h);
+  const packet = ["Rate sheet (PDF)", "Certificate of Insurance", "W-9", "Driver credential summary", "Vehicle spec"];
+  const buttons = [...h.matchAll(/<button[^>]*data-packet-button="[^"]+"[^>]*>([\s\S]*?)<\/button>/g)].map((m) => text(m[1]).trim());
+  check("/partners: five packet buttons", buttons.length === 5 && packet.every((p) => buttons.some((b) => b.includes(p))), buttons.join(" | "));
+  const ids = ["acct-facility", "acct-facilityType", "acct-contactName", "acct-role", "acct-phone", "acct-email", "acct-billingName", "acct-billingEmail", "acct-poRequired", "acct-bookers", "acct-volume", "acct-standing", "acct-notes", "acct-website", "acct-standing-toggle", "acct-standing-rows"];
+  const missing = ids.filter((id) => !new RegExp(`id="${id}"`).test(h));
+  check("/partners: account form fields present by id", missing.length === 0, missing.join(","));
+  const packetIds = ["pk-items", "pk-name", "pk-facility", "pk-role", "pk-email", "pk-website"].filter((id) => !new RegExp(`id="${id}"`).test(h));
+  check("/partners: packet form fields present by id", packetIds.length === 0, packetIds.join(","));
+  check("/partners: standing expander wired (aria-expanded/aria-controls)", /aria-expanded="false"[^>]*aria-controls="acct-standing-rows"|aria-controls="acct-standing-rows"[^>]*aria-expanded="false"/.test(h) || /id="acct-standing-toggle"[^>]*aria-expanded/.test(h));
+  check(
+    "/partners: PHI notice verbatim",
+    t.includes("Initials only. Please don't send names, dates of birth, diagnoses or street addresses here. We'll take the pickup address by phone."),
+  );
+  const dispatchNull = /dispatchPhone:\s*null/.test(readFileSync("src/config/site.ts", "utf8"));
+  check("/partners: 'Ask for dispatch.' shown while dispatchPhone is null", !dispatchNull || t.includes("Ask for dispatch."));
+  check("/partners: packet intro line", t.includes("We'll email what you ask for as soon as it's ready. Nothing is posted here."));
+  const invented = ["Net-30", "Jay still takes", "Drop-off notes on file", "Early chairs"].filter((s) => t.includes(s));
+  check("/partners: no invented claims", invented.length === 0, invented.join(","));
+  check("/partners: no hosted packet files", !/href="[^"]+\.(pdf|docx?)"/i.test(h));
+  check("/partners: H1", /<h1[^>]*>Patient rides for facilities in north Houston<\/h1>/.test(h));
+  check("/partners: links to both landing pages", /href="\/partners\/dialysis"/.test(h) && /href="\/partners\/discharge"/.test(h));
+  for (const [p, h1] of [["/partners/dialysis", "Dialysis transportation contracts in north Houston"], ["/partners/discharge", "Hospital discharge transportation for case managers in north Houston"]]) {
+    const r = await fetch(BASE + p);
+    const body = await r.text();
+    check(`${p}: 200 with H1`, r.status === 200 && text(get(body, /<h1[^>]*>([\s\S]*?)<\/h1>/)).trim() === h1, `${r.status} "${text(get(body, /<h1[^>]*>([\s\S]*?)<\/h1>/)).trim()}"`);
+    check(`${p}: links to /partners#account`, /href="\/partners#account"/.test(body));
+    check(`${p}: in sitemap`, urls.includes(p));
+  }
+  const old = await fetch(BASE + "/services/facility-and-discharge-partners", { redirect: "manual" });
+  const loc = old.headers.get("location") ?? "";
+  check("Old facility service URL: 301 to /partners", old.status === 301 && (loc === "/partners" || new URL(loc, BASE).pathname === "/partners"), `${old.status} ${loc}`);
+  check("Old facility service URL gone from sitemap", !urls.includes("/services/facility-and-discharge-partners"));
+}
+
+// 6b. Launch blockers: none of these strings may render anywhere (built HTML, visible text + meta).
+{
+  const strings = ["years driving", "5,000", "98%", "Net-30", "insured", "certified", "text you", "by text"];
+  const placeholders = ["555-", "12345"];
+  const found = {};
+  for (const p of allPages) {
+    const h = await html(p);
+    const t = text(h) + " " + [...h.matchAll(/<meta[^>]+content="([^"]*)"/g)].map((m) => m[1]).join(" ");
+    for (const w of [...strings, ...placeholders]) if (t.toLowerCase().includes(w.toLowerCase())) (found[w] ??= []).push(p);
+  }
+  for (const w of strings) check(`Built HTML: "${w}" appears nowhere`, !found[w], (found[w] ?? []).slice(0, 4).join(" "));
+  // The phone and street are placeholders until Jay confirms them; check:launch blocks a live build while they are.
+  for (const w of placeholders) console.log(`INFO  "${w}" on ${(found[w] ?? []).length} page(s) (placeholder phone/address; a live build fails until replaced)`);
+  const safety = await html("/safety");
+  check("/safety shows the one honest line", /data-unconfirmed/.test(safety) && /Jay is confirming these details/.test(text(safety)));
+  check("/pricing rules block shows the one honest line", /data-unconfirmed/.test(await html("/pricing")));
+  check("Medicaid answer is the brokers sentence", /We(&#x27;|')re currently private-pay and facility-billed/.test(await html("/faq")) && !/Medicare does not pay/.test(await html("/faq")));
+  check("SMS mock hidden while smsEnabled is false", !/data-sms-mock/.test(home) && !/data-sms-mock/.test(await html("/partners")));
+  const hosp = await html("/service-area/hospitals/houston-methodist-willowbrook");
+  check("Invented hospital notes gone", !/Traffic on 249|vans are near it most days/.test(hosp));
+  const faq = text(await html("/faq"));
+  check("FAQ 11 carries no hospital list", !/We serve .*Hospital.* and every other hospital/.test(faq));
+  const partnerRedirect = await fetch(BASE + "/services/facility-and-discharge-partners", { redirect: "manual" });
+  check("Old facility service URL → 301 /partners", partnerRedirect.status === 301 && /\/partners$/.test(partnerRedirect.headers.get("location") ?? ""), `${partnerRedirect.status} ${partnerRedirect.headers.get("location")}`);
+  for (const [p, h1] of [["/book", "Book a wheelchair van ride in north Houston"], ["/pricing", "Wheelchair van ride prices in north Houston"], ["/service-area", "Wheelchair van service area in north Houston"], ["/contact", "Contact Northline, wheelchair van rides in north Houston"]]) {
+    check(`H1 ${p}`, text(get(await html(p), /<h1[^>]*>([\s\S]*?)<\/h1>/)).trim() === h1, text(get(await html(p), /<h1[^>]*>([\s\S]*?)<\/h1>/)).trim());
+  }
+  check("FinalCta sentence case, no poster class", /Ready when you are\./.test(home) && !/id="final-cta-heading"[^>]*poster/.test(home));
 }
 
 // 6. sticky bar + success screens show responseTime

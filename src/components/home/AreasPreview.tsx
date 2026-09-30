@@ -29,7 +29,7 @@ export function AreasPreview() {
   }));
 
   return (
-    <section id="areas" aria-labelledby="areas-heading" className="bg-navy on-dark py-16 text-cream sm:py-20 lg:py-24">
+    <section id="areas" aria-labelledby="areas-heading" className="bg-navy on-dark py-12 text-cream sm:py-20 lg:py-24">
       <div className="container-page">
         <p className="label mb-3 text-cream">Where we drive</p>
         <h2 id="areas-heading" className="max-w-3xl text-[2rem] font-bold !text-white sm:text-[2.5rem]">
@@ -40,7 +40,19 @@ export function AreasPreview() {
         </p>
 
         <div className="mt-10 grid gap-10 xl:grid-cols-[minmax(0,1fr)_18rem] xl:items-start xl:gap-12">
-          <div className="relative -mx-4 sm:mx-0 lg:max-w-[1200px]">
+          {/* Phones: a static, lazy image of the same map; the interactive map is desktop-only. */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- a static SVG; next/image adds nothing here */}
+          <img
+            data-service-map-static
+            src="/brand/service-map.svg"
+            alt={mapDescription}
+            width={1200}
+            height={900}
+            loading="lazy"
+            decoding="async"
+            className="-mx-4 block h-auto w-[calc(100%+2rem)] max-w-none sm:mx-0 sm:w-full sm:rounded-[var(--radius-card)] lg:hidden"
+          />
+          <div className="relative hidden lg:block lg:max-w-[1200px]">
             <div
               data-service-map
               role="img"

@@ -20,6 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...coreAreas.map((a) => entry(`/service-area/${a.slug}`, 0.8)),
     ...hospitals.map((h) => entry(`/service-area/hospitals/${h.slug}`, 0.7)),
     entry("/partners", 0.8),
+    entry("/partners/dialysis", 0.7),
+    entry("/partners/discharge", 0.7),
     entry("/safety", 0.7),
     entry("/about", 0.6),
     entry("/faq", 0.6),

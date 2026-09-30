@@ -380,7 +380,7 @@ async function main() {
   out.push(`</g>`);
 
   // Road and water names
-  out.push(`<g data-road-labels="" class="t-text" font-size="12" font-weight="700" fill="${WHITE}" fill-opacity="0.55" letter-spacing="0.04em">`);
+  out.push(`<g data-road-labels="" class="t-text" font-size="16" font-weight="700" fill="${WHITE}" fill-opacity="0.6" letter-spacing="0.04em">`);
   for (const l of ROAD_LABELS) {
     const [x, y] = project(l.at);
     const rot = l.along ? angleAlong(l.along[0], l.along[1]) : 0;
@@ -405,7 +405,7 @@ async function main() {
   out.push(`</g>`);
 
   // Hospitals
-  out.push(`<g data-hospitals="" class="t-text" font-size="14" font-weight="400" fill="${WHITE}">`);
+  out.push(`<g data-hospitals="" class="t-text" font-size="17" font-weight="400" fill="${WHITE}">`);
   for (const h of site.hospitals) {
     const [x, y] = geoXY(h.geo);
     const cfg = HOSPITAL_LABEL[h.slug] ?? { anchor: "start" as Anchor, lines: [h.name] };
@@ -444,7 +444,7 @@ async function main() {
     out.push(
       `<g data-tmc="" data-x="${r1(x)}" data-y="${r1(y)}" class="t-text" fill="${WHITE}">` +
         `<g data-tmc-ring="" style="transform-origin:${r1(x)}px ${r1(y)}px"><circle cx="${r1(x)}" cy="${r1(y)}" r="7.5" fill="none" stroke="${WHITE}" stroke-width="2.5"/><circle cx="${r1(x)}" cy="${r1(y)}" r="2.5"/></g>` +
-        `<text class="t-tmc" data-label="" x="${r1(x - 14)}" y="${r1(y + 5)}" text-anchor="end" font-size="14" font-weight="700">Texas Medical Center</text></g>`,
+        `<text class="t-tmc" data-label="" x="${r1(x - 14)}" y="${r1(y + 5)}" text-anchor="end" font-size="17" font-weight="700">Texas Medical Center</text></g>`,
     );
   }
 

@@ -15,32 +15,33 @@ export const metadata: Metadata = buildMetadata({
 const copy: ServiceCopy = {
   audiences: [
     { title: "You use a wheelchair every day", body: "Manual or power chair, you roll on and stay in your own seat. No transfers, no lifting." },
-    { title: "You're booking for a parent", body: "You can be at work in Katy while Mom rides from Spring. We call you to confirm and text you when she's picked up and dropped off." },
+    { title: "You're booking for a parent", body: "You can be at work in Katy while Mom rides from Spring. We call you to confirm the ride." },
     { title: "You can't manage the car anymore", body: "A hip, a stroke, a bad knee. If getting into a car is the hard part, a ramp van fixes it." },
     { title: "You need it for more than doctors", body: "Church, a grandson's game, the pharmacy, the airport. Any trip where the chair has to come along." },
   ],
   steps: [
     { title: "Tell us where and when", body: `Call ${site.phone.display} or book online. Pickup address, where you're going, the date and time, and how you get around.` },
     { title: "We confirm and price it", body: `We call back within ${site.responseTime} with your pickup time and the exact price. The day before, we call again to confirm.` },
-    { title: "Your driver does the rest", body: "A text when they're on the way. Help at your door. A secured ride. A walk to the right suite. And the same care coming home." },
+    { title: "Your driver does the rest", body: "Help at your door. A secured ride. A walk to the right suite. And the same care coming home." },
   ],
   included: [
     { title: "Door to door, not curb to curb", body: "Your driver comes to your front door and walks you inside at the other end." },
-    { title: "Your own wheelchair, the whole way", body: "Four floor straps hold the chair. A lap and shoulder belt hold you." },
-    { title: "A driver who knows your name", body: "Standing rides get the same driver whenever we can." },
+    { title: "Your own wheelchair, the whole way", body: "You roll on in your own chair and stay in it." },
+    // ASK JAY: do standing rides get the same driver? How is a chair secured (straps, belts)?
     { title: `Up to ${site.capabilities.maxCompanions ?? 2} companions`, body: "Family, a caregiver, a friend. Tell us so we save the seats." },
     { title: "Waiting, if you want it", body: "Book wait & return and your driver stays through the appointment." },
-    { title: "The price up front", body: "You hear the number when we confirm. It doesn't change after." },
+    { title: "The price up front", body: "You hear the price on the call, before the ride." },
   ],
   onTheDay: [
     "The day before your ride, we call to confirm the pickup time. If anything about your home is unusual, a gate, a steep driveway, a dog, that's the time to tell us.",
-    `Your driver texts when they're on the way and arrives about ${site.onTimePromise.arriveEarlyMinutes ?? 10} minutes early. They come to the door, say their name, and ask how you like to be helped.`,
-    "Getting into the van takes about two minutes. You roll up the ramp, the driver locks your chair to the floor, and you buckle up. Then a calm, quiet ride. Most drivers keep the radio off unless you'd like it on.",
-    "At the other end, the driver walks you to the check-in desk or the right suite. If you booked wait & return, they're back at the door within a few minutes of your call. Then the same careful ride home.",
+    `Your driver arrives${site.onTimePromise.arriveEarlyMinutes ? ` about ${site.onTimePromise.arriveEarlyMinutes} minutes` : ""} early. They come to the door, say their name, and ask how you like to be helped.`,
+    // ASK JAY: how long does boarding take? Radio on or off?
+    "You roll up the ramp, the driver secures your chair, and you buckle up.",
+    "At the other end, the driver walks you to the check-in desk or the right suite. If you booked wait & return, call when you're done and your driver brings you home.",
   ],
   extra: <CanAndCant heading="What our vans and drivers can do" />,
 };
 
 export default function Page() {
-  return <ServicePage service={service} title="Wheelchair Transportation in Houston" copy={copy} />;
+  return <ServicePage service={service} title="Wheelchair transportation in Houston" copy={copy} />;
 }

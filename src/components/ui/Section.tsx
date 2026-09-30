@@ -25,7 +25,7 @@ export function Section({ id, eyebrow, title, intro, children, tone = "cream", c
   const hid = headingId ?? (id ? `${id}-heading` : undefined);
   const dark = tone === "navy";
   return (
-    <section id={id} aria-labelledby={hid} className={`${tones[tone]} py-16 sm:py-20 lg:py-24 ${className}`}>
+    <section id={id} aria-labelledby={hid} className={`${tones[tone]} py-12 sm:py-20 lg:py-24 ${className}`}>
       <div className="container-page">
         <div className="max-w-3xl">
           {eyebrow && (

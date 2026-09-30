@@ -18,7 +18,7 @@ export const metadata: Metadata = buildMetadata({
 export default function ContactPage() {
   return (
     <>
-      <PageHeader crumbs={[{ name: "Contact", path: "/contact" }]} title="Talk to a person" answer={`Call, text or book online. ${t.response.callback}`} cta={false} />
+      <PageHeader crumbs={[{ name: "Contact", path: "/contact" }]} title="Contact Northline, wheelchair van rides in north Houston" answer={`${site.smsEnabled ? "Call, text or book online." : "Call or book online."} ${t.response.callback}`} cta={false} />
       <section aria-label="Ways to reach us" className="bg-white py-16">
         <div className="container-page grid gap-10 md:grid-cols-2">
           <div className="space-y-6">

@@ -10,7 +10,7 @@ const service = getService("dialysis-transportation")!;
 
 export const metadata: Metadata = buildMetadata({
   title: "Dialysis Rides in North Houston",
-  description: `Standing wheelchair van rides to dialysis in north Houston: same days, same times, same driver. Early chairs welcome. Call ${site.phone.display}.`,
+  description: `Standing wheelchair van rides to dialysis in north Houston, set up once for the same days and chair times each week. Call ${site.phone.display}.`,
   path: `/services/${service.slug}`,
 });
 
@@ -18,31 +18,30 @@ const copy: ServiceCopy = {
   audiences: [
     { title: "Riders starting dialysis", body: "The first weeks are hard enough. We take the ride off your list for good, three times a week." },
     { title: "Families who can't drive every session", body: "Three rides a week, every week, is a part-time job. Hand it to us and go back to being family." },
-    { title: "Riders with an early chair", body: "5 AM chairs are common and most ride services won't take them. We start early on purpose." },
+    // ASK JAY: how early can pickups start? Do you take 5 AM chairs?
+    { title: "Riders with an early chair", body: "Tell us your chair time, however early, and Jay will tell you on the call what he can do." },
     { title: "Clinic social workers", body: "One call sets up a standing schedule for a patient. Changes are one call, too. See our page for clinics." },
   ],
   steps: [
     { title: "Give us the chair time", body: "Not the appointment time. Tell us when you need to be in the chair and we plan the pickup backward." },
     { title: "Pick the days", body: "Monday, Wednesday, Friday, or Tuesday, Thursday, Saturday. Tell us how long the session runs so we plan the return." },
-    { title: "We set it and keep it", body: "After the first week, the schedule runs itself. Hospital stay? Clinic moved you? One call pauses or changes it." },
+    { title: "We set it up once", body: "The ride repeats on your days each week. A hospital stay or a new chair time is one call to change." },
   ],
   included: [
-    { title: "The same driver, most days", body: "Riders do better with a familiar face. Drivers learn the routine, the door, the chair." },
-    { title: "Early pickups", body: "Our first vans roll before 5 AM. Early chairs are our specialty, not an exception." },
-    { title: "A slow, careful ride home", body: "You're tired and unsteady after a session. Your driver knows it and goes at your pace." },
-    { title: "Texts to the family", body: "Picked up, dropped off, home. Whoever you name gets the texts." },
-    { title: "Walked to the chair", body: "Your driver takes you inside to the treatment floor, not the front door." },
-    { title: "One weekly price", body: "Told to you before the first ride. The same every week." },
+    // ASK JAY: same driver most days? First van before 5 AM? Texts to family at pickup/drop-off? One weekly price?
+    { title: "A standing schedule", body: "Your days and chair time, set once, repeating every week." },
+    { title: "Door to door", body: "Your driver comes to your door and takes you inside at the clinic." },
+    { title: "A ride home after every session", body: "Tell us how long your session runs and we plan the return." },
   ],
   onTheDay: [
-    "The first week, we call the day before each ride, like any new ride. After that we stop calling unless something changes, and you still get the text when your driver is on the way.",
+    "The first week, we call the day before each ride, like any new ride. After that we stop calling unless something changes.",
     "Your driver arrives early and helps you into the van. Dialysis mornings are quiet rides. At the clinic, they walk you to the treatment floor and make sure the nurses have you.",
     "Because a session runs three to four hours, we usually come back rather than wait. When you're done, the clinic or you call, and the driver is there. The ride home is slower on purpose. A hand up the steps, and inside to a chair.",
   ],
   extra: (
     <Section id="clinics" tone="white" eyebrow="Where we drive" title="Dialysis centers across north Houston">
       <p className="mt-4 max-w-3xl text-lg text-ink/85">
-        We drive to every dialysis clinic in our service area. These are the corridors we run most days. Don&apos;t see yours? We still go there.
+        We drive to dialysis clinics across our service area. Don&apos;t see yours here? Call and ask.
       </p>
       <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {coreAreas.map((a) => {
@@ -63,5 +62,5 @@ const copy: ServiceCopy = {
 };
 
 export default function Page() {
-  return <ServicePage service={service} title="Dialysis Rides in North Houston" copy={copy} />;
+  return <ServicePage service={service} title="Dialysis rides in north Houston" copy={copy} />;
 }

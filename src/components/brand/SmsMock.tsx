@@ -6,6 +6,8 @@ import { LogoMark } from "@/components/ui/Logo";
  * his name, with a time and a promise to text again. Sample data.
  */
 export function SmsMock({ className = "" }: { className?: string }) {
+  // Texts are a promise: nothing renders until Jay's line sends and answers them.
+  if (!site.smsEnabled) return null;
   return (
     <figure data-sms-mock className={`mx-auto w-full max-w-[20rem] ${className}`}>
       <div className="rounded-[2.5rem] bg-ink p-2.5 shadow-[var(--shadow-lift)]">

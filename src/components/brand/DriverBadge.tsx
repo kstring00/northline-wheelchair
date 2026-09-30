@@ -2,6 +2,7 @@ import Image from "next/image";
 import { site, telHref } from "@/config/site";
 import type { TeamMember } from "@/config/site";
 import { Logo } from "@/components/ui/Logo";
+import { Unconfirmed } from "@/components/ui/Unconfirmed";
 
 /**
  * Driver badge (Brand Guidelines 3.2): photo circle, first name big, one line
@@ -24,11 +25,13 @@ export function DriverBadge({ m }: { m: TeamMember }) {
         </div>
         <h3 className="mt-5 text-[44px] font-extrabold leading-none tracking-[-0.03em] !text-ink">{m.firstName}</h3>
         <p className="mt-2 text-lg">{m.role}</p>
-        {m.certifications.length > 0 && (
+        {m.certifications.length > 0 ? (
           <p className="mt-1 text-ink/85">
             <span className="sr-only">Certifications: </span>
             {m.certifications.join(" · ")}
           </p>
+        ) : (
+          <Unconfirmed className="mt-2" />
         )}
         <div className="mt-auto w-full border-t border-ink/15 pt-4">
           <p className="text-sm font-bold">{site.name}</p>
