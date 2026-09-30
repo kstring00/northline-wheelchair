@@ -4,7 +4,7 @@
 <!-- geometry: hand-traced from known alignments (Overpass unreachable at build) -->
 <title>Northline service area: north Houston</title>
 <defs>
-<filter id="nl-field-feather" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="14"/></filter>
+<filter id="nl-field-feather" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
 <clipPath id="nl-map-clip"><rect width="1200" height="900"/></clipPath>
 </defs>
 <style>
@@ -80,10 +80,10 @@
 <text class="t-road" data-label="" x="360.2" y="544.2" text-anchor="middle" transform="rotate(32 360.2 544.2)">US-290</text>
 <text class="t-road" data-label="" x="384.2" y="432" text-anchor="middle" transform="rotate(57 384.2 432)">TX-249</text>
 <text class="t-road" data-label="" x="468.1" y="346.2" text-anchor="middle" transform="rotate(-13 468.1 346.2)">Grand Parkway 99</text>
-<text class="t-road" data-label="" x="683.9" y="570.5" text-anchor="middle">Beltway 8</text>
-<text class="t-road" data-label="" x="666" y="429.2" text-anchor="middle" transform="rotate(80 666 429.2)">Hardy Toll Rd</text>
-<text class="t-road" data-label="" x="719.9" y="459.7" text-anchor="middle">FM 1960</text>
-<text class="t-road" data-label="" x="722.3" y="664.6" text-anchor="middle" transform="rotate(-83 722.3 664.6)">US-59</text>
+<text class="t-road" data-label="" x="564" y="542.8" text-anchor="middle">Beltway 8</text>
+<text class="t-road" data-label="" x="662.4" y="408.5" text-anchor="middle" transform="rotate(80 662.4 408.5)">Hardy Toll Rd</text>
+<text class="t-road" data-label="" x="737.9" y="454.2" text-anchor="middle">FM 1960</text>
+<text class="t-road" data-label="" x="758.3" y="613.4" text-anchor="middle" transform="rotate(-85 758.3 613.4)">US-59</text>
 <text class="t-road" data-label="" x="372.2" y="761.5" text-anchor="middle">I-10</text>
 <text class="t-road" data-label="" x="947.7" y="519.2" text-anchor="middle" font-weight="400" font-style="italic" letter-spacing="0.08em">Lake Houston</text>
 <text class="t-road" data-label="" x="372.2" y="297.7" text-anchor="middle" font-weight="400" font-style="italic" letter-spacing="0.08em">Spring Creek</text>

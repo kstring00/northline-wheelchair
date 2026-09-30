@@ -14,25 +14,15 @@ async function settle(page) {
 }
 
 async function bookRide(page) {
+  // The five required fields only: that is the whole form now.
   await page.goto(BASE + "/book", { waitUntil: "networkidle" });
-  await page.locator('input[name="who"][value="loved-one"]').check();
-  await page.getByRole("button", { name: /^Continue/ }).click();
+  await page.locator("#contactName").fill("Denise Alvarez");
+  await page.locator("#phone").fill("281-555-0199");
   await page.locator("#pickupAddress").fill("4210 Spring Cypress Rd, Spring, TX");
   await page.locator("#destination").fill("DaVita Cypress Creek");
   const next = new Date(); next.setDate(next.getDate() + ((8 - next.getDay()) % 7 || 7)); // next Monday
   await page.locator("#date").fill(next.toISOString().slice(0, 10));
   await page.locator("#time").fill("07:15");
-  await page.locator('input[name="tripType"][value="wait-and-return"]').check();
-  await page.locator('input[name="repeat"][value="repeat"]').check();
-  for (const d of ["Mon", "Wed", "Fri"]) await page.locator(`input[name="repeatDays"][value="${d}"]`).check();
-  await page.getByRole("button", { name: /^Continue/ }).click();
-  await page.locator('input[name="mobility"][value="own-wheelchair"]').check();
-  const chair = page.locator('input[name="chairType"][value="manual"]');
-  if (await chair.count()) await chair.check();
-  const rider = page.locator("#riderName");
-  if (await rider.count()) await rider.fill("Ruth Alvarez");
-  await page.locator("#contactName").fill("Denise Alvarez");
-  await page.locator("#phone").fill("281-555-0199");
   await page.getByRole("button", { name: "Send ride request" }).click();
   await page.locator("[data-booking-success]").waitFor();
   await page.waitForTimeout(400);
@@ -44,10 +34,23 @@ for (const vp of [
 ]) {
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: vp.isMobile, hasTouch: vp.isMobile, deviceScaleFactor: vp.deviceScaleFactor });
   const page = await ctx.newPage();
+  // Full-page captures stitch the sticky header and the fixed skip link into every crop; hide them for the shots.
+  await page.addInitScript(() => document.addEventListener("DOMContentLoaded", () => { const st = document.createElement("style"); st.textContent = "header{position:static!important} a[href='#main']{display:none!important}"; document.head.appendChild(st); }));
   for (const [slug, path] of [["home", "/"], ["about", "/about"]]) {
     await page.goto(BASE + path, { waitUntil: "networkidle" });
     await settle(page);
     await page.screenshot({ path: `${out}/${slug}-${vp.name}.png`, fullPage: true });
+    if (path === "/") {
+      // Section crops for review: hero, services, map, reviews, owner.
+      for (const [name, sel] of [["hero", "#hero"], ["services", "#services"], ["map", "#areas"], ["reviews", "#reviews"], ["owner", "#meet-jay"]]) {
+        const el = page.locator(sel).first();
+        await el.scrollIntoViewIfNeeded(); await page.waitForTimeout(2300);
+        const r = await el.evaluate((e) => { const b = e.getBoundingClientRect(); return { x: b.left + scrollX, y: b.top + scrollY, width: b.width, height: b.height }; });
+        await page.screenshot({ path: `${out}/home-${name}-${vp.name}.png`, fullPage: true, clip: r });
+      }
+      // Map with the Spring chip open.
+      if (!vp.isMobile) { await page.hover("[data-city='spring']"); await page.waitForTimeout(400); const r = await page.locator("#areas").evaluate((e) => { const b = e.getBoundingClientRect(); return { x: b.left + scrollX, y: b.top + scrollY, width: b.width, height: b.height }; }); await page.screenshot({ path: `${out}/home-map-hover-${vp.name}.png`, fullPage: true, clip: r }); }
+    }
   }
   // Clip the footer out of a full-page capture so the sticky header doesn't overlay it.
   const box = await page.locator("footer").evaluate((el) => { const r = el.getBoundingClientRect(); return { x: r.left + scrollX, y: r.top + scrollY, width: r.width, height: r.height }; });

@@ -25,6 +25,7 @@ type RideCardProps = {
 };
 
 export function RideCard({ tag, pickup, dropoff, when, driver, phone = site.phone.display, className = "", titleAs: Title = "p", sample = false }: RideCardProps) {
+  const longTag = (tag?.length ?? 0) > 28;
   return (
     <article
       data-ride-card
@@ -37,11 +38,11 @@ export function RideCard({ tag, pickup, dropoff, when, driver, phone = site.phon
         </span>
       )}
       {/* Header strip: logomark, RIDE CARD, tag. */}
-      <div className="flex items-center gap-2 bg-navy px-3.5 py-2.5 text-white [--logo-dot:var(--color-navy)]">
+      <div className="flex flex-wrap items-center gap-2 bg-navy px-3.5 py-2.5 text-white [--logo-dot:var(--color-navy)]">
         <LogoMark className="h-5 w-5 shrink-0" />
         <Title className="!m-0 whitespace-nowrap font-sans text-[11px] font-bold uppercase leading-none tracking-[0.14em] !text-white">Ride Card</Title>
         {tag && (
-          <span data-ride-card-tag className="ml-auto max-w-[62%] rounded-full bg-amber px-2.5 py-1 text-right text-[10px] font-bold uppercase leading-[1.25] tracking-[0.1em] text-ink">
+          <span data-ride-card-tag className={`rounded-full bg-amber px-2.5 py-1 font-bold leading-[1.3] text-ink ${longTag ? "mt-1 basis-full text-left text-[11px] tracking-[0.01em]" : "ml-auto text-right text-[10px] uppercase tracking-[0.1em]"}`}>
             {tag}
           </span>
         )}

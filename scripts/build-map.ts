@@ -279,10 +279,10 @@ const ROAD_LABELS: { text: string; at: LonLat; along?: [LonLat, LonLat]; anchor?
   { text: "US-290", at: [-95.63, 29.947], along: [[-95.618, 29.928], [-95.65, 29.945]], anchor: "middle", feature: "us290" },
   { text: "TX-249", at: [-95.61, 30.028], along: [[-95.585, 30.02], [-95.6, 30.04]], anchor: "middle", feature: "tx249" },
   { text: "Grand Parkway 99", at: [-95.54, 30.09], along: [[-95.55, 30.075], [-95.5, 30.085]], anchor: "middle", feature: "sh99" },
-  { text: "Beltway 8", at: [-95.36, 29.928], anchor: "middle", feature: "beltway8" },
-  { text: "Hardy Toll Rd", at: [-95.375, 30.03], along: [[-95.391, 29.995], [-95.403, 30.052]], anchor: "middle", feature: "hardy" },
-  { text: "FM 1960", at: [-95.33, 30.008], anchor: "middle", feature: "fm1960" },
-  { text: "US-59", at: [-95.328, 29.86], along: [[-95.32, 29.845], [-95.315, 29.88]], anchor: "middle", feature: "us59" },
+  { text: "Beltway 8", at: [-95.46, 29.948], anchor: "middle", feature: "beltway8" },
+  { text: "Hardy Toll Rd", at: [-95.378, 30.045], along: [[-95.391, 29.995], [-95.403, 30.052]], anchor: "middle", feature: "hardy" },
+  { text: "FM 1960", at: [-95.315, 30.012], anchor: "middle", feature: "fm1960" },
+  { text: "US-59", at: [-95.298, 29.897], along: [[-95.315, 29.88], [-95.31, 29.935]], anchor: "middle", feature: "us59" },
   { text: "I-10", at: [-95.62, 29.79], anchor: "middle", feature: "i10" },
   { text: "Lake Houston", at: [-95.14, 29.965], anchor: "middle", feature: "lake-houston" },
   { text: "Spring Creek", at: [-95.62, 30.125], anchor: "middle", feature: "spring-creek" },
@@ -325,7 +325,7 @@ async function main() {
   out.push(`<!-- geometry: ${source} -->`);
   out.push(`<title>Northline service area: north Houston</title>`);
   out.push(`<defs>
-<filter id="nl-field-feather" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="14"/></filter>
+<filter id="nl-field-feather" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="14"/></filter>
 <clipPath id="nl-map-clip"><rect width="${W}" height="${H}"/></clipPath>
 </defs>`);
   out.push(`<style>

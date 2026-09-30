@@ -24,7 +24,8 @@
     "screenshots:brand": "node scripts/brand-screenshots.mjs",
     "check:copy": "node scripts/check-copy.mjs",
     "prebuild": "node scripts/check-copy.mjs",
-    "test:email": "tsx scripts/test-email.ts"
+    "test:email": "tsx scripts/test-email.ts",
+    "build:map": "tsx scripts/build-map.ts"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
