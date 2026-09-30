@@ -13,7 +13,7 @@ import { CheckIcon } from "@/components/ui/Icons";
 export const metadata: Metadata = buildMetadata({
   title: "About Jay",
   brandFirst: true,
-  description: `Meet Jay, owner and driver at ${site.name} in north Houston. Why he started a wheelchair van service, and the people who drive your rides.`,
+  description: `Meet Jay, owner and driver at ${site.name} in north Houston, and the people who drive your rides.`,
   path: "/about",
 });
 
@@ -23,7 +23,7 @@ export default function AboutPage() {
       <PageHeader
         crumbs={[{ name: "About", path: "/about" }]}
         title="About Jay and Northline"
-        answer={`${site.name} is a locally owned wheelchair van service on Houston's north side. Jay started it to give riders the ride he wanted for his own dad: on time, careful, and walked to the right door.`}
+        answer={`${site.name} is a locally owned wheelchair van service on Houston's north side.`}
         cta={false}
       />
       <OwnerNote />
@@ -35,7 +35,7 @@ export default function AboutPage() {
             <div key={h}>
               <h3 className="text-xl font-bold !text-cream">{h}</h3>
               <ul className="mt-3 space-y-2">
-                {list.map((x) => <li key={x} className="flex gap-2 text-mist"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-cream" /> {x}</li>)}
+                {list.map((x) => <li key={x} className="flex gap-2 text-cream/80"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-cream" /> {x}</li>)}
               </ul>
             </div>
           ))}

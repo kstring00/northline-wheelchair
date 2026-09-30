@@ -19,7 +19,7 @@ export const t = {
     orCall: `or call ${site.phone.display}`,
     text: "Text us",
     quote: "Get a quote in 2 minutes",
-    leaveReview: "Leave us a Google review",
+    leaveReview: "Leave a review",
     back: "Back",
     continueTo: (step: string) => `Continue to ${step}`,
     send: "Send ride request",
@@ -58,7 +58,6 @@ export const t = {
   labels: {
     hours: "Hours",
     afterHours: "After hours?",
-    sample: "Example review",
     draft: "Draft, pending approval",
     confirm: "To confirm with Jay",
     seHabla: "Se habla español",

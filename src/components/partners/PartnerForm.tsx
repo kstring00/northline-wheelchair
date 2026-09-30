@@ -55,8 +55,8 @@ export function PartnerForm() {
 
   if (status === "sent") {
     return (
-      <div className="rounded-[var(--radius-card)] border-2 border-success bg-white p-6 sm:p-8">
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-success text-cream" aria-hidden="true"><CheckIcon className="h-7 w-7" /></span>
+      <div className="rounded-[var(--radius-card)] border-2 border-navy bg-white p-6 sm:p-8">
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-navy text-cream" aria-hidden="true"><CheckIcon className="h-7 w-7" /></span>
         <h3 ref={doneRef} tabIndex={-1} className="mt-4 text-2xl font-bold focus:outline-none">Thanks, {d.contact.split(" ")[0]}. Jay will call you.</h3>
         <p className="mt-2 text-lg">{t.response.callback} Need a ride before then? Call dispatch directly.</p>
         <a href={telHref} className={buttonClass("secondary", "lg", "mt-5")}><PhoneIcon /> {t.actions.callNumber}</a>
@@ -66,15 +66,15 @@ export function PartnerForm() {
   const errorList = Object.entries(errors).filter(([, v]) => v) as [keyof P, string][];
 
   return (
-    <form noValidate onSubmit={onSubmit} data-clarity-mask="true" aria-labelledby="partner-form-heading" className="rounded-[var(--radius-card)] border border-hairline bg-white p-5 shadow-[var(--shadow-soft)] sm:p-8">
+    <form noValidate onSubmit={onSubmit} data-clarity-mask="true" aria-labelledby="partner-form-heading" className="rounded-[var(--radius-card)] border border-ink/15 bg-white p-5 shadow-[var(--shadow-soft)] sm:p-8">
       <h3 id="partner-form-heading" className="text-2xl font-bold">Set up a facility account</h3>
-      <p className="mt-1 text-muted">Takes a minute. Jay calls you back to set up billing and your first ride.</p>
+      <p className="mt-1 text-ink/85">Takes a minute. Jay calls you back to set up billing and your first ride.</p>
       {errorList.length > 0 && (
-        <div ref={summaryRef} tabIndex={-1} role="alert" className="mt-5 rounded-xl border-[3px] border-error bg-white p-4">
-          <p className="flex items-center gap-2 font-bold text-error"><AlertIcon /> Please fix {errorList.length === 1 ? "this" : `these ${errorList.length} things`}:</p>
+        <div ref={summaryRef} tabIndex={-1} role="alert" className="mt-5 rounded-xl border-[3px] border-navy bg-white p-4">
+          <p className="flex items-center gap-2 font-bold text-ink"><AlertIcon /> Please fix {errorList.length === 1 ? "this" : `these ${errorList.length} things`}:</p>
           <ul className="mt-1 space-y-1">
             {errorList.map(([k, m]) => (
-              <li key={k}><a href={`#p-${k}`} className="font-bold text-error underline" onClick={(ev) => { ev.preventDefault(); document.getElementById(`p-${k}`)?.focus(); }}>{m}</a></li>
+              <li key={k}><a href={`#p-${k}`} className="font-bold text-ink underline" onClick={(ev) => { ev.preventDefault(); document.getElementById(`p-${k}`)?.focus(); }}>{m}</a></li>
             ))}
           </ul>
         </div>
@@ -111,7 +111,7 @@ export function PartnerForm() {
       <button type="submit" disabled={status === "sending"} className={buttonClass("primary", "lg", "mt-8 w-full sm:w-auto sm:min-w-64")}>
         {status === "sending" ? "Sending…" : "Set up an account"}
       </button>
-      <p className="mt-4 text-sm text-muted">Or skip the form and call dispatch at {site.phone.display}.</p>
+      <p className="mt-4 text-sm text-ink/85">Or skip the form and call dispatch at {site.phone.display}.</p>
     </form>
   );
 }

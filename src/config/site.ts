@@ -55,6 +55,10 @@ export type Hospital = {
   typicalTrips: string[];
   /** Something true and specific about running rides to this campus. */
   localNote: string;
+  /** Real position for the service map (WGS84). */
+  geo: { latitude: number; longitude: number };
+  /** Street-grid node on the hero map demo (hero-map.svg, 720×520): column i indexes XS (0–16, west→east), row j indexes YS (0–14, north→south). */
+  mapNode: { i: number; j: number };
 };
 
 export type TeamMember = {
@@ -95,18 +99,20 @@ export const site = {
   owner: {
     firstName: "Jay",
     fullName: "Jay", // CONFIRM Jay's last name for the About page and schema
-    role: "Owner and driver", // CONFIRM
+    role: "Owner & driver", // CONFIRM
     photo: {
       src: "/images/owner-jay.jpg", // CONFIRM replace with Jay's real photo
       alt: "Jay, owner of Northline Wheelchair Transportation, standing beside a Northline wheelchair van", // CONFIRM
       width: 960,
       height: 1200,
     } satisfies ImageAsset,
-    note: [
-      // CONFIRM Jay's own words. Draft written for the pitch.
-      "I started Northline after a year of driving my own dad to dialysis three times a week. Finding a ride that showed up on time and treated him with respect was harder than it should have been.",
-      "Every rider in my van gets what I wanted for my dad: a driver who calls the day before, shows up early, walks you to the right door, and waits to bring you home.",
-    ],
+    /**
+     * Jay's story, in his own words, from questionnaire Q11. Empty until he
+     * writes it: the site shows a marked placeholder, never draft copy.
+     */
+    note: [] as string[], // CONFIRM Q11
+    /** Headline for the owner note, in Jay's words. Empty = placeholder. */
+    noteHeadline: "", // CONFIRM
   },
 
   phone: { display: "(281) 555-0142", e164: "+12815550142" }, // CONFIRM
@@ -274,6 +280,8 @@ export const site = {
       dropOffNotesDraft: true,
       typicalTrips: ["Discharge rides home to Spring and Klein", "Cardiology and imaging appointments", "ER visits that turn into a ride home"],
       localNote: "This is the closest full hospital to most of our Spring and FM 1960 riders, so our vans are near it most days.", // CONFIRM
+      geo: { latitude: 29.9884, longitude: -95.4259 }, // CONFIRM from the street address
+      mapNode: { i: 3, j: 2 }, // CONFIRM position on the hero map grid
     },
     {
       slug: "memorial-hermann-the-woodlands",
@@ -286,6 +294,8 @@ export const site = {
       dropOffNotesDraft: true,
       typicalTrips: ["Rides home to The Woodlands and Spring after a stay", "Cancer center visits", "Follow-up visits in the medical office buildings"],
       localNote: "Riders often have a visit at the hospital and a second one in the office buildings on the same campus. Book a wait-and-return and we'll move you between them.", // CONFIRM
+      geo: { latitude: 30.1568, longitude: -95.4563 }, // CONFIRM from the street address
+      mapNode: { i: 13, j: 12 }, // CONFIRM position on the hero map grid
     },
     {
       slug: "houston-methodist-willowbrook",
@@ -298,6 +308,8 @@ export const site = {
       dropOffNotesDraft: true,
       typicalTrips: ["Discharge rides home to Cypress and Tomball", "Physical therapy visits", "Specialist visits in the office buildings"],
       localNote: "Traffic on 249 stacks up after 3 PM. For afternoon pickups we leave early and text you when we're close.", // CONFIRM
+      geo: { latitude: 29.9781, longitude: -95.5519 }, // CONFIRM from the street address
+      mapNode: { i: 9, j: 3 }, // CONFIRM position on the hero map grid
     },
     {
       slug: "st-lukes-the-woodlands",
@@ -310,8 +322,13 @@ export const site = {
       dropOffNotesDraft: true,
       typicalTrips: ["Rides home to north Montgomery County after a stay", "Heart and vascular follow-ups", "Rehab and therapy visits"],
       localNote: "It's the farthest north of the hospitals we serve, so we plan extra time on I-45 during the morning rush.", // CONFIRM
+      geo: { latitude: 30.1922, longitude: -95.4533 }, // CONFIRM from the street address
+      mapNode: { i: 15, j: 9 }, // CONFIRM position on the hero map grid
     },
   ] satisfies Hospital[],
+
+  /** Order of the Home services list, by what brings in rides. "For facilities" lives in the strip below it. */
+  homeServiceOrder: ["dialysis-transportation", "medical-appointments", "hospital-discharge", "wheelchair-transportation", "senior-transportation"],
 
   services: [
     {
@@ -320,7 +337,7 @@ export const site = {
       shortName: "Wheelchair van rides",
       place: "Houston",
       answer: "Northline gives door-to-door wheelchair van rides in Houston, Spring, Humble, The Woodlands and Cypress. Your driver helps you from your door, secures your wheelchair in a ramp or lift van, and walks you to the right suite.",
-      cardSummary: "Door-to-door rides in ramp and lift vans. You stay in your own wheelchair the whole way.",
+      cardSummary: "Door-to-door rides in ramp and lift vans, anywhere in the Houston area. You stay in your own wheelchair the whole way, and your driver walks you to the right door.",
       primaryKeyword: "wheelchair transportation Houston",
       faqIds: [1, 4, 6, 7, 8],
     },
@@ -330,7 +347,7 @@ export const site = {
       shortName: "Medical appointments",
       place: "North Houston",
       answer: "Northline drives north Houston riders to doctor visits, therapy, imaging and other medical appointments in a wheelchair van, then waits and brings them home.",
-      cardSummary: "Doctor visits, therapy and imaging. The driver waits and brings you home.",
+      cardSummary: "Doctor visits, therapy, imaging and follow-ups, timed so you arrive early. Your driver can wait and bring you home.",
       primaryKeyword: "medical transportation north Houston",
       faqIds: [1, 5, 6, 3, 15],
     },
@@ -340,7 +357,7 @@ export const site = {
       shortName: "Dialysis rides",
       place: "North Houston",
       answer: "Northline gives standing wheelchair van rides to dialysis in north Houston, three times a week on the same days and times, with the same driver whenever we can.",
-      cardSummary: "Same days, same times, same driver. Early chairs are our specialty.",
+      cardSummary: "Standing rides three times a week, same days and same times, usually the same driver. Early chairs are our specialty.",
       primaryKeyword: "dialysis transportation Houston",
       faqIds: [10, 2, 5, 12, 3],
     },
@@ -350,7 +367,7 @@ export const site = {
       shortName: "Hospital discharge",
       place: "Houston",
       answer: "Northline picks riders up from Houston hospitals and rehab centers when they're discharged and brings them home in a wheelchair van, often the same day you call.",
-      cardSummary: "A safe ride home from the hospital, timed to the discharge, often same day.",
+      cardSummary: "A ride home from the hospital, timed to the discharge and often the same day. We meet you at the entrance the nurse names.",
       primaryKeyword: "hospital discharge transportation Houston",
       faqIds: [11, 2, 4, 7, 3],
     },
@@ -360,7 +377,7 @@ export const site = {
       shortName: "Senior rides",
       place: "North Houston",
       answer: "Northline gives assisted rides to older adults in north Houston who walk with a cane, a walker or a steady arm, with a driver who helps from door to door.",
-      cardSummary: "Assisted rides for older adults who walk with a cane, walker or a steady arm.",
+      cardSummary: "Assisted rides for older adults who walk with a cane, a walker or a steady arm. No wheelchair needed to ride with us.",
       primaryKeyword: "senior transportation Houston",
       faqIds: [16, 4, 6, 7, 3],
     },
@@ -380,10 +397,10 @@ export const site = {
   team: [
     {
       firstName: "Jay",
-      role: "Owner and driver",
+      role: "Owner & driver",
       yearsDriving: 12, // CONFIRM
       quote: "I drive most of the dialysis runs myself. I like knowing my regulars by name.", // CONFIRM
-      certifications: ["CPR / First Aid", "PASS securement"], // CONFIRM
+      certifications: ["CPR", "First Aid", "PASS certified"], // CONFIRM
       photo: null as ImageAsset | null, // CONFIRM real photo
       isPlaceholder: true,
     },
@@ -402,38 +419,12 @@ export const site = {
   googleRating: null as number | null, // CONFIRM e.g. 4.9 once the profile has reviews
   googleReviewCount: null as number | null, // CONFIRM
   googleReviewUrl: null as string | null, // CONFIRM "Leave a review" link from the Google Business Profile
-  reviews: [
-    {
-      author: "Denise R.",
-      rating: 5,
-      text: "Jay got my mother to dialysis on time every single week. He walks her to the chair and waits to bring her home. She actually looks forward to the ride now.",
-      date: "2026-06-14",
-      driverName: "Jay",
-      source: "google",
-      sourceUrl: null,
-      isPlaceholder: true, // CONFIRM replace with a real review
-    },
-    {
-      author: "Marcus T.",
-      rating: 5,
-      text: "We book Northline for discharges almost every day. They answer the phone, the van is clean, and they show up. That matters.",
-      date: "2026-05-02",
-      driverName: null,
-      source: "google",
-      sourceUrl: null,
-      isPlaceholder: true, // CONFIRM
-    },
-    {
-      author: "Linda G.",
-      rating: 5,
-      text: "The driver was patient with my husband's power chair and treated him like his own grandfather. The text when he was on the way meant I wasn't watching the window.",
-      date: "2026-04-21",
-      driverName: null,
-      source: "google",
-      sourceUrl: null,
-      isPlaceholder: true, // CONFIRM
-    },
-  ] satisfies Review[],
+  /**
+   * Real reviews only. No review, quote or star renders anywhere until this
+   * holds an entry with isPlaceholder: false. Filled from the Google Business
+   * Profile as reviews come in (CONFIRM).
+   */
+  reviews: [] as Review[],
 
   social: {
     googleBusinessProfile: "", // CONFIRM
@@ -448,6 +439,8 @@ export const site = {
   },
 
   images: {
+    /** false: the hero shows the brand map pattern. Set true once hero.src is a real photo. */
+    heroPhotoReady: false, // CONFIRM
     hero: {
       src: "/images/hero-placeholder.jpg", // CONFIRM real photo of Jay helping a rider into the van
       alt: "A Northline driver guiding a smiling older woman in a wheelchair up the ramp of a navy wheelchair van", // CONFIRM
@@ -456,7 +449,6 @@ export const site = {
     } satisfies ImageAsset,
     vanRamp: { src: "/images/van-ramp-placeholder.jpg", alt: "A Northline wheelchair van with its side ramp lowered to the curb", width: 1600, height: 1067 } satisfies ImageAsset, // CONFIRM
     driverHelping: { src: "/images/driver-helping-placeholder.jpg", alt: "A driver securing a wheelchair with floor straps inside the van", width: 1600, height: 1067 } satisfies ImageAsset, // CONFIRM
-    houston: { src: "/images/houston-placeholder.jpg", alt: "The downtown Houston skyline at sunrise seen from the north", width: 1600, height: 900 } satisfies ImageAsset, // CONFIRM
   },
 };
 

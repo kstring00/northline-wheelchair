@@ -65,8 +65,8 @@ export function QuoteForm() {
 
   if (status === "sent") {
     return (
-      <div className="rounded-[var(--radius-card)] border-2 border-success bg-white p-6 sm:p-8">
-        <span className="grid h-12 w-12 place-items-center rounded-full bg-success text-cream" aria-hidden="true"><CheckIcon className="h-7 w-7" /></span>
+      <div className="rounded-[var(--radius-card)] border-2 border-navy bg-white p-6 sm:p-8">
+        <span className="grid h-12 w-12 place-items-center rounded-full bg-navy text-cream" aria-hidden="true"><CheckIcon className="h-7 w-7" /></span>
         <h3 ref={doneRef} tabIndex={-1} className="mt-4 text-2xl font-bold focus:outline-none">Got it. We&apos;ll call you with the price.</h3>
         <p className="mt-2 text-lg">{t.response.callback} The number we give you is the number you pay.</p>
         <a href={telHref} className={buttonClass("secondary", "lg", "mt-5")}><PhoneIcon /> {t.actions.callNumber}</a>
@@ -77,16 +77,16 @@ export function QuoteForm() {
   const errorList = Object.entries(errors).filter(([, v]) => v) as [keyof Q, string][];
 
   return (
-    <form noValidate onSubmit={onSubmit} data-clarity-mask="true" aria-labelledby="quote-heading" className="rounded-[var(--radius-card)] border border-hairline bg-white p-5 shadow-[var(--shadow-soft)] sm:p-8">
+    <form noValidate onSubmit={onSubmit} data-clarity-mask="true" aria-labelledby="quote-heading" className="rounded-[var(--radius-card)] border border-ink/15 bg-white p-5 shadow-[var(--shadow-soft)] sm:p-8">
       <h3 id="quote-heading" className="text-2xl font-bold">{t.actions.quote}</h3>
-      <p className="mt-1 text-muted">Six quick answers. We call back with the exact price.</p>
+      <p className="mt-1 text-ink/85">Six quick answers. We call back with the exact price.</p>
 
       {errorList.length > 0 && (
-        <div ref={summaryRef} tabIndex={-1} role="alert" className="mt-5 rounded-xl border-[3px] border-error bg-white p-4">
-          <p className="flex items-center gap-2 font-bold text-error"><AlertIcon /> Please fix {errorList.length === 1 ? "this" : `these ${errorList.length} things`}:</p>
+        <div ref={summaryRef} tabIndex={-1} role="alert" className="mt-5 rounded-xl border-[3px] border-navy bg-white p-4">
+          <p className="flex items-center gap-2 font-bold text-ink"><AlertIcon /> Please fix {errorList.length === 1 ? "this" : `these ${errorList.length} things`}:</p>
           <ul className="mt-1 space-y-1">
             {errorList.map(([k, m]) => (
-              <li key={k}><a href={`#q-${k}`} className="font-bold text-error underline" onClick={(ev) => { ev.preventDefault(); document.getElementById(`q-${k}`)?.focus(); }}>{m}</a></li>
+              <li key={k}><a href={`#q-${k}`} className="font-bold text-ink underline" onClick={(ev) => { ev.preventDefault(); document.getElementById(`q-${k}`)?.focus(); }}>{m}</a></li>
             ))}
           </ul>
         </div>

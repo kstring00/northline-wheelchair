@@ -37,14 +37,14 @@ export default function SafetyPage() {
       <section aria-label="Standards" className="bg-white py-16 sm:py-20">
         <div className="container-page grid gap-12 md:grid-cols-2">
           {blocks.map((b) => (
-            <div key={b.title} className="border-t-4 border-navy-900 pt-6">
+            <div key={b.title} className="border-t-4 border-navy pt-6">
               <h2 className="text-2xl font-bold">{b.title}</h2>
               <ul className="mt-5 space-y-3">
                 {b.items.map((it) => (
-                  <li key={it} className="flex gap-3 text-lg"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-success" /> {it}</li>
+                  <li key={it} className="flex gap-3 text-lg"><CheckIcon className="mt-1 h-5 w-5 shrink-0 text-navy" /> {it}</li>
                 ))}
               </ul>
-              {b.note && <p className="mt-4 text-muted">{b.note}</p>}
+              {b.note && <p className="mt-4 text-ink/85">{b.note}</p>}
             </div>
           ))}
         </div>
@@ -60,9 +60,9 @@ export default function SafetyPage() {
             ["Lap and shoulder belt", "For you, not the chair. Same as a car seat belt, anchored to the van."],
           ].map(([h, b], i) => (
             <li key={h} className="rounded-[var(--radius-card)] bg-white p-6">
-              <span aria-hidden="true" className="font-display text-3xl font-bold text-navy-700">0{i + 1}</span>
+              <span aria-hidden="true" className="font-display text-3xl font-bold text-navy">0{i + 1}</span>
               <h3 className="mt-2 text-xl font-bold">{h}</h3>
-              <p className="mt-1 text-muted">{b}</p>
+              <p className="mt-1 text-ink/85">{b}</p>
             </li>
           ))}
         </ol>
@@ -74,7 +74,7 @@ export default function SafetyPage() {
       <section className="bg-cream py-12">
         <div className="container-page">
           <p className="text-lg">
-            Questions we get about safety are answered on the <Link href="/faq" className="font-bold text-navy-700 underline">FAQ page</Link>, including what drivers don&apos;t do.
+            Questions we get about safety are answered on the <Link href="/faq" className="font-bold text-navy underline">FAQ page</Link>, including what drivers don&apos;t do.
           </p>
         </div>
       </section>

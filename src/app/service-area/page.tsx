@@ -26,27 +26,27 @@ export default function ServiceAreaPage() {
       <Section id="cities" tone="white" eyebrow="Main areas" title="Cities we serve every day">
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {coreAreas.map((a) => (
-            <li key={a.slug} className="lift-card rounded-[var(--radius-card)] border border-hairline bg-cream">
+            <li key={a.slug} className="lift-card rounded-[var(--radius-card)] border border-ink/15 bg-cream">
               <Link href={`/service-area/${a.slug}`} className="flex min-h-24 items-start gap-4 rounded-[var(--radius-card)] p-5 no-underline">
-                <PinIcon className="mt-1 h-6 w-6 shrink-0 text-navy-700" />
+                <PinIcon className="mt-1 h-6 w-6 shrink-0 text-navy" />
                 <span>
-                  <span className="block text-xl font-bold text-navy-900">{a.name} wheelchair transportation</span>
-                  <span className="mt-1 block text-muted">{a.summary}</span>
+                  <span className="block text-xl font-bold text-navy">{a.name} wheelchair transportation</span>
+                  <span className="mt-1 block text-ink/85">{a.summary}</span>
                 </span>
               </Link>
             </li>
           ))}
         </ul>
         <h3 className="mt-12 text-xl font-bold">Also serving</h3>
-        <p className="mt-2 text-lg text-muted">{site.moreAreas.join(", ")}. Not on the list? Call {site.phone.display} and ask.</p>
+        <p className="mt-2 text-lg text-ink/85">{site.moreAreas.join(", ")}. Not on the list? Call {site.phone.display} and ask.</p>
       </Section>
       <Section id="hospitals" eyebrow="Hospital pages" title="Hospitals we drive to most, with drop-off notes">
         <ul className="mt-8 grid gap-4 sm:grid-cols-2">
           {hospitals.map((h) => (
-            <li key={h.slug} className="lift-card rounded-[var(--radius-card)] border border-hairline bg-white">
+            <li key={h.slug} className="lift-card rounded-[var(--radius-card)] border border-ink/15 bg-white">
               <Link href={`/service-area/hospitals/${h.slug}`} className="flex min-h-24 flex-col justify-center rounded-[var(--radius-card)] p-5 no-underline">
-                <span className="text-xl font-bold text-navy-900">{h.name}</span>
-                <span className="mt-1 text-muted">{h.city} · {h.typicalTrips[0]}</span>
+                <span className="text-xl font-bold text-navy">{h.name}</span>
+                <span className="mt-1 text-ink/85">{h.city} · {h.typicalTrips[0]}</span>
               </Link>
             </li>
           ))}

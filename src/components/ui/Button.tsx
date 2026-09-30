@@ -8,11 +8,12 @@ const base =
   "relative inline-flex items-center justify-center gap-2 rounded-full font-bold no-underline text-center transition-[transform,background-color] duration-200 ease-[var(--ease-gentle)] active:translate-y-px select-none";
 
 const variants: Record<Variant, string> = {
-  // Amber is used ONLY for the primary call to action.
-  primary: "bg-amber text-navy-950 hover:bg-amber-hover shadow-[0_2px_0_rgb(11_27_51/0.25)]",
-  secondary: "bg-white text-navy-900 border-2 border-navy-900 hover:bg-navy-100",
-  ghost: "text-navy-900 underline decoration-2 hover:bg-navy-100",
-  onDark: "bg-transparent text-cream border-2 border-cream hover:bg-navy-700",
+  // Amber appears in three places only: the pin, this button, a route line.
+  // Text is Ink (7.1:1 on amber). Hover never introduces another colour.
+  primary: "bg-amber text-ink shadow-[0_2px_0_rgb(30_37_51/0.25)] hover:-translate-y-0.5 hover:underline decoration-2 underline-offset-4",
+  secondary: "bg-white text-navy border-2 border-navy hover:bg-morning",
+  ghost: "text-navy underline decoration-2 hover:bg-morning",
+  onDark: "bg-transparent text-cream border-2 border-cream hover:bg-cream/10",
 };
 
 const sizes: Record<Size, string> = {

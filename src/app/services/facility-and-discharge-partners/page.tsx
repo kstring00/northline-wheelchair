@@ -43,7 +43,7 @@ const copy: ServiceCopy = {
     <Section id="account" tone="white" eyebrow="Get started" title="One line for your whole team">
       <div className="mt-8 grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
         <p className="max-w-2xl text-lg">
-          Set up an account and every discharge planner, social worker and charge nurse on your floor can book with one call. Invoicing, standing rides and reporting are on the <Link href="/partners" className="font-bold text-navy-700 underline">facilities page</Link>.
+          Set up an account and every discharge planner, social worker and charge nurse on your floor can book with one call. Invoicing, standing rides and reporting are on the <Link href="/partners" className="font-bold text-navy underline">facilities page</Link>.
         </p>
         <ButtonLink href="/partners#account" size="lg">Set up a facility account</ButtonLink>
       </div>

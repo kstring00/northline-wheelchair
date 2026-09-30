@@ -22,10 +22,11 @@ const atkinson = Atkinson_Hyperlegible({
   variable: "--font-atkinson",
 });
 
-// Headings only: one static bold weight keeps the font payload small (LCP).
+// Headings and the wordmark: 700 for headings, 800 for the wordmark and poster
+// headlines, 500 for the plain fact under a poster headline.
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["700"],
+  weight: ["500", "700", "800"],
   display: "swap",
   adjustFontFallback: false,
   fallback: ["Bricolage Fallback Arial", "Bricolage Fallback Roboto", "system-ui", "sans-serif"],
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#10284A",
+  themeColor: "#16284A",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -69,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh pb-[calc(5rem+env(safe-area-inset-bottom))] antialiased lg:pb-0">
         <a
           href="#main"
-          className="fixed left-3 top-3 z-[100] -translate-y-24 rounded-full bg-navy-900 px-5 py-3 font-bold text-cream on-dark focus:translate-y-0"
+          className="fixed left-3 top-3 z-[100] -translate-y-24 rounded-full bg-navy px-5 py-3 font-bold text-cream on-dark focus:translate-y-0"
         >
           Skip to main content
         </a>

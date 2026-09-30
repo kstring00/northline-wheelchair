@@ -26,7 +26,7 @@ export function PageHeader({ crumbs, title, answer, children, aside, cta = true 
           {cta && (
             <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
               <ButtonLink href={bookHref} size="lg" className="sm:min-w-56">Book a Ride</ButtonLink>
-              <a href={telHref} className="inline-flex min-h-14 items-center justify-center rounded-full px-4 text-lg font-bold text-navy-900 underline decoration-2 underline-offset-4 hover:bg-navy-100">
+              <a href={telHref} className="inline-flex min-h-14 items-center justify-center rounded-full px-4 text-lg font-bold text-navy underline decoration-2 underline-offset-4 hover:bg-morning">
                 or call {site.phone.display}
               </a>
             </div>

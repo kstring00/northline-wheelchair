@@ -1,18 +1,42 @@
-// Verifies every text/background pair in the palette against WCAG targets.
-const hex = (h) => h.replace("#", "").match(/../g).map((x) => parseInt(x, 16) / 255);
-const lum = (h) => { const [r, g, b] = hex(h).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+// Verifies every text/background pair against WCAG targets. Colours are read
+// from the six brand tokens in globals.css (no hand-kept copy). Opacity steps
+// (ink/85 muted text, cream/80 on navy…) are blended onto their ground first.
+import { readFileSync } from "node:fs";
+
+const css = readFileSync(new URL("../src/app/globals.css", import.meta.url), "utf8");
+const T = Object.fromEntries([...css.matchAll(/--color-([a-z]+):\s*(#[0-9a-f]{6})/gi)].map(([, k, v]) => [k, v]));
+const need = ["navy", "amber", "cream", "ink", "morning", "sand", "white"];
+const missing = need.filter((k) => !T[k]);
+if (missing.length) { console.log(`FAIL  missing tokens: ${missing.join(", ")}`); process.exit(1); }
+
+const rgb = (h) => h.replace("#", "").match(/../g).map((x) => parseInt(x, 16));
+const mix = (fg, bg, a) => "#" + rgb(fg).map((c, i) => Math.round(a * c + (1 - a) * rgb(bg)[i]).toString(16).padStart(2, "0")).join("");
+const lum = (h) => { const [r, g, b] = rgb(h).map((c) => c / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m); return (x + 0.05) / (y + 0.05); };
-const P = { navy950: "#0B1B33", navy900: "#10284A", navy700: "#1F4570", navy100: "#E4EBF5", cream: "#FBF7F0", sand: "#F3ECE0", white: "#FFFFFF", ink: "#14202F", muted: "#3E4A5A", amber: "#F4A340", amberHover: "#F7B865", amberInk: "#8A4B00", error: "#A3161A", success: "#1B6B3A", mist: "#C9D6E8", line: "#6B7A8F" };
+/** "ink" or "ink/85" → a hex, blended onto `bg` when it has an opacity. */
+const col = (spec, bg) => { const [k, a] = spec.split("/"); return a ? mix(T[k], T[bg], Number(a) / 100) : T[k]; };
+
 const pairs = [
-  ["Body text on cream", "ink", "cream", 7], ["Body text on white", "ink", "white", 7], ["Body text on sand", "ink", "sand", 7],
-  ["Muted text on cream", "muted", "cream", 7], ["Muted text on sand", "muted", "sand", 7], ["Muted on white", "muted", "white", 7],
-  ["Heading navy on cream", "navy900", "cream", 7], ["Link navy700 on cream", "navy700", "cream", 7], ["navy700 on white", "navy700", "white", 7],
-  ["Cream text on navy900", "cream", "navy900", 7], ["Mist text on navy900", "mist", "navy900", 7], ["Cream on navy950", "cream", "navy950", 7],
-  ["CTA: navy950 on amber", "navy950", "amber", 7], ["CTA hover: navy950 on amberHover", "navy950", "amberHover", 7],
-  ["Amber ink (small accent text) on cream", "amberInk", "cream", 4.5], ["Error text on cream", "error", "cream", 7], ["Error on white", "error", "white", 7], ["Success on cream", "success", "cream", 4.5],
-  ["Focus ring navy900 vs cream (non-text 3:1)", "navy900", "cream", 3], ["Focus ring amber vs navy900 (non-text 3:1)", "amber", "navy900", 3],
-  ["Input border line vs white (non-text 3:1)", "line", "white", 3], ["Navy text on navy100", "navy900", "navy100", 7],
+  // Brand Guidelines 2.1 / brand insert §2 (the required pairs).
+  ["Ink on Cream (body text)", "ink", "cream", 7],
+  ["Navy on Cream (headings, links)", "navy", "cream", 7],
+  ["Ink on Amber (primary button text)", "ink", "amber", 4.5],
+  // Every other text/ground pair in use.
+  ["Ink on White", "ink", "white", 7], ["Ink on Sand", "ink", "sand", 7], ["Ink on Morning", "ink", "morning", 7],
+  ["Navy on White", "navy", "white", 7], ["Navy on Sand", "navy", "sand", 7], ["Navy on Morning", "navy", "morning", 7],
+  ["Muted ink/85 on Cream", "ink/85", "cream", 7], ["Muted ink/85 on White", "ink/85", "white", 7],
+  ["Muted ink/85 on Sand", "ink/85", "sand", 7], ["Muted ink/85 on Morning", "ink/85", "morning", 7],
+  ["White on Navy", "white", "navy", 7], ["Cream on Navy", "cream", "navy", 7], ["Muted cream/80 on Navy", "cream/80", "navy", 7],
+  ["Placeholder ink/70 on White", "ink/70", "white", 4.5],
+  // Non-text (3:1).
+  ["Focus ring Navy vs Cream", "navy", "cream", 3], ["Focus ring Cream vs Navy (dark sections)", "cream", "navy", 3],
+  ["Input border ink/60 vs White", "ink/60", "white", 3], ["Amber pin vs Navy", "amber", "navy", 3],
 ];
 let fail = 0;
-for (const [label, fg, bg, min] of pairs) { const r = ratio(P[fg], P[bg]); const ok = r >= min; if (!ok) fail++; console.log(`${ok ? "PASS" : "FAIL"}  ${r.toFixed(2).padStart(5)}:1  (need ${min})  ${label}`); }
+for (const [label, fg, bg, min] of pairs) {
+  const r = ratio(col(fg, bg), T[bg]);
+  const ok = r >= min;
+  if (!ok) fail++;
+  console.log(`${ok ? "PASS" : "FAIL"}  ${r.toFixed(2).padStart(5)}:1  (need ${min})  ${label}`);
+}
 process.exit(fail ? 1 : 0);

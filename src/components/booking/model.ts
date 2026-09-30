@@ -1,7 +1,6 @@
 import { site } from "@/config/site";
 
 export type Who = "self" | "loved-one" | "facility";
-export type Step = 1 | 2 | 3;
 
 export type BookingData = {
   who: Who | "";
@@ -24,7 +23,7 @@ export type BookingData = {
   phone: string;
   email: string;
   notes: string;
-  /** Honeypot: humans never see or fill this. Checked server-side in Phase 2. */
+  /** Honeypot: humans never see or fill this. Checked server-side in /api/book. */
   website: string;
 };
 
@@ -68,38 +67,26 @@ export const mobilityOptions: { value: Exclude<BookingData["mobility"], "">; lab
 export const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
 export const dayNames: Record<string, string> = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday", Sat: "Saturday", Sun: "Sunday" };
 
-/** Copy that changes with who the ride is for. */
+/**
+ * Copy that changes with who the ride is for. The required fields use the
+ * neutral labels; these tailor the optional "anything else" section.
+ */
 export function copyFor(who: Who | "") {
   switch (who) {
     case "loved-one":
       return {
-        tripHeading: "Your loved one's trip",
-        pickupLabel: "Where should we pick them up?",
         mobilityLegend: "How does your loved one get around?",
         riderLabel: "Rider's full name",
-        contactLabel: "Your name",
-        phoneLabel: "Your phone number",
-        phoneHint: "We'll call this number to confirm the ride.",
       };
     case "facility":
       return {
-        tripHeading: "The patient's trip",
-        pickupLabel: "Pickup address (home, hospital or facility)",
         mobilityLegend: "How does the patient get around?",
         riderLabel: "Patient or client name",
-        contactLabel: "Your name",
-        phoneLabel: "Your direct phone number",
-        phoneHint: "We'll call you to confirm. Add an extension in the notes if needed.",
       };
     default:
       return {
-        tripHeading: "Your trip",
-        pickupLabel: "Where should we pick you up?",
-        mobilityLegend: "How do you get around?",
-        riderLabel: "Your full name",
-        contactLabel: "Your full name",
-        phoneLabel: "Your phone number",
-        phoneHint: "We'll call this number to confirm the ride.",
+        mobilityLegend: "How does the rider get around?",
+        riderLabel: "Rider's full name",
       };
   }
 }
@@ -116,32 +103,75 @@ export function todayISO(now = new Date()) {
   return new Date(now.getTime() - tz).toISOString().slice(0, 10);
 }
 
-/** Plain-language validation for one step. Order matches the on-screen order. */
-export function validateStep(step: Step, d: BookingData): Errors {
+/** The five things we need before Jay can call. Order matches the on-screen order. */
+export const requiredFields = ["contactName", "phone", "pickupAddress", "destination", "date", "time"] as const;
+
+/**
+ * Plain-language validation for the required fields. Used on the client and
+ * again in /api/book. Order matches the on-screen order.
+ */
+export function validateRequired(d: BookingData, today = todayISO()): Errors {
   const e: Errors = {};
-  if (step === 1) {
-    if (!d.who) e.who = "Please choose who this ride is for.";
-  }
-  if (step === 2) {
-    if (d.pickupAddress.trim().length < 5) e.pickupAddress = "Please enter the pickup address, with the street and city.";
-    if (d.destination.trim().length < 3) e.destination = "Please enter where you're going. A place name and address work best.";
-    if (!d.date) e.date = "Please choose the date of the ride.";
-    else if (d.date < todayISO()) e.date = "That date has already passed. Please choose today or a later date.";
-    if (!d.time) e.time = "Please enter the appointment or pickup time.";
-    if (!d.tripType) e.tripType = "Please choose one-way, round trip, or wait and return.";
-    if (d.repeat === "repeat" && d.repeatDays.length === 0) e.repeatDays = "Please choose the days this ride repeats.";
-  }
-  if (step === 3) {
-    if (!d.mobility) e.mobility = "Please choose how the rider gets around.";
-    if (d.who !== "self" && d.riderName.trim().length < 2) e.riderName = "Please enter the rider's name.";
-    if (d.contactName.trim().length < 2) e.contactName = d.who === "self" ? "Please enter your name." : "Please enter your name so we know who to ask for.";
-    if (d.who === "facility" && d.orgName.trim().length < 2) e.orgName = "Please enter your facility or organization name.";
-    if (phoneDigits(d.phone).length !== 10) e.phone = `Please enter a 10-digit phone number, like ${site.phone.display}.`;
-    if (d.who === "facility" && !d.email.trim()) e.email = "Please enter your work email so we can send the confirmation.";
-    else if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim()))
-      e.email = "Please check the email address. It should look like name@example.com.";
-  }
+  if (d.contactName.trim().length < 2) e.contactName = "Please enter your name.";
+  if (phoneDigits(d.phone).length !== 10) e.phone = `Please enter a 10-digit phone number, like ${site.phone.display}.`;
+  if (d.pickupAddress.trim().length < 5) e.pickupAddress = "Please enter the pickup address, with the street and city.";
+  if (d.destination.trim().length < 3) e.destination = "Please enter where you're going. A place name and address work best.";
+  if (!d.date) e.date = "Please choose the date of the ride.";
+  else if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date)) e.date = "Please choose the date of the ride.";
+  else if (d.date < today) e.date = "That date has already passed. Please choose today or a later date.";
+  if (!d.time) e.time = "Please enter the appointment time.";
   return e;
+}
+
+/** Optional fields only get checked when they were filled in. */
+export function validateOptional(d: BookingData): Errors {
+  const e: Errors = {};
+  if (d.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(d.email.trim()))
+    e.email = "Please check the email address. It should look like name@example.com.";
+  if (d.repeat === "repeat" && d.repeatDays.length === 0) e.repeatDays = "Please choose the days this ride repeats.";
+  return e;
+}
+
+/** Everything the form checks before sending, in on-screen order. */
+export function validateBooking(d: BookingData): Errors {
+  return { ...validateRequired(d), ...validateOptional(d) };
+}
+
+/**
+ * Coerce an untrusted JSON body into a BookingData with every key present
+ * (strings trimmed to a sane length, unknown enum values dropped). The route
+ * validates the result with validateRequired.
+ */
+export function coerceBooking(input: unknown): BookingData {
+  const src = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
+  const str = (k: keyof BookingData, max = 500) => (typeof src[k] === "string" ? (src[k] as string).slice(0, max) : "");
+  const oneOf = <T extends string>(k: keyof BookingData, allowed: readonly T[]): T | "" => {
+    const v = src[k];
+    return typeof v === "string" && (allowed as readonly string[]).includes(v) ? (v as T) : "";
+  };
+  return {
+    who: oneOf("who", ["self", "loved-one", "facility"] as const),
+    pickupAddress: str("pickupAddress"),
+    pickupUnit: str("pickupUnit", 200),
+    destination: str("destination"),
+    date: str("date", 10),
+    time: str("time", 5),
+    tripType: oneOf("tripType", ["one-way", "round-trip", "wait-and-return"] as const),
+    returnTime: str("returnTime", 5),
+    repeat: oneOf("repeat", ["once", "repeat"] as const) || "once",
+    repeatDays: Array.isArray(src.repeatDays) ? days.filter((x) => (src.repeatDays as unknown[]).includes(x)) : [],
+    repeatUntil: str("repeatUntil", 10),
+    mobility: oneOf("mobility", ["own-wheelchair", "needs-wheelchair", "walker", "walk-with-help"] as const),
+    chairType: oneOf("chairType", ["manual", "power", "not-sure"] as const),
+    companions: str("companions", 2) || "0",
+    riderName: str("riderName", 200),
+    contactName: str("contactName", 200),
+    orgName: str("orgName", 200),
+    phone: str("phone", 40),
+    email: str("email", 200),
+    notes: str("notes", 4000),
+    website: str("website", 200),
+  };
 }
 
 export function formatTime(t: string) {

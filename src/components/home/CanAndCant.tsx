@@ -10,12 +10,12 @@ type Row = { can: boolean | null; yes: string; no: string; unknown: string };
  */
 function List({ title, items, tone }: { title: string; items: string[]; tone: "can" | "cant" | "ask" }) {
   return (
-    <div className={`rounded-[var(--radius-card)] p-6 ${tone === "can" ? "bg-white" : tone === "cant" ? "bg-navy-900 text-cream on-dark" : "border border-hairline bg-cream"}`}>
+    <div className={`rounded-[var(--radius-card)] p-6 ${tone === "can" ? "bg-white" : tone === "cant" ? "bg-navy text-cream on-dark" : "border border-ink/15 bg-cream"}`}>
       <h3 className={`text-xl font-bold ${tone === "cant" ? "!text-cream" : ""}`}>{title}</h3>
       <ul className="mt-4 space-y-3">
         {items.map((x) => (
-          <li key={x} className={`flex gap-3 ${tone === "cant" ? "text-mist" : ""}`}>
-            <span aria-hidden="true" className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full ${tone === "can" ? "bg-success text-cream" : tone === "cant" ? "bg-cream text-navy-900" : "bg-navy-100 text-navy-900"}`}>
+          <li key={x} className={`flex gap-3 ${tone === "cant" ? "text-cream/80" : ""}`}>
+            <span aria-hidden="true" className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full ${tone === "can" ? "bg-navy text-cream" : tone === "cant" ? "bg-cream text-navy" : "bg-morning text-navy"}`}>
               {tone === "cant" ? <CloseIcon className="h-4 w-4" /> : tone === "can" ? <CheckIcon className="h-4 w-4" /> : <span className="text-sm font-bold">?</span>}
             </span>
             <span>{x}</span>
@@ -48,9 +48,9 @@ export function CanAndCant({ heading = "What we can and can't do" }: { heading?:
   return (
     <section aria-labelledby="canandcant-heading" className="bg-sand py-16 sm:py-20 lg:py-24">
       <div className="container-page">
-        <p className="mb-3 text-sm font-bold uppercase tracking-[0.12em] text-navy-700">Plain answers</p>
+        <p className="mb-3 label text-navy">Plain answers</p>
         <h2 id="canandcant-heading" className="max-w-3xl text-[2rem] font-bold sm:text-[2.5rem]">{heading}</h2>
-        <p className="mt-4 max-w-3xl text-lg text-muted">We&apos;d rather tell you now than surprise you at the door. If your situation isn&apos;t here, call and ask.</p>
+        <p className="mt-4 max-w-3xl text-lg text-ink/85">We&apos;d rather tell you now than surprise you at the door. If your situation isn&apos;t here, call and ask.</p>
         <div className={`mt-10 grid gap-5 ${ask.length ? "lg:grid-cols-3" : "md:grid-cols-2"}`}>
           <List title={t.labels.weCan} items={can.map((r) => r.yes)} tone="can" />
           <List title={t.labels.weCant} items={cant.map((r) => r.no)} tone="cant" />

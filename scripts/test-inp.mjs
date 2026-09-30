@@ -23,10 +23,10 @@ await run("/", [
   (p) => p.locator("#faq button[aria-expanded]").nth(1).tap(),
 ]);
 await run("/book", [
-  (p) => p.locator('label[for="who-loved-one"]').tap(),
-  (p) => p.getByRole("button", { name: /Continue/ }).tap(),
-  (p) => p.getByLabel("Where should we pick them up?").tap(),
+  (p) => p.getByLabel("Pickup address").tap(),
   (p) => p.keyboard.type("12 Main"),
-  (p) => p.getByRole("button", { name: /Continue/ }).tap(),
+  (p) => p.getByRole("button", { name: /Anything else we should know/ }).tap(),
+  (p) => p.locator('label[for="who-loved-one"]').tap(),
+  (p) => p.getByRole("button", { name: "Send ride request" }).tap(),
 ]);
 await b.close();
